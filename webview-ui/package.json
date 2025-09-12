@@ -6,6 +6,7 @@
     "start": "EXTEND_ESLINT=true react-scripts start",
     "build": "NODE_OPTIONS=--openssl-legacy-provider EXTEND_ESLINT=true react-scripts build",
     "build:writeoff": "NODE_OPTIONS=--openssl-legacy-provider EXTEND_ESLINT=true react-scripts build",
+    "build:dev": "NODE_OPTIONS=--openssl-legacy-provider EXTEND_ESLINT=true GENERATE_SOURCEMAP=true react-scripts build",
     "test": "EXTEND_ESLINT=true react-scripts test",
     "eject": "react-scripts eject"
   },

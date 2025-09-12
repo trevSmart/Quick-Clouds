@@ -37,7 +37,7 @@ export default [
 
     // Configuration for webview-ui React files
     {
-        files: ['webview-ui/src/**/*.{js,jsx}', 'media/**/*.js'],
+        files: ['webview-ui/**/*.{js,jsx}', 'media/**/*.js'],
         languageOptions: {
             ecmaVersion: 2020,
             sourceType: 'module',

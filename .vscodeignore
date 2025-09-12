@@ -33,3 +33,7 @@ dist/qc2-*.vsix
 
 # Webview UI node_modules (not needed for extension)
 webview-ui/node_modules/**
+
+# Environment files
+**/.env
+**/.env.*
