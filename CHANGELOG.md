@@ -70,7 +70,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.3.61] - 2024-01-07
 
 ### Added
-- Initial QC2 fork from QualityClouds Live Check Quality for Salesforce
+- Initial QC2 fork from QualityClouds QC2 extension
 - Custom modifications for internal use
 - Enhanced debugging capabilities
 
@@ -78,7 +78,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Original Extension History
 
-This changelog covers QC2 modifications. For the original QualityClouds Live Check Quality for Salesforce extension history, refer to the original extension documentation.
+This changelog covers QC2 modifications. For the original QualityClouds QC2 extension history, refer to the original extension documentation.
 
 ### Key Original Features
 - Real-time code quality analysis for Salesforce

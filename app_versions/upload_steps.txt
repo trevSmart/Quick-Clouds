@@ -1,7 +1,7 @@
 Upload .vsix to OpenVSX
     In terminal:
         1. npx -> will open new prompt terminal
-        2. ovsx publish livecheckqualityforsalesforce-XXX.vsix -p ${token_in_vault}
+        2. ovsx publish qc2-XXX.vsix -p ${token_in_vault}
     If token fails (could be) create a new one.
 
 Upload .vsix to VS Marketplace

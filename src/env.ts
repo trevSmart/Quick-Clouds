@@ -9,7 +9,7 @@ var Env;
 })(Env = exports.Env || (exports.Env = {}));
 var CallbackUri;
 (function (CallbackUri) {
-    CallbackUri["DEFAULT"] = "vscode://QualityClouds.livecheckqualityforsalesforce";
+    CallbackUri["DEFAULT"] = "vscode://QualityClouds.qc2";
 })(CallbackUri = exports.CallbackUri || (exports.CallbackUri = {}));
 var AuthBaseUrl;
 (function (AuthBaseUrl) {

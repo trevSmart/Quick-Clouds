@@ -2,11 +2,11 @@
 
 ## Project Overview
 
-QC2 is a customized version of the QualityClouds Live Check Quality for Salesforce extension. It's a VSCode extension that provides automated code quality analysis for Salesforce development, including Apex, Lightning Web Components, and other Salesforce metadata.
+QC2 is a customized version of the QualityClouds QC2 extension. It's a VSCode extension that provides automated code quality analysis for Salesforce development, including Apex, Lightning Web Components, and other Salesforce metadata.
 
 ## Project History & Context
 
-- **Original Extension**: QualityClouds Live Check Quality for Salesforce (v2.3.1)
+- **Original Extension**: QualityClouds QC2 (v2.3.1)
 - **Customized Version**: QC2 (forked, renamed and modified)
 - **Main Issue**: The original extension had a critical bug where the "Quality Center" panel would get stuck in an infinite loading state
 - **Solution Approach**: Implemented comprehensive logging and debugging capabilities to identify and fix the loading issue
@@ -226,7 +226,7 @@ QC2/
 
 ### Package.json Changes
 - **Name**: `qc2` (was `livecheckqualityforsalesforce`)
-- **Display Name**: `QC2` (was `Live Check Quality for Salesforce`)
+- **Display Name**: `QC2` (was `QC2`)
 - **Commands**: All prefixed with `qc2.` instead of `qualityclouds.`
 - **Configuration**: `QC2Configuration.API-key` (was `UserConfiguration.API-key`)
 
@@ -392,7 +392,7 @@ npm run package
 
 ## Contact & Support
 
-- **Original Extension**: QualityClouds Live Check Quality for Salesforce
+- **Original Extension**: QualityClouds QC2
 - **Customized Version**: QC2 (internal modification)
 - **Issue Tracking**: Use QC2 output channel for debugging
 - **Development**: Follow logging-based debugging approach
