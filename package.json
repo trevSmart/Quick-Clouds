@@ -1,5 +1,6 @@
 {
 	"name": "qc2",
+	"type": "module",
 	"displayName": "QC2",
 	"description": "Checks for adherence to coding best practices for Salesforce.",
 	"version": "2.3.70",
@@ -98,7 +99,7 @@
 		"vscode:prepublish": "echo 'Skipping compilation for pre-built extension'",
 		"compile": "tsc -p ./",
 		"watch": "tsc -watch -p ./",
-		"lint": "eslint src --ext ts",
+		"lint": "eslint src",
 		"package": "npm install && npm run build:webview && npm version patch --no-git-tag-version && VERSION=$(node -p \"require('./package.json').version\") && vsce package --out dist/qc2-v$VERSION.vsix && code-insiders --install-extension dist/qc2-v$VERSION.vsix",
 		"clean builds": "rm -f dist/qc2-*.vsix"
 	},
