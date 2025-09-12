@@ -15,8 +15,8 @@ const constants_1 = require("../constants");
 let buttonLCInstance = null;
 function getButtonLCInstance() {
     if (!buttonLCInstance) {
-        buttonLCInstance = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right);
-        buttonLCInstance.text = 'LiveCheck';
+        buttonLCInstance = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 1);
+        buttonLCInstance.text = '$(search-fuzzy) LiveCheck';
         buttonLCInstance.command = 'qc2.check';
     }
     return buttonLCInstance;

@@ -15,8 +15,8 @@ const constants_1 = require("../constants");
 let qualityCenterButtonInstance = null;
 function getQualityCenterButtonInstance() {
     if (!qualityCenterButtonInstance) {
-        qualityCenterButtonInstance = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right);
-        qualityCenterButtonInstance.text = 'Quality Center';
+        qualityCenterButtonInstance = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 3);
+        qualityCenterButtonInstance.text = '$(library) Quality Center';
         qualityCenterButtonInstance.command = 'qc2.myIssues';
     }
     return qualityCenterButtonInstance;

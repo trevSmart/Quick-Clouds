@@ -42,6 +42,8 @@ function App() {
     const [ruleFilter, setRuleFilter] = useState('');
     const [viewMode, setViewMode] = useState('single'); // 'bulk' or 'single'
     const [loading, setLoading] = useState(false);
+    const [historyId, setHistoryId] = useState(null);
+    const [historyPath, setHistoryPath] = useState(null);
 
     // Reference to the reason select element
     const reasonSelectRef = useRef(null);
@@ -82,6 +84,12 @@ function App() {
                             console.log('First issue sample:', data.issues[0]);
                         }
                         setIssues(data.issues || []);
+                        if (typeof data.historyId !== 'undefined') {
+                            setHistoryId(data.historyId);
+                        }
+                        if (typeof data.historyPath !== 'undefined') {
+                            setHistoryPath(data.historyPath);
+                        }
                     }
                     break;
                 case 'templatesData':
@@ -140,6 +148,24 @@ function App() {
         } else {
             setSelectedIssues(prev => prev.filter(id => id !== issueId));
         }
+    };
+
+    const handleOpenInEditor = (issue, e) => {
+        if (e && typeof e.stopPropagation === 'function') {
+            e.stopPropagation();
+            e.preventDefault();
+        }
+        try {
+            vscode.postMessage({
+                command: 'openFileAtLine',
+                data: {
+                    historyId,
+                    historyPath, // optional hint for backend
+                    fileName: issue.fileName,
+                    lineNumber: issue.lineNumber
+                }
+            });
+        } catch (_) { }
     };
 
     // Helper function to get issue ID (some issues use 'id', others use 'uuid')
@@ -212,13 +238,9 @@ function App() {
 
         console.log('After selection - selectedIssue will be:', issue);
 
-        // Scroll to reason select and give it focus
+        // Focus on reason select without scrolling
         setTimeout(() => {
             if (reasonSelectRef.current) {
-                reasonSelectRef.current.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'center'
-                });
                 reasonSelectRef.current.focus();
             }
         }, 100); // Small delay to ensure the state update has rendered
@@ -351,7 +373,16 @@ function App() {
                                                     onChange={(e) => handleIssueSelect(getIssueId(issue), e.target.checked)}
                                                 />
                                                 <div className="issue-details">
-                                                    <div className="issue-line">{issue.fileName || 'Unknown file'}, line {issue.lineNumber}</div>
+                                                    <div className="issue-line">
+                                                        {issue.fileName || 'Unknown file'}, line {issue.lineNumber}
+                                                        <button
+                                                            className="go-to-file-btn"
+                                                            title="Open file at this line"
+                                                            onClick={(e) => handleOpenInEditor(issue, e)}
+                                                        >
+                                                            <span className="codicon codicon-go-to-file" aria-hidden="true"></span>
+                                                        </button>
+                                                    </div>
                                                     <div className={`severity-badge ${getSeverityClass(issue.severity)}`}>
                                                         {issue.severity}
                                                     </div>
@@ -387,7 +418,16 @@ function App() {
                                                 </span>
                                                 <span className="issue-rule">{issue.issueType}</span>
                                             </div>
-                                            <div className="issue-line">{formatIssueLine(issue)}</div>
+                                            <div className="issue-line">
+                                                {formatIssueLine(issue)}
+                                                <button
+                                                    className="go-to-file-btn"
+                                                    title="Open file at this line"
+                                                    onClick={(e) => handleOpenInEditor(issue, e)}
+                                                >
+                                                    <span className="codicon codicon-go-to-file" aria-hidden="true"></span>
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 );
@@ -462,7 +502,7 @@ function App() {
                             }
                             className="single-submit-btn"
                         >
-                            {loading ? 'Processing...' : 'Send'}
+                            {loading ? 'Processing...' : 'Send request'}
                         </button>
                     </div>
                 )}

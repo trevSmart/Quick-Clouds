@@ -173,10 +173,20 @@ class WriteOffMenuPanel {
             return 'href=""';
         });
 
-        // Inject a base tag to ensure any other relative paths resolve correctly
+        // Inject CSP, a base tag to ensure any other relative paths resolve correctly
         // and a bridge script to route window.alert to VS Code notifications
         const bridgeUri = (0, getUri_1.getUri)(webview, extensionUri, ['media', 'webview-bridge.js']);
-        indexHtml = indexHtml.replace('<head>', `<head><base href="${baseUri}/"><script src="${bridgeUri}"></script>`);
+        const cspMeta = `<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src ${webview.cspSource} data:; script-src ${webview.cspSource}; style-src ${webview.cspSource} 'unsafe-inline'; font-src ${webview.cspSource};">`;
+        indexHtml = indexHtml.replace('<head>', `<head>${cspMeta}<base href="${baseUri}/"><script src="${bridgeUri}"></script>`);
+
+        // Log the resolved asset URIs for diagnostics
+        try {
+            const jsMatch = indexHtml.match(/src=\"([^\"]*static\/js\/[^\"]*)\"/);
+            const cssMatch = indexHtml.match(/href=\"([^\"]*static\/css\/[^\"]*)\"/);
+            logger.info('WriteOffMenuPanel: Resolved JS URI: ' + (jsMatch ? jsMatch[1] : 'not found'));
+            logger.info('WriteOffMenuPanel: Resolved CSS URI: ' + (cssMatch ? cssMatch[1] : 'not found'));
+        }
+        catch (_) { }
 
         logger.info('WriteOffMenuPanel: HTML content generated successfully');
         logger.info('WriteOffMenuPanel: HTML length: ' + indexHtml.length + ' characters');
@@ -229,6 +239,16 @@ class WriteOffMenuPanel {
                 const responseData = { command: 'WOdata', data: JSON.stringify(woData) };
                 logger.info('WriteOffMenuPanel: Sending WOdata response: ' + JSON.stringify(responseData));
                 WriteOffMenuPanel.currentPanel._panel.webview.postMessage(responseData);
+            }
+            if (command === 'getTemplates') {
+                try {
+                    const templates = (yield this._storageManager.getUserData('WOtemplates')) || [];
+                    WriteOffMenuPanel.currentPanel._panel.webview.postMessage({ command: 'templatesData', data: JSON.stringify(templates) });
+                }
+                catch (e) {
+                    logger.warn('WriteOffMenuPanel: getTemplates failed: ' + (e === null || e === void 0 ? void 0 : e.message));
+                    WriteOffMenuPanel.currentPanel._panel.webview.postMessage({ command: 'templatesData', data: JSON.stringify([]) });
+                }
             }
             if (command === "writeoffRequest") {
                 logger.info('WriteOffMenuPanel: Write-off request received');

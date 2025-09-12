@@ -20,8 +20,8 @@ function createStatusBarItems(apiKeyStatus, authType, isAuthenticated = false, s
     // Check debug mode setting
     const debugMode = vscode.workspace.getConfiguration("QC2Configuration").get("debugMode", false);
 
-    const newWO = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right);
-    newWO.text = 'Write off';
+    const newWO = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 2);
+    newWO.text = '$(comment-unresolved) Write off';
     newWO.command = 'qc2.writeoff';
 
     // Show write off button if debug mode is enabled, otherwise hide it
