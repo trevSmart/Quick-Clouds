@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 
 // Acquire VS Code API once per webview and cache on window
@@ -42,6 +42,9 @@ function App() {
     const [ruleFilter, setRuleFilter] = useState('');
     const [viewMode, setViewMode] = useState('single'); // 'bulk' or 'single'
     const [loading, setLoading] = useState(false);
+    
+    // Reference to the reason select element
+    const reasonSelectRef = useRef(null);
 
     // Extract the element name without duplicated file information
     const getCleanElementName = (issue) => {
@@ -187,6 +190,17 @@ function App() {
         setSelectedIssues([]);
 
         console.log('After selection - selectedIssue will be:', issue);
+
+        // Scroll to reason select and give it focus
+        setTimeout(() => {
+            if (reasonSelectRef.current) {
+                reasonSelectRef.current.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'center' 
+                });
+                reasonSelectRef.current.focus();
+            }
+        }, 100); // Small delay to ensure the state update has rendered
     };
 
     const handleSingleWriteOff = () => {
@@ -394,6 +408,7 @@ function App() {
                 <div className="form-group">
                     <label>Reason:</label>
                     <select
+                        ref={reasonSelectRef}
                         value={reason}
                         onChange={(e) => setReason(e.target.value)}
                     >
