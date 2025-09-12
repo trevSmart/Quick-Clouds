@@ -164,7 +164,9 @@ function App() {
     };
 
     const getSeverityClass = (severity) => {
-        if (!severity) {return 'severity-unknown';}
+        if (!severity) {
+            return 'severity-unknown';
+        }
         return `severity-${severity.toLowerCase()}`;
     };
 

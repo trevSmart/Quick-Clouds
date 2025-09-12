@@ -55,7 +55,11 @@ export default [
             'curly': ['error', 'all'],
             'eqeqeq': 'warn',
             'no-throw-literal': 'warn',
-            'semi': 'off'
+            'semi': 'off',
+            // Prevent multiple statements per line
+            'max-statements-per-line': ['error', { max: 1 }],
+            // Prevent unused expressions (like the && operator chain)
+            'no-unused-expressions': 'error'
         }
     },
 
@@ -67,7 +71,8 @@ export default [
             '**/*.d.ts',
             'node_modules/**',
             'webview-ui/node_modules/**',
-            'webview-ui/build/**'
+            'webview-ui/build/**',
+            'media/main.js' // Compiled/minified file
         ]
     }
 ];
