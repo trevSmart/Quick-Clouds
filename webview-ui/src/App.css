@@ -68,6 +68,24 @@
     margin-bottom: 20px;
 }
 
+.section-title {
+    margin-bottom: 10px;
+    padding-top: 20px;
+    padding-left: 9px;
+}
+
+/* Reduced top padding specifically for the "Issues" section title */
+.section-title.issues-title {
+    padding-top: 8px;
+}
+
+.section-title h2 {
+    margin: 0;
+    color: var(--vscode-descriptionForeground);
+    font-size: 19px;
+    font-weight: 600;
+}
+
 .filters {
     display: flex;
     gap: 20px;
@@ -123,13 +141,23 @@
     margin-bottom: 15px;
 }
 
-.form-group:first-child {
-    padding-bottom: 15px;
+.form-group:nth-of-type(2) {
+    margin-top: 28px;
+}
+
+.form-group:first-of-type {
+    padding-bottom: 25px;
     border-bottom: 1px solid var(--vscode-panel-border);
 }
 
 .form-group:last-child {
     margin-bottom: 0;
+}
+
+.form-group-button {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
 }
 
 .form-group label {
@@ -158,9 +186,6 @@
     min-height: 60px;
 }
 
-.bulk-mode {
-    /* Styles are now handled by the parent .issues-section */
-}
 
 .bulk-header {
     display: flex;
@@ -197,8 +222,10 @@
 }
 
 .issues-list {
-    max-height: 400px;
+    max-height: 330px;
     overflow-y: auto;
+    /* Ensure the scrollbar track shows this background */
+    background-color: var(--vscode-panel-background);
 }
 
 .rule-group {
@@ -302,19 +329,19 @@
 }
 
 .severity-badge.severity-high {
-    background-color: #dc3545;
+    background-color: #c82333;
     color: white;
-    border: 1px solid #c82333;
+    border: 1px solid #a71e2a;
 }
 
 .severity-badge.severity-medium {
-    background-color: #fd7e14;
+    background-color: #ffa366;
     color: black;
     border: 1px solid #e55a00;
 }
 
 .severity-badge.severity-low {
-    background-color: #ffc107;
+    background-color: #ffe066;
     color: #212529;
     border: 1px solid #e0a800;
 }
@@ -366,9 +393,6 @@
     font-weight: 500;
 }
 
-.single-mode {
-    /* Styles are now handled by the parent .issues-section */
-}
 
 .issue-item-single {
     display: flex;
@@ -377,10 +401,20 @@
     padding: 15px 20px;
     border-bottom: 1px solid var(--vscode-panel-border);
     transition: all 0.2s;
+    cursor: pointer;
 }
 
 .issue-item-single:hover {
     background-color: var(--vscode-list-hoverBackground);
+}
+
+.issue-item-single.selected {
+    background-color: var(--vscode-list-activeSelectionBackground);
+    border-left: 3px solid var(--vscode-focusBorder);
+}
+
+.issue-item-single.selected:hover {
+    background-color: var(--vscode-list-activeSelectionBackground);
 }
 
 .issue-item-single:last-child {
@@ -433,7 +467,8 @@
 }
 
 .issues-list::-webkit-scrollbar-track {
-    background: var(--vscode-scrollbarSlider-background);
+    /* Let the list background show through for a perfect match */
+    background: transparent;
 }
 
 .issues-list::-webkit-scrollbar-thumb {
@@ -443,4 +478,28 @@
 
 .issues-list::-webkit-scrollbar-thumb:hover {
     background: var(--vscode-scrollbarSlider-activeBackground);
+}
+
+/* Ensure corner matches when both axes scroll */
+.issues-list::-webkit-scrollbar-corner {
+    background: transparent;
+}
+
+/* Firefox scrollbar colors */
+.issues-list {
+    /* Firefox: thumb color + transparent track so the list bg shows */
+    scrollbar-color: var(--vscode-scrollbarSlider-hoverBackground) transparent;
+}
+
+.issues-counter {
+    padding: 15px 20px;
+    text-align: center;
+    border-top: 1px solid var(--vscode-panel-border);
+    background-color: var(--vscode-panel-background);
+}
+
+.issues-counter p {
+    margin: 0;
+    color: var(--vscode-descriptionForeground);
+    font-size: 12px;
 }

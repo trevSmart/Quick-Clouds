@@ -2,7 +2,7 @@
 	"name": "qc2",
 	"displayName": "QC2",
 	"description": "Checks for adherence to coding best practices for Salesforce.",
-	"version": "2.3.92",
+	"version": "2.3.124",
 	"license": "MIT",
 	"icon": "resources/logo.png",
 	"engines": {
@@ -91,13 +91,9 @@
 		}
 	},
 	"scripts": {
-		"install:all": "npm install && npm --prefix ./webview-ui install ./webview-ui",
-		"start:webview": "npm --prefix ./webview-ui run start",
-		"test:webview": "npm --prefix ./webview-ui run test",
 		"build:webview": "NODE_OPTIONS=--openssl-legacy-provider npm --prefix ./webview-ui run build",
 		"vscode:prepublish": "echo 'Skipping compilation for pre-built extension'",
 		"compile": "tsc -p ./",
-		"watch": "tsc -watch -p ./",
 		"lint": "eslint src webview-ui/src media eslint.config.mjs --fix",
 		"package": "npm install && npm run build:webview && npm version patch --no-git-tag-version && VERSION=$(node -p \"require('./package.json').version\") && vsce package --out dist/qc2-v$VERSION.vsix && code-insiders --install-extension dist/qc2-v$VERSION.vsix",
 		"clean builds": "rm -f dist/qc2-*.vsix"
@@ -109,6 +105,7 @@
 		"@types/vscode": "^1.64.0",
 		"@typescript-eslint/eslint-plugin": "^8.43.0",
 		"@typescript-eslint/parser": "^8.43.0",
+		"@vscode/test-electron": "^2.5.2",
 		"@vscode/vsce": "^3.6.0",
 		"eslint": "^9.35.0",
 		"typescript": "^5.9.2"

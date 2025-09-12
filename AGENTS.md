@@ -124,9 +124,16 @@ QC2 is a customized version of the Live Check Quality for Salesforce extension. 
 # Install dependencies
 npm install
 
-# Package extension (skips compilation due to JS conflicts)
+# Package extension (includes webview build and automatic installation)
 npm run package
 ```
+
+### Temporary Files Management
+- **Location**: All temporary files (Node.js scripts, database queries, test files, etc.) must be created inside the `tmp/` directory
+- **Directory Creation**: If the `tmp/` directory doesn't exist, it must be created at the moment of first use
+- **Cleanup**: Temporary files must be deleted immediately once they are no longer needed
+- **Purpose**: Maintains a clean workspace and prevents accumulation of unnecessary files
+- **Examples**: Debug scripts, temporary database exports, test queries, temporary configuration files
 
 ### Configuration Files
 - `tsconfig.json` - TypeScript configuration (relaxed for JS compatibility)

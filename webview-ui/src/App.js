@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 
 // Acquire VS Code API once per webview and cache on window
@@ -33,14 +33,41 @@ const HARDCODED_REASONS = [
 function App() {
     const [issues, setIssues] = useState([]);
     const [selectedIssues, setSelectedIssues] = useState([]);
+    const [selectedIssue, setSelectedIssue] = useState(null); // For single mode
     const [templates, setTemplates] = useState([]);
     const [selectedTemplate, setSelectedTemplate] = useState('');
     const [reason, setReason] = useState('');
     const [description, setDescription] = useState('');
     const [severityFilter, setSeverityFilter] = useState('all');
-    const [filter, setFilter] = useState('');
+    const [ruleFilter, setRuleFilter] = useState('');
     const [viewMode, setViewMode] = useState('single'); // 'bulk' or 'single'
     const [loading, setLoading] = useState(false);
+
+    // Reference to the reason select element
+    const reasonSelectRef = useRef(null);
+
+    // Extract the element name without duplicated file information
+    const getCleanElementName = (issue) => {
+        if (!issue?.elementName) {
+            return '';
+        }
+
+        const file = issue.fileName;
+        if (file) {
+            const suffix = ` - ${file}`;
+            if (issue.elementName.endsWith(suffix)) {
+                return issue.elementName.slice(0, -suffix.length);
+            }
+        }
+        return issue.elementName;
+    };
+
+    // Format line information for single issue view
+    const formatIssueLine = (issue) => {
+        const element = getCleanElementName(issue);
+        const base = `${issue.fileName || 'Unknown file'}, line ${issue.lineNumber}`;
+        return element ? `${base}: ${element}` : base;
+    };
 
     useEffect(() => {
         // Listen for messages from the extension
@@ -80,11 +107,11 @@ function App() {
         }
 
         // Then apply text filter if provided
-        if (!filter) {
+        if (!ruleFilter) {
             return true;
         }
 
-        const searchTerm = filter.toLowerCase();
+        const searchTerm = ruleFilter.toLowerCase();
         const severity = (issue.severity || '').toLowerCase();
         const rule = (issue.issueType || '').toLowerCase();
         const fileName = (issue.fileName || '').toLowerCase();
@@ -172,7 +199,37 @@ function App() {
         });
     };
 
-    const handleSingleWriteOff = (issue) => {
+    const handleIssueSelection = (issue) => {
+        const issueId = issue.id || issue.uuid;
+        console.log('Selecting issue:', issueId, issue);
+        console.log('Current selectedIssue:', selectedIssue);
+
+        // Only select this specific issue
+        setSelectedIssue(issue);
+
+        // Clear bulk mode selection when selecting in single mode
+        setSelectedIssues([]);
+
+        console.log('After selection - selectedIssue will be:', issue);
+
+        // Scroll to reason select and give it focus
+        setTimeout(() => {
+            if (reasonSelectRef.current) {
+                reasonSelectRef.current.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+                reasonSelectRef.current.focus();
+            }
+        }, 100); // Small delay to ensure the state update has rendered
+    };
+
+    const handleSingleWriteOff = () => {
+        if (!selectedIssue) {
+            alert('Please select an issue first');
+            return;
+        }
+
         if (!reason.trim() || !description.trim()) {
             alert('Please provide both reason and description');
             return;
@@ -182,7 +239,7 @@ function App() {
         vscode.postMessage({
             command: 'writeoffRequest',
             data: {
-                ...issue,
+                ...selectedIssue,
                 writeOff: {
                     requestReason: reason.trim(),
                     requestDescription: description.trim(),
@@ -211,9 +268,10 @@ function App() {
                             onClick={() => {
                                 console.log('Switching to bulk mode, current issues:', issues.length);
                                 setViewMode('bulk');
+                                setSelectedIssue(null); // Clear single mode selection
                             }}
                         >
-                            Switch to bulk mode
+                            Bulk mode
                         </button>
                     ) : (
                         <button
@@ -224,18 +282,22 @@ function App() {
                                     console.log('First issue in single mode:', issues[0]);
                                 }
                                 setViewMode('single');
+                                setSelectedIssues([]); // Clear bulk mode selection
                             }}
                         >
-                            Switch to single mode
+                            Single mode
                         </button>
                     )}
                 </div>
             </div>
 
+            <div className="section-title issues-title">
+                <h2>Issues</h2>
+            </div>
             <div className="issues-section">
                 <div className="filters">
                     <div className="filter-group">
-                        <label>Filter by severity:</label>
+                        <label>Severity:</label>
                         <select value={severityFilter} onChange={(e) => setSeverityFilter(e.target.value)}>
                             <option value="all">All</option>
                             <option value="High">High</option>
@@ -248,9 +310,9 @@ function App() {
                         <label>Filter:</label>
                         <input
                             type="text"
-                            placeholder="Search by rule, file, line, or element..."
-                            value={filter}
-                            onChange={(e) => setFilter(e.target.value)}
+                            placeholder="Type to filter"
+                            value={ruleFilter}
+                            onChange={(e) => setRuleFilter(e.target.value)}
                         />
                     </div>
                 </div>
@@ -293,7 +355,7 @@ function App() {
                                                     <div className={`severity-badge ${getSeverityClass(issue.severity)}`}>
                                                         {issue.severity}
                                                     </div>
-                                                    <div className="issue-element">{issue.elementName}</div>
+                                                    <div className="issue-element">{getCleanElementName(issue)}</div>
                                                 </div>
                                             </div>
                                         ))}
@@ -305,31 +367,50 @@ function App() {
                 ) : (
                     <div className="single-mode">
                         <div className="issues-list">
-                            {filteredIssues.map(issue => (
-                                <div key={`single-${issue.id || issue.uuid}`} className="issue-item-single">
-                                    <div className="issue-details">
-                                        <div className="issue-header">
-                                            <span className={`severity-badge ${getSeverityClass(issue.severity)}`}>
-                                                {issue.severity}
-                                            </span>
-                                            <span className="issue-rule">{issue.issueType}</span>
-                                        </div>
-                                        <div className="issue-line">{issue.fileName || 'Unknown file'}, line {issue.lineNumber}: {issue.elementName}</div>
-                                    </div>
-                                    <button
-                                        onClick={() => handleSingleWriteOff(issue)}
-                                        disabled={loading}
-                                        className="single-submit-btn"
+                            {filteredIssues.map(issue => {
+                                const issueId = issue.id || issue.uuid;
+                                const selectedId = selectedIssue?.id || selectedIssue?.uuid;
+                                const isSelected = selectedIssue && issueId === selectedId;
+                                if (isSelected) {
+                                    console.log('Issue marked as selected:', issueId, 'selectedIssue:', selectedId);
+                                }
+                                return (
+                                    <div
+                                        key={`single-${issue.id || issue.uuid}`}
+                                        className={`issue-item-single ${isSelected ? 'selected' : ''}`}
+                                        onClick={() => handleIssueSelection(issue)}
                                     >
-                                        {loading ? 'Processing...' : 'Send'}
-                                    </button>
-                                </div>
-                            ))}
+                                        <div className="issue-details">
+                                            <div className="issue-header">
+                                                <span className={`severity-badge ${getSeverityClass(issue.severity)}`}>
+                                                    {issue.severity}
+                                                </span>
+                                                <span className="issue-rule">{issue.issueType}</span>
+                                            </div>
+                                            <div className="issue-line">{formatIssueLine(issue)}</div>
+                                        </div>
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
                 )}
+
+                {/* Move the counter inside the issues container */}
+                <div className="issues-counter">
+                    {viewMode === 'single' ? (
+                        <p>
+                            {selectedIssue ? `Selected: ${formatIssueLine(selectedIssue)}` : 'No issue selected'} | Total: {issues.length} issues
+                        </p>
+                    ) : (
+                        <p>Selected: {selectedIssues.length} issues | Total: {issues.length} issues</p>
+                    )}
+                </div>
             </div>
 
+            <div className="section-title">
+                <h2>Request details</h2>
+            </div>
             <div className="writeoff-form">
                 <div className="form-group">
                     <label>Templates:</label>
@@ -348,6 +429,7 @@ function App() {
                 <div className="form-group">
                     <label>Reason:</label>
                     <select
+                        ref={reasonSelectRef}
                         value={reason}
                         onChange={(e) => setReason(e.target.value)}
                     >
@@ -364,15 +446,28 @@ function App() {
                     <textarea
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
-                        placeholder="Detailed description"
+                        placeholder="Explain why this issue should be written off"
                         rows="3"
                     />
                 </div>
+                {viewMode === 'single' && (
+                    <div className="form-group form-group-button">
+                        <button
+                            onClick={handleSingleWriteOff}
+                            disabled={
+                                loading ||
+                                !selectedIssue ||
+                                !reason.trim() ||
+                                !description.trim()
+                            }
+                            className="single-submit-btn"
+                        >
+                            {loading ? 'Processing...' : 'Send'}
+                        </button>
+                    </div>
+                )}
             </div>
 
-            <div className="footer">
-                <p>Selected: {selectedIssues.length} issues | Total: {issues.length} issues</p>
-            </div>
         </div>
     );
 }
