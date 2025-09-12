@@ -1,7 +1,7 @@
 // Bridge script injected into Write-Off webview
 // - Replaces window.alert to use VS Code notifications via postMessage
 // - Can be extended for confirm/prompt if needed
-(function() {
+(function () {
   try {
     // Ensure only one VS Code API instance exists per webview
     let vscode = null;
@@ -18,15 +18,15 @@
         vscode = null;
       }
     }
-    if (!vscode) return;
+    if (!vscode) { return; }
 
     const originalAlert = window.alert;
-    window.alert = function(msg) {
+    window.alert = function (msg) {
       try {
         // Alerts from webview represent validation warnings by default
         vscode.postMessage({ command: 'notify', level: 'warning', message: String(msg) });
       } catch (e) {
-        try { originalAlert && originalAlert(String(msg)); } catch(_) {}
+        try { originalAlert && originalAlert(String(msg)); } catch (_) { }
       }
     };
 
@@ -40,11 +40,11 @@
   } catch (_) {
     // noop
   }
-  
+
   // Post-process write-off UI subtitles to show "<file>, line <n>"
   try {
     const deriveFile = (raw) => {
-      if (!raw) return '';
+      if (!raw) { return ''; }
       // If pattern like "Name - file.ext" -> take file.ext
       const parts = String(raw).split(' - ');
       const candidate = parts[parts.length - 1];
@@ -53,19 +53,19 @@
       return m ? m[0] : candidate || String(raw);
     };
     const rewrite = (root) => {
-      if (!root) return;
+      if (!root) { return; }
       root.querySelectorAll('.issue-item, .issue-item-single').forEach(it => {
         const lineEl = it.querySelector('.issue-line');
-        if (!lineEl) return;
+        if (!lineEl) { return; }
         let fileFromSibling = '';
         const elemEl = it.querySelector('.issue-element');
-        if (elemEl) fileFromSibling = elemEl.textContent || '';
+        if (elemEl) { fileFromSibling = elemEl.textContent || ''; }
 
         // Try parse from current line text: "Line 12: something"
         const txt = lineEl.textContent || '';
         let lineNo = '';
         const m = txt.match(/Line\s+(\d+)/i);
-        if (m) lineNo = m[1];
+        if (m) { lineNo = m[1]; }
 
         const file = deriveFile(fileFromSibling || txt);
         if (file && lineNo) {
@@ -78,7 +78,7 @@
       });
     };
     // Run after load
-    const run = () => { try { rewrite(document); } catch(_) {} };
+    const run = () => { try { rewrite(document); } catch (_) { } };
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', run, { once: true });
     } else {
@@ -88,7 +88,7 @@
     // Also re-run shortly after data arrives from extension to catch React renders
     const scheduleBurst = () => {
       let count = 0;
-      const h = setInterval(() => { run(); if (++count >= 10) clearInterval(h); }, 150);
+      const h = setInterval(() => { run(); if (++count >= 10) { clearInterval(h); } }, 150);
     };
     window.addEventListener('message', (e) => {
       const cmd = e && e.data && e.data.command;
@@ -120,7 +120,7 @@
               }
             }
           });
-        } catch (_) {}
+        } catch (_) { }
       }
     });
   } catch (_) { /* ignore */ }

@@ -3,9 +3,9 @@ import tseslint from '@typescript-eslint/eslint-plugin';
 import tsparser from '@typescript-eslint/parser';
 
 export default [
-    // Base configuration for all files
+    // Configuration for main extension TypeScript files
     {
-        files: ['**/*.{js,ts}'],
+        files: ['src/**/*.{js,ts}', 'eslint.config.js'],
         languageOptions: {
             parser: tsparser,
             parserOptions: {
@@ -28,7 +28,31 @@ export default [
             '@/semi': 'warn',
 
             // General ESLint rules
-            'curly': 'warn',
+            'curly': ['error', 'all'],
+            'eqeqeq': 'warn',
+            'no-throw-literal': 'warn',
+            'semi': 'off'
+        }
+    },
+
+    // Configuration for webview-ui React files
+    {
+        files: ['webview-ui/src/**/*.{js,jsx}', 'media/**/*.js'],
+        languageOptions: {
+            ecmaVersion: 2020,
+            sourceType: 'module',
+            parserOptions: {
+                ecmaFeatures: {
+                    jsx: true
+                }
+            },
+            globals: {
+                'acquireVsCodeApi': 'readonly'
+            }
+        },
+        rules: {
+            // Relaxed rules for React/webview files
+            'curly': ['error', 'all'],
             'eqeqeq': 'warn',
             'no-throw-literal': 'warn',
             'semi': 'off'
