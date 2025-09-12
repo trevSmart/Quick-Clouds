@@ -42,6 +42,29 @@ function App() {
     const [viewMode, setViewMode] = useState('single'); // 'bulk' or 'single'
     const [loading, setLoading] = useState(false);
 
+    // Extract the element name without duplicated file information
+    const getCleanElementName = (issue) => {
+        if (!issue?.elementName) {
+            return '';
+        }
+
+        const file = issue.fileName;
+        if (file) {
+            const suffix = ` - ${file}`;
+            if (issue.elementName.endsWith(suffix)) {
+                return issue.elementName.slice(0, -suffix.length);
+            }
+        }
+        return issue.elementName;
+    };
+
+    // Format line information for single issue view
+    const formatIssueLine = (issue) => {
+        const element = getCleanElementName(issue);
+        const base = `${issue.fileName || 'Unknown file'}, line ${issue.lineNumber}`;
+        return element ? `${base}: ${element}` : base;
+    };
+
     useEffect(() => {
         // Listen for messages from the extension
         window.addEventListener('message', event => {
@@ -272,7 +295,7 @@ function App() {
                                                     <div className={`severity-badge ${getSeverityClass(issue.severity)}`}>
                                                         {issue.severity}
                                                     </div>
-                                                    <div className="issue-element">{issue.elementName}</div>
+                                                    <div className="issue-element">{getCleanElementName(issue)}</div>
                                                 </div>
                                             </div>
                                         ))}
@@ -293,7 +316,7 @@ function App() {
                                             </span>
                                             <span className="issue-rule">{issue.issueType}</span>
                                         </div>
-                                        <div className="issue-line">{issue.fileName || 'Unknown file'}, line {issue.lineNumber}: {issue.elementName}</div>
+                                        <div className="issue-line">{formatIssueLine(issue)}</div>
                                     </div>
                                     <button
                                         onClick={() => handleSingleWriteOff(issue)}
