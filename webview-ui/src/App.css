@@ -68,6 +68,17 @@
     margin-bottom: 20px;
 }
 
+.section-title {
+    margin-bottom: 10px;
+}
+
+.section-title h2 {
+    margin: 0;
+    color: var(--vscode-editor-foreground);
+    font-size: 18px;
+    font-weight: 600;
+}
+
 .filters {
     display: flex;
     gap: 20px;
@@ -123,13 +134,23 @@
     margin-bottom: 15px;
 }
 
-.form-group:first-child {
-    padding-bottom: 15px;
+.form-group:nth-of-type(2) {
+    margin-top: 25px;
+}
+
+.form-group:first-of-type {
+    padding-bottom: 25px;
     border-bottom: 1px solid var(--vscode-panel-border);
 }
 
 .form-group:last-child {
     margin-bottom: 0;
+}
+
+.form-group-button {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
 }
 
 .form-group label {
@@ -158,9 +179,6 @@
     min-height: 60px;
 }
 
-.bulk-mode {
-    /* Styles are now handled by the parent .issues-section */
-}
 
 .bulk-header {
     display: flex;
@@ -197,7 +215,7 @@
 }
 
 .issues-list {
-    max-height: 400px;
+    max-height: 300px;
     overflow-y: auto;
 }
 
@@ -302,19 +320,19 @@
 }
 
 .severity-badge.severity-high {
-    background-color: #dc3545;
+    background-color: #c82333;
     color: white;
-    border: 1px solid #c82333;
+    border: 1px solid #a71e2a;
 }
 
 .severity-badge.severity-medium {
-    background-color: #fd7e14;
+    background-color: #ffa366;
     color: black;
     border: 1px solid #e55a00;
 }
 
 .severity-badge.severity-low {
-    background-color: #ffc107;
+    background-color: #ffe066;
     color: #212529;
     border: 1px solid #e0a800;
 }
@@ -366,9 +384,6 @@
     font-weight: 500;
 }
 
-.single-mode {
-    /* Styles are now handled by the parent .issues-section */
-}
 
 .issue-item-single {
     display: flex;
@@ -377,10 +392,20 @@
     padding: 15px 20px;
     border-bottom: 1px solid var(--vscode-panel-border);
     transition: all 0.2s;
+    cursor: pointer;
 }
 
 .issue-item-single:hover {
     background-color: var(--vscode-list-hoverBackground);
+}
+
+.issue-item-single.selected {
+    background-color: var(--vscode-list-activeSelectionBackground);
+    border-left: 3px solid var(--vscode-focusBorder);
+}
+
+.issue-item-single.selected:hover {
+    background-color: var(--vscode-list-activeSelectionBackground);
 }
 
 .issue-item-single:last-child {

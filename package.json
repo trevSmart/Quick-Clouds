@@ -2,7 +2,7 @@
 	"name": "qc2",
 	"displayName": "QC2",
 	"description": "Checks for adherence to coding best practices for Salesforce.",
-	"version": "2.3.89",
+	"version": "2.3.109",
 	"license": "MIT",
 	"icon": "resources/logo.png",
 	"engines": {
@@ -109,6 +109,7 @@
 		"@types/vscode": "^1.64.0",
 		"@typescript-eslint/eslint-plugin": "^8.43.0",
 		"@typescript-eslint/parser": "^8.43.0",
+		"@vscode/test-electron": "^2.5.2",
 		"@vscode/vsce": "^3.6.0",
 		"eslint": "^9.35.0",
 		"typescript": "^5.9.2"
