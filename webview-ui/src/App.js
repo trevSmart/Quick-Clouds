@@ -256,13 +256,13 @@ function App() {
                 </div>
             </div>
 
-            <div className="section-title">
+            <div className="section-title issues-title">
                 <h2>Issues</h2>
             </div>
             <div className="issues-section">
                 <div className="filters">
                     <div className="filter-group">
-                        <label>Filter by severity:</label>
+                        <label>Severity:</label>
                         <select value={severityFilter} onChange={(e) => setSeverityFilter(e.target.value)}>
                             <option value="all">All</option>
                             <option value="High">High</option>
@@ -272,10 +272,10 @@ function App() {
                         </select>
                     </div>
                     <div className="filter-group">
-                        <label>Filter by rule:</label>
+                        <label>Filter:</label>
                         <input
                             type="text"
-                            placeholder="Search rules..."
+                            placeholder="Type to filter"
                             value={ruleFilter}
                             onChange={(e) => setRuleFilter(e.target.value)}
                         />
@@ -360,6 +360,17 @@ function App() {
                         </div>
                     </div>
                 )}
+
+                {/* Move the counter inside the issues container */}
+                <div className="issues-counter">
+                    {viewMode === 'single' ? (
+                        <p>
+                            {selectedIssue ? `Selected: ${formatIssueLine(selectedIssue)}` : 'No issue selected'} | Total: {issues.length} issues
+                        </p>
+                    ) : (
+                        <p>Selected: {selectedIssues.length} issues | Total: {issues.length} issues</p>
+                    )}
+                </div>
             </div>
 
             <div className="section-title">
@@ -407,7 +418,12 @@ function App() {
                     <div className="form-group form-group-button">
                         <button
                             onClick={handleSingleWriteOff}
-                            disabled={loading || !selectedIssue}
+                            disabled={
+                                loading ||
+                                !selectedIssue ||
+                                !reason.trim() ||
+                                !description.trim()
+                            }
                             className="single-submit-btn"
                         >
                             {loading ? 'Processing...' : 'Send'}
@@ -416,15 +432,6 @@ function App() {
                 )}
             </div>
 
-            <div className="footer">
-                {viewMode === 'single' ? (
-                    <p>
-                        {selectedIssue ? `Selected: ${formatIssueLine(selectedIssue)}` : 'No issue selected'} | Total: {issues.length} issues
-                    </p>
-                ) : (
-                    <p>Selected: {selectedIssues.length} issues | Total: {issues.length} issues</p>
-                )}
-            </div>
         </div>
     );
 }

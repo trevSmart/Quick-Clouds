@@ -70,12 +70,19 @@
 
 .section-title {
     margin-bottom: 10px;
+    padding-top: 20px;
+    padding-left: 9px;
+}
+
+/* Reduced top padding specifically for the "Issues" section title */
+.section-title.issues-title {
+    padding-top: 8px;
 }
 
 .section-title h2 {
     margin: 0;
-    color: var(--vscode-editor-foreground);
-    font-size: 18px;
+    color: var(--vscode-descriptionForeground);
+    font-size: 19px;
     font-weight: 600;
 }
 
@@ -135,7 +142,7 @@
 }
 
 .form-group:nth-of-type(2) {
-    margin-top: 25px;
+    margin-top: 28px;
 }
 
 .form-group:first-of-type {
@@ -215,8 +222,10 @@
 }
 
 .issues-list {
-    max-height: 300px;
+    max-height: 330px;
     overflow-y: auto;
+    /* Ensure the scrollbar track shows this background */
+    background-color: var(--vscode-panel-background);
 }
 
 .rule-group {
@@ -458,7 +467,8 @@
 }
 
 .issues-list::-webkit-scrollbar-track {
-    background: var(--vscode-scrollbarSlider-background);
+    /* Let the list background show through for a perfect match */
+    background: transparent;
 }
 
 .issues-list::-webkit-scrollbar-thumb {
@@ -468,4 +478,28 @@
 
 .issues-list::-webkit-scrollbar-thumb:hover {
     background: var(--vscode-scrollbarSlider-activeBackground);
+}
+
+/* Ensure corner matches when both axes scroll */
+.issues-list::-webkit-scrollbar-corner {
+    background: transparent;
+}
+
+/* Firefox scrollbar colors */
+.issues-list {
+    /* Firefox: thumb color + transparent track so the list bg shows */
+    scrollbar-color: var(--vscode-scrollbarSlider-hoverBackground) transparent;
+}
+
+.issues-counter {
+    padding: 12px 20px;
+    text-align: center;
+    border-top: 1px solid var(--vscode-panel-border);
+    background-color: var(--vscode-panel-background);
+}
+
+.issues-counter p {
+    margin: 0;
+    color: var(--vscode-descriptionForeground);
+    font-size: 12px;
 }
