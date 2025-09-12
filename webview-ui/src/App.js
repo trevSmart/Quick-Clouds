@@ -180,14 +180,14 @@ function App() {
                             className="toggle-btn"
                             onClick={() => setViewMode('bulk')}
                         >
-                            Switch to Bulk
+                            Switch to bulk mode
                         </button>
                     ) : (
                         <button
                             className="toggle-btn"
                             onClick={() => setViewMode('single')}
                         >
-                            Switch to Single
+                            Switch to single mode
                         </button>
                     )}
                 </div>
@@ -282,7 +282,7 @@ function App() {
                                         disabled={loading}
                                         className="single-submit-btn"
                                     >
-                                        {loading ? 'Processing...' : 'Request'}
+                                        {loading ? 'Processing...' : 'Send'}
                                     </button>
                                 </div>
                             ))}
