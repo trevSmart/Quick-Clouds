@@ -42,7 +42,7 @@ function App() {
     const [ruleFilter, setRuleFilter] = useState('');
     const [viewMode, setViewMode] = useState('single'); // 'bulk' or 'single'
     const [loading, setLoading] = useState(false);
-    
+
     // Reference to the reason select element
     const reasonSelectRef = useRef(null);
 
@@ -194,9 +194,9 @@ function App() {
         // Scroll to reason select and give it focus
         setTimeout(() => {
             if (reasonSelectRef.current) {
-                reasonSelectRef.current.scrollIntoView({ 
-                    behavior: 'smooth', 
-                    block: 'center' 
+                reasonSelectRef.current.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
                 });
                 reasonSelectRef.current.focus();
             }
