@@ -91,7 +91,7 @@
 				}
 				// Hide the redundant element label in bulk view
 				if (elemEl && elemEl.parentElement) {
-					elemEl.style.display = 'none';s
+					elemEl.style.display = 'none';
 				}
 			});
 		};
