@@ -7,21 +7,12 @@ Quality Clouds makes SaaS platforms such as Salesforce easier to govern and grow
 Designed by experts to deliver rich insights for both business and IT, it offers unrivalled transparency over the entire software development lifecycle.
 Its comprehensive selection of automated solutions empower users to deliver high quality platforms in a fraction of the time.
 
-
-![QC2](https://qualityclouds.com/documentation/wp-content/uploads/2024/06/VSC-2.1-salesforce.gif)
-
 Once installed and configured, your QC2 extension lets you check and improve your code with best practices from our rulesets.
-
 
 ## Features
 
 ### Checking on demand
 Every time you wish, you can run a check on the file you are working on.
-
-
-## Requirements
-
-See [our documentation](https://qualityclouds.com/documentation/qc/qc2-visual-studio-code-extension/) for details.
 
 
 ## Extension Settings
@@ -30,10 +21,5 @@ You need to provide a valid API key to connect the Quality Clouds ruleset agains
 To obtain an API key, contact your Quality Clouds admin.
 If you're an admin, check out our [Administering API keys](https://docs.qualityclouds.com/display/QCD/Administering+API+keys) article.
 
-
-
 ## Supported configuration element (CE) types
 You can check the following types of CEs: Classes, Triggers, Pages, Components, Objects, Reports, Workflows, Javascript.
-
-## Find out more
-See [our documentation](https://docs.qualityclouds.com/qcd/qc2-visual-studio-code-extension.html) for details.

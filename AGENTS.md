@@ -2,11 +2,11 @@
 
 ## Project Overview
 
-QC2 is a customized version of the QualityClouds QC2 extension. It's a VSCode extension that provides automated code quality analysis for Salesforce development, including Apex, Lightning Web Components, and other Salesforce metadata.
+QC2 is a customized version of the Live Check Quality for Salesforce extension. It's a VSCode extension that provides automated code quality analysis for Salesforce development, including Apex, Lightning Web Components, and other Salesforce metadata.
 
 ## Project History & Context
 
-- **Original Extension**: QualityClouds QC2 (v2.3.1)
+- **Original Extension**: Live Check Quality for Salesforce
 - **Customized Version**: QC2 (forked, renamed and modified)
 - **Main Issue**: The original extension had a critical bug where the "Quality Center" panel would get stuck in an infinite loading state
 - **Solution Approach**: Implemented comprehensive logging and debugging capabilities to identify and fix the loading issue
@@ -90,13 +90,15 @@ QC2 is a customized version of the QualityClouds QC2 extension. It's a VSCode ex
   - Request URL and method
   - Authentication type used
   - Complete stack traces
-- **Client Name Fix**: Changed from `'SalesforceVSCPlugin'` to `'VSCodeExtension'`
+- **Client Name**: Maintained as `'SalesforceVSCPlugin'` (same as original extension for API compatibility)
+- **Callback URI**: Maintained as `'vscode://QualityClouds.livecheckqualityforsalesforce'` (same as original extension for OAuth compatibility)
 
 **Files Modified:**
 - `out/services/LiveCheck.js` - Enhanced API error handling
 - `out/utilities/executeLiveCheck.js` - Enhanced execution error handling
-- `out/constants.js` - Updated QC_CLIENT_NAME
-- `src/constants.ts` - Updated QC_CLIENT_NAME
+- `out/constants.js` - Maintained original QC_CLIENT_NAME
+- `src/constants.ts` - Maintained original QC_CLIENT_NAME
+- `src/env.ts` - Maintained original CallbackUri
 - Added logger imports to both files
 
 ### Command Conflicts Resolved
@@ -226,7 +228,7 @@ QC2/
 
 ### Package.json Changes
 - **Name**: `qc2` (was `livecheckqualityforsalesforce`)
-- **Display Name**: `QC2` (was `QC2`)
+- **Display Name**: `QC2` (was `Live Check Quality for Salesforce`)
 - **Commands**: All prefixed with `qc2.` instead of `qualityclouds.`
 - **Configuration**: `QC2Configuration.API-key` (was `UserConfiguration.API-key`)
 
@@ -235,41 +237,6 @@ QC2/
 - **VSCode Version**: ^1.64.0
 - **Categories**: Linters, Language Packs
 
-## Troubleshooting
-
-### Common Issues
-
-1. **Extension Not Loading**
-   - Check for command conflicts with original QualityClouds
-   - Verify all `qc2.*` commands are properly registered
-
-2. **Quality Center Stuck Loading**
-   - Use `qc2.showLogs` to see detailed traces
-   - Look for the last log entry to identify bottleneck
-   - Check if `docs.default.getDocumentsInfo()` is hanging
-
-3. **Build Errors**
-   - TypeScript conflicts due to JS compilation
-   - Use `npm run package` with prepublish script disabled
-   - Avoid `npm run compile` due to variable conflicts
-
-4. **TypeScript Compilation Issues**
-   - **Problem**: `Cannot redeclare block-scoped variable` errors
-   - **Cause**: VSCode trying to compile pre-compiled JavaScript files as TypeScript
-   - **Solution**:
-     - Set `"noEmit": true` and `"allowJs": true` in `tsconfig.json`
-     - Disable TypeScript validation in VSCode settings
-     - Add `.vscodeignore` to exclude TypeScript source files
-     - Remove `preLaunchTask` from debug configuration
-
-5. **Logger Import Errors**
-   - **Problem**: `logger_1 is not defined` when using enhanced logging
-   - **Cause**: Missing logger imports in compiled JavaScript files
-   - **Solution**: Manually add logger imports to compiled files:
-     ```javascript
-     const logger_1 = require("../utilities/logger");
-     ```
-
 ### Debugging Steps
 
 1. **Enable Logging**: Ensure QC2Logger is properly initialized
@@ -277,61 +244,6 @@ QC2/
 3. **Trace Execution**: Follow logs from command trigger to failure point
 4. **Identify Bottleneck**: Look for operations that don't complete
 5. **Implement Fix**: Add timeouts, error handling, or optimization
-
-## Recent Improvements (Session Updates)
-
-### Enhanced Error Logging System ✅
-- **Implemented**: Comprehensive API error logging for Live Check failures
-- **Features**:
-  - Detailed server response capture (status, data, headers)
-  - Request information logging (URL, method, auth type)
-  - Enhanced user error messages with specific details
-  - Complete stack trace logging for debugging
-- **Files Modified**: `out/services/LiveCheck.js`, `out/utilities/executeLiveCheck.js`
-
-### VSCode Debugging Setup ✅
-- **Implemented**: Complete debugging configuration for extension development
-- **Features**:
-  - Launch configurations for extension debugging
-  - Build tasks for compilation
-  - Workspace settings to prevent TypeScript conflicts
-  - Source map support for debugging compiled JavaScript
-- **Files Created**: `.vscode/launch.json`, `.vscode/tasks.json`, `.vscode/settings.json`
-
-### TypeScript Configuration Optimization ✅
-- **Implemented**: Resolved TypeScript compilation conflicts
-- **Features**:
-  - Disabled TypeScript emission (using pre-compiled JS)
-  - Configured VSCode to skip TypeScript source files
-  - Removed obsolete TypeScript options
-  - Fixed variable redeclaration errors
-- **Files Modified**: `tsconfig.json`, `.vscode/settings.json`
-
-### Write-Off Interface Overhaul ✅
-- **Implemented**: Complete redesign of write-off interface for efficiency
-- **Features**:
-  - **Bulk Write-Off Support**: Select and process multiple issues at once
-  - **Write-Off Templates**: Pre-defined templates for common reasons
-  - **Dual Mode Interface**: Bulk mode and single mode for different workflows
-  - **Smart Filtering**: Filter by severity, rule type, and search terms
-  - **Grouped Issues**: Issues grouped by rule type for better organization
-  - **Validation**: Comprehensive validation before submission
-  - **Progress Feedback**: Real-time feedback during bulk operations
-- **Files Created**:
-  - `src/services/BulkWriteOff.ts` - Service for bulk write-off operations
-  - `out/services/BulkWriteOff.js` - Compiled bulk write-off service
-  - `webview-ui/src/App.js` - New React interface
-  - `webview-ui/src/App.css` - Enhanced styling
-  - `webview-ui/src/index.js` - React entry point
-- **Files Modified**:
-  - `out/panels/WriteOffMenuPanel.js` - Enhanced with bulk operations
-  - `webview-ui/package.json` - Updated for new interface
-- **Templates Available**:
-  - False Positive Rule
-  - Business Requirement
-  - Legacy Code
-  - Performance Optimization
-  - Third Party Integration
 
 ### Debug Mode Implementation ✅
 - **Implemented**: Safe development mode for write-off operations
@@ -370,33 +282,8 @@ npm install
 # Package and install extension automatically
 npm run package
 ```
-
 **Script de Package Automatitzat:**
 - **Comanda**: `npm run package`
 - **Funcionalitat**: Genera VSIX amb timestamp i l'instal·la automàticament a VSCode
 - **Format**: `qc2-YYYYMMDD-HHMMSS.vsix`
 - **Requirement**: VSCode ha d'estar tancat per permetre la instal·lació automàtica
-
-## Future Improvements
-
-### Immediate Priorities
-1. **Fix Quality Center Loading**: Resolve infinite loading issue
-2. **Optimize Performance**: Improve `getDocumentsInfo()` performance
-3. **Error Handling**: Add better error recovery mechanisms
-
-### Long-term Enhancements
-1. **Async Operations**: Make file system operations non-blocking
-2. **Progress Indicators**: Show loading progress to users
-3. **Caching**: Implement intelligent caching for repeated operations
-4. **Configuration**: Add more customization options
-
-## Contact & Support
-
-- **Original Extension**: QualityClouds QC2
-- **Customized Version**: QC2 (internal modification)
-- **Issue Tracking**: Use QC2 output channel for debugging
-- **Development**: Follow logging-based debugging approach
-
----
-
-*This document was generated based on the debugging and modification work done on the QC2 extension. It should be updated as new issues are discovered and resolved.*
