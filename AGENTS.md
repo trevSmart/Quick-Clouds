@@ -11,6 +11,30 @@ QC2 is a customized version of the Live Check Quality for Salesforce extension. 
 - **Main Issue**: The original extension had a critical bug where the "Quality Center" panel would get stuck in an infinite loading state
 - **Solution Approach**: Implemented comprehensive logging and debugging capabilities to identify and fix the loading issue
 
+### Original Extension Location
+
+**Path to Original Extension:**
+```
+/Users/marcpla/.vscode/extensions/qualityclouds.livecheckqualityforsalesforce-2.3.1
+```
+
+**Extension Details:**
+- **Name**: `livecheckqualityforsalesforce`
+- **Display Name**: "Live Check Quality for Salesforce"
+- **Version**: 2.3.1
+- **Publisher**: QualityClouds
+- **Installation Date**: July 18, 2024
+
+**Directory Structure:**
+- `package.json` - Extension manifest
+- `out/` - Compiled JavaScript code
+- `webview-ui/` - React user interface
+- `node_modules/` - Dependencies
+- `resources/` - Resources (images, etc.)
+- `media/` - Additional media files
+
+**Purpose**: This is the original extension that was forked to create QC2. It can be used as a reference for comparing original implementation with QC2 modifications or for understanding the base functionality.
+
 ## Architecture & Structure
 
 ### Core Components

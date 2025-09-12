@@ -1,46 +1,26 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const ELEMENTS_TO_ANALYZE = [
-    ".object",
-    ".cls",
-    ".page",
-    ".component",
-    ".trigger",
-    ".report",
-    ".workflow",
-    ".js",
-    ".flow",
-    ".profile",
-    ".profile-meta.xml",
-    ".object-meta.xml",
-    ".component-meta.xml",
-    ".trigger-meta.xml",
-    ".report-meta.xml",
-    ".workflow-meta.xml",
-    ".js-meta.xml",
-    ".flow-meta.xml",
-    ".approvalProcess-meta.xml",
-    ".sharingRules-meta.xml",
-    ".role-meta.xml",
-    ".reportType-meta.xml",
-    ".permissionset-meta.xml",
-    ".network-meta.xml",
-    ".layout-meta.xml",
-    ".group-meta.xml",
-    ".email-meta.xml",
-    ".field-meta.xml",
-    ".dashboard-meta.xml",
-    ".app-meta.xml",
-    ".os-meta.xml",
-    ".ouc-meta.xml",
-    ".oip-meta.xml",
-    ".rpt-meta.xml",
-    ".genAiPromptTemplate-meta.xml",
-    ".genAiFunction-meta.xml",
-    ".genAiPlugin-meta.xml",
-];
-function isElementToAnalize(elementName) {
-    return ELEMENTS_TO_ANALYZE.some((suffix) => elementName.endsWith(suffix));
+
+// Only include Apex classes/triggers and JS from Aura/LWC under force-app
+function isElementToAnalize(fullPath) {
+    try {
+        const p = String(fullPath || '').replace(/\\/g, '/');
+        if (!p.includes('/force-app/')) return false;
+
+        // Apex classes
+        if (/\/force-app\/.*\/classes\/[^/]+\.cls$/i.test(p)) return true;
+        // Apex triggers
+        if (/\/force-app\/.*\/triggers\/[^/]+\.trigger$/i.test(p)) return true;
+        // Aura JS
+        if (/\/force-app\/.*\/aura\/[^/]+\.js$/i.test(p)) return true;
+        // LWC JS
+        if (/\/force-app\/.*\/lwc\/[^/]+\.js$/i.test(p)) return true;
+
+        return false;
+    } catch (_) {
+        return false;
+    }
 }
+
 exports.default = isElementToAnalize;
 //# sourceMappingURL=IsElementToAnalize.js.map

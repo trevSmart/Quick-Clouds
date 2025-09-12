@@ -11,18 +11,30 @@ class DocumentsData {
         filesToAnalize.forEach(file => {
             documentsInfo.push({ pathCE: file, lastModefiedDate: this.getLastModifiedTime(file), CEname: path.basename(file) });
         });
+        // Sort by last modified desc for a more useful view
+        documentsInfo.sort((a, b) => {
+            const ta = new Date(a.lastModefiedDate).getTime();
+            const tb = new Date(b.lastModefiedDate).getTime();
+            return tb - ta;
+        });
         return documentsInfo;
     }
     static getFilesToAnalize(workspacePath) {
         let filesToAnalize = [];
         let files = fs.readdirSync(workspacePath);
+        const EXCLUDED_DIRS = new Set(['node_modules', '.git', 'out', 'webview-ui', 'build', 'tmp', '.vscode', 'dist', 'coverage']);
         files.forEach(file => {
             let filePath = path.join(workspacePath, file);
-            if (fs.statSync(filePath).isDirectory()) {
+            let stat = fs.statSync(filePath);
+            if (stat.isDirectory()) {
+                const base = path.basename(filePath);
+                if (EXCLUDED_DIRS.has(base)) {
+                    return;
+                }
                 filesToAnalize = filesToAnalize.concat(this.getFilesToAnalize(filePath));
             }
             else {
-                if ((0, IsElementToAnalize_1.default)(file)) {
+                if ((0, IsElementToAnalize_1.default)(filePath)) {
                     filesToAnalize.push(filePath);
                 }
             }
