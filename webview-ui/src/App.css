@@ -45,6 +45,21 @@
     color: var(--vscode-button-secondaryForeground);
 }
 
+.toggle-btn {
+    padding: 8px 16px;
+    border: 1px solid var(--vscode-button-border);
+    background-color: var(--vscode-button-background);
+    color: var(--vscode-button-foreground);
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s;
+    font-weight: 500;
+}
+
+.toggle-btn:hover {
+    background-color: var(--vscode-button-hoverBackground);
+}
+
 /* Issues section - unified filters and list */
 .issues-section {
     background-color: var(--vscode-panel-background);

@@ -1,9 +1,8 @@
 {
 	"name": "qc2",
-	"type": "module",
 	"displayName": "QC2",
 	"description": "Checks for adherence to coding best practices for Salesforce.",
-	"version": "2.3.79",
+	"version": "2.3.80",
 	"license": "MIT",
 	"icon": "resources/logo.png",
 	"engines": {

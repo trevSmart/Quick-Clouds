@@ -175,18 +175,21 @@ function App() {
             <div className="header">
                 <h1>Request write-off</h1>
                 <div className="view-toggle">
-                    <button
-                        className={viewMode === 'single' ? 'active' : ''}
-                        onClick={() => setViewMode('single')}
-                    >
-                        Single
-                    </button>
-                    <button
-                        className={viewMode === 'bulk' ? 'active' : ''}
-                        onClick={() => setViewMode('bulk')}
-                    >
-                        Bulk
-                    </button>
+                    {viewMode === 'single' ? (
+                        <button
+                            className="toggle-btn"
+                            onClick={() => setViewMode('bulk')}
+                        >
+                            Switch to Bulk
+                        </button>
+                    ) : (
+                        <button
+                            className="toggle-btn"
+                            onClick={() => setViewMode('single')}
+                        >
+                            Switch to Single
+                        </button>
+                    )}
                 </div>
             </div>
 
