@@ -1,0 +1,35 @@
+# Source TypeScript files (we use pre-compiled JS)
+src/**/*.ts
+!src/**/*.js
+
+# Development files
+.vscode/**
+.git/**
+.gitignore
+.eslintrc.json
+tsconfig.json
+*.log
+*.tmp
+
+# Build artifacts
+out/**/*.map
+out/**/*.d.ts
+
+# Temporary files
+tmp/**
+*.apex
+
+# Documentation
+README.md
+AGENTS.md
+app_versions/**
+
+# Media files: exclude all except the webview bridge
+media/**
+!media/webview-bridge.js
+
+# Old builds
+dist/qc2-*.vsix
+
+# Webview UI node_modules (not needed for extension)
+webview-ui/node_modules/**
