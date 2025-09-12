@@ -135,12 +135,28 @@ class LocalStorageService {
     getLastScanIssuesFromHistoryId(historyId) {
         return __awaiter(this, void 0, void 0, function* () {
             const db = yield this.getDb();
-            const stmt = db.prepare(`SELECT issue_data FROM Issues WHERE history_id = ?`);
+            // Get both issues and file path from history
+            const stmt = db.prepare(`
+                SELECT i.issue_data, lh.path
+                FROM Issues i
+                JOIN LivecheckHistory lh ON i.history_id = lh.id
+                WHERE i.history_id = ?
+            `);
             stmt.bind([historyId]);
             const issues = [];
+            let filePath = null;
             while (stmt.step()) {
                 const row = stmt.getAsObject();
-                issues.push(JSON.parse(row.issue_data));
+                const issue = JSON.parse(row.issue_data);
+                // Add file path to each issue
+                if (!filePath) {
+                    filePath = row.path;
+                }
+                // Extract filename from path
+                const path = require('path');
+                const fileName = path.basename(filePath);
+                issue.fileName = fileName;
+                issues.push(issue);
             }
             stmt.free();
             return issues;

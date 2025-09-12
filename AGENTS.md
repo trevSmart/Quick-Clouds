@@ -266,6 +266,27 @@ QC2/
   - **Description**: "Enable debug mode to simulate write-off requests instead of sending them to the server"
   - **Usage**: Activate in VSCode Settings to enable safe development mode
 
+### Write-Off Panel Issue Format Fix ✅
+- **Implemented**: Correct issue display format in write-off panel
+- **Problem**: Issues were displayed inconsistently between single and bulk modes, neither showing the correct "filename.js, line X" format
+- **Solution**:
+  - **Enhanced Data Retrieval**: Modified `LocalStorageService.getLastScanIssuesFromHistoryId()` to include file path from history
+  - **Added File Name Field**: Extended Issue interface to include `fileName` field
+  - **Updated Display Logic**: Modified both single and bulk modes to show consistent format
+- **Files Modified**:
+  - `src/services/LocalStorageService.ts` - Enhanced to retrieve file path from history
+  - `out/services/LocalStorageService.js` - Compiled version with file path retrieval
+  - `src/services/BulkWriteOff.ts` - Added `fileName?: string` to Issue interface
+  - `webview-ui/src/App.js` - Updated display format for both modes
+- **Display Format**:
+  - **Bulk Mode**: `{fileName}, line {lineNumber}` (e.g., "TestClass.cls, line 12")
+  - **Single Mode**: `{fileName}, line {lineNumber}: {elementName}` (e.g., "TestClass.cls, line 12: testMethod")
+- **Technical Details**:
+  - Uses SQL JOIN to retrieve file path from `LivecheckHistory` table
+  - Extracts filename using `path.basename()` from full file path
+  - Fallback to "Unknown file" if filename is not available
+  - Maintains backward compatibility with existing issue data
+
 ## Build and Release Process
 
 ### VSIX Packaging Guidelines

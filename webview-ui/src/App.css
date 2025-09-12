@@ -123,6 +123,11 @@
     margin-bottom: 15px;
 }
 
+.form-group:first-child {
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--vscode-panel-border);
+}
+
 .form-group:last-child {
     margin-bottom: 0;
 }

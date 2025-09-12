@@ -10,6 +10,7 @@ export interface Issue {
     severity: string;
     lineNumber: string;
     elementName: string;
+    fileName?: string; // Added to store filename from history
     tags?: Array<{ name: string }>;
     qualityGateBreaker?: boolean;
     aboveRadar?: boolean;

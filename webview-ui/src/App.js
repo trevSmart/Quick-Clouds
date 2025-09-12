@@ -50,6 +50,10 @@ function App() {
                 case 'WOdata':
                     if (message.data) {
                         const data = JSON.parse(message.data);
+                        console.log('WOdata received:', data.issues?.length, 'issues');
+                        if (data.issues && data.issues.length > 0) {
+                            console.log('First issue sample:', data.issues[0]);
+                        }
                         setIssues(data.issues || []);
                     }
                     break;
@@ -90,20 +94,25 @@ function App() {
         }
     };
 
+    // Helper function to get issue ID (some issues use 'id', others use 'uuid')
+    const getIssueId = (issue) => {
+        return issue.id || issue.uuid;
+    };
+
     const handleSelectAll = (ruleType) => {
         const ruleIssues = groupedIssues[ruleType] || [];
-        const allSelected = ruleIssues.every(issue => selectedIssues.includes(issue.id));
+        const allSelected = ruleIssues.every(issue => selectedIssues.includes(getIssueId(issue)));
 
         if (allSelected) {
             // Deselect all issues in this rule
             setSelectedIssues(prev => prev.filter(id =>
-                !ruleIssues.some(issue => issue.id === id)
+                !ruleIssues.some(issue => getIssueId(issue) === id)
             ));
         } else {
             // Select all issues in this rule
             const newSelected = ruleIssues
-                .filter(issue => !selectedIssues.includes(issue.id))
-                .map(issue => issue.id);
+                .filter(issue => !selectedIssues.includes(getIssueId(issue)))
+                .map(issue => getIssueId(issue));
             setSelectedIssues(prev => [...prev, ...newSelected]);
         }
     };
@@ -128,7 +137,7 @@ function App() {
             return;
         }
 
-        const selectedIssuesData = issues.filter(issue => selectedIssues.includes(issue.id));
+        const selectedIssuesData = issues.filter(issue => selectedIssues.includes(getIssueId(issue)));
 
         setLoading(true);
         vscode.postMessage({
@@ -178,14 +187,23 @@ function App() {
                     {viewMode === 'single' ? (
                         <button
                             className="toggle-btn"
-                            onClick={() => setViewMode('bulk')}
+                            onClick={() => {
+                                console.log('Switching to bulk mode, current issues:', issues.length);
+                                setViewMode('bulk');
+                            }}
                         >
                             Switch to bulk mode
                         </button>
                     ) : (
                         <button
                             className="toggle-btn"
-                            onClick={() => setViewMode('single')}
+                            onClick={() => {
+                                console.log('Switching to single mode, current issues:', issues.length);
+                                if (issues.length > 0) {
+                                    console.log('First issue in single mode:', issues[0]);
+                                }
+                                setViewMode('single');
+                            }}
                         >
                             Switch to single mode
                         </button>
@@ -238,19 +256,19 @@ function App() {
                                             onClick={() => handleSelectAll(ruleType)}
                                             className="select-all-btn"
                                         >
-                                            {ruleIssues.every(issue => selectedIssues.includes(issue.id)) ? 'Deselect All' : 'Select All'}
+                                            {ruleIssues.every(issue => selectedIssues.includes(getIssueId(issue))) ? 'Deselect All' : 'Select All'}
                                         </button>
                                     </div>
                                     <div className="issues-grid">
                                         {ruleIssues.map(issue => (
-                                            <div key={issue.id} className="issue-item">
+                                            <div key={`bulk-${issue.id || issue.uuid}`} className="issue-item">
                                                 <input
                                                     type="checkbox"
-                                                    checked={selectedIssues.includes(issue.id)}
-                                                    onChange={(e) => handleIssueSelect(issue.id, e.target.checked)}
+                                                    checked={selectedIssues.includes(getIssueId(issue))}
+                                                    onChange={(e) => handleIssueSelect(getIssueId(issue), e.target.checked)}
                                                 />
                                                 <div className="issue-details">
-                                                    <div className="issue-line">Line {issue.lineNumber}</div>
+                                                    <div className="issue-line">{issue.fileName || 'Unknown file'}, line {issue.lineNumber}</div>
                                                     <div className={`severity-badge ${getSeverityClass(issue.severity)}`}>
                                                         {issue.severity}
                                                     </div>
@@ -267,7 +285,7 @@ function App() {
                     <div className="single-mode">
                         <div className="issues-list">
                             {filteredIssues.map(issue => (
-                                <div key={issue.id} className="issue-item-single">
+                                <div key={`single-${issue.id || issue.uuid}`} className="issue-item-single">
                                     <div className="issue-details">
                                         <div className="issue-header">
                                             <span className={`severity-badge ${getSeverityClass(issue.severity)}`}>
@@ -275,7 +293,7 @@ function App() {
                                             </span>
                                             <span className="issue-rule">{issue.issueType}</span>
                                         </div>
-                                        <div className="issue-line">Line {issue.lineNumber}: {issue.elementName}</div>
+                                        <div className="issue-line">{issue.fileName || 'Unknown file'}, line {issue.lineNumber}: {issue.elementName}</div>
                                     </div>
                                     <button
                                         onClick={() => handleSingleWriteOff(issue)}
