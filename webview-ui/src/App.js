@@ -38,7 +38,7 @@ function App() {
     const [reason, setReason] = useState('');
     const [description, setDescription] = useState('');
     const [severityFilter, setSeverityFilter] = useState('all');
-    const [ruleFilter, setRuleFilter] = useState('');
+    const [filter, setFilter] = useState('');
     const [viewMode, setViewMode] = useState('single'); // 'bulk' or 'single'
     const [loading, setLoading] = useState(false);
 
@@ -72,9 +72,30 @@ function App() {
     }, []);
 
     const filteredIssues = issues.filter(issue => {
+        // First filter by severity
         const matchesSeverity = severityFilter === 'all' || issue.severity.toLowerCase() === severityFilter.toLowerCase();
-        const matchesRule = !ruleFilter || issue.issueType.toLowerCase().includes(ruleFilter.toLowerCase());
-        return matchesSeverity && matchesRule;
+
+        if (!matchesSeverity) {
+            return false;
+        }
+
+        // Then apply text filter if provided
+        if (!filter) {
+            return true;
+        }
+
+        const searchTerm = filter.toLowerCase();
+        const severity = (issue.severity || '').toLowerCase();
+        const rule = (issue.issueType || '').toLowerCase();
+        const fileName = (issue.fileName || '').toLowerCase();
+        const lineNumber = (issue.lineNumber || '').toString();
+        const elementName = (issue.elementName || '').toLowerCase();
+
+        return severity.includes(searchTerm) ||
+            rule.includes(searchTerm) ||
+            fileName.includes(searchTerm) ||
+            lineNumber.includes(searchTerm) ||
+            elementName.includes(searchTerm);
     });
 
     const groupedIssues = filteredIssues.reduce((groups, issue) => {
@@ -224,12 +245,12 @@ function App() {
                         </select>
                     </div>
                     <div className="filter-group">
-                        <label>Filter by rule:</label>
+                        <label>Filter:</label>
                         <input
                             type="text"
-                            placeholder="Search rules..."
-                            value={ruleFilter}
-                            onChange={(e) => setRuleFilter(e.target.value)}
+                            placeholder="Search by rule, file, line, or element..."
+                            value={filter}
+                            onChange={(e) => setFilter(e.target.value)}
                         />
                     </div>
                 </div>
