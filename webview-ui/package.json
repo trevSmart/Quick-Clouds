@@ -23,6 +23,7 @@
     "@types/react-dom": "^17.0.11",
     "@types/vscode-webview": "^1.57.0",
     "react-scripts": "^5.0.1",
+    "resolve-url-loader": "^5.0.0",
     "rewire": "^9.0.1",
     "typescript": "^4.4.4"
   },
@@ -50,5 +51,10 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "overrides": {
+    "resolve-url-loader": "^5.0.0",
+    "nth-check": "^2.0.1",
+    "webpack-dev-server": "^5.2.1"
   }
 }
