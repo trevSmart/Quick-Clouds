@@ -15,7 +15,7 @@ export function createStatusBarItems(apiKeyStatus: any, authType: string, isAuth
     }
 
     // Check debug mode setting
-    const debugMode = vscode.workspace.getConfiguration("QuickCloudsConfiguration").get("debugMode", false);
+    const debugMode = vscode.workspace.getConfiguration("QuickClouds").get("debugMode", false);
 
     // Priority 20 to sit between LiveCheck (30) and Quality Center (10)
     const newWO = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 20);

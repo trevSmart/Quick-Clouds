@@ -46,7 +46,7 @@ class WriteOffMenuPanel {
 
         // Set an event listener to listen for when the panel is disposed (i.e. when the user closes
         // the panel or when the panel is closed programmatically)
-        this._panel.onDidDispose(this.dispose, null, this._disposables);
+        this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
         logger.info('WriteOffMenuPanel: Disposal listener set');
 
         // Set the HTML content for the webview panel

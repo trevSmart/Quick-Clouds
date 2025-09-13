@@ -43,22 +43,23 @@ export async function activate(context: vscode.ExtensionContext) {
         });
 
         const liveCheckCommand = vscode.commands.registerCommand(CMD_LIVECHECK, async () => {
-            await executeLiveCheck(storageManager, buttonLC, context);
+            // Pass the write-off button and correct argument order
+            await executeLiveCheck(context, newWO, storageManager);
         });
 
         const writeOffCommand = vscode.commands.registerCommand(CMD_WRITE_OFF, async () => {
-            const writeOffPanel = new WriteOffMenuPanel(context.extensionUri);
-            writeOffPanel.show();
+            // Open Write-off panel using static render
+            WriteOffMenuPanel.render(context.extensionUri, context, env, newWO, storageManager);
         });
 
         const myIssuesCommand = vscode.commands.registerCommand(CMD_MY_ISSUES, async () => {
-            const myIssuesPanel = new MyIssuesPanel(context.extensionUri);
-            myIssuesPanel.show();
+            // Open Quality Center using static render
+            MyIssuesPanel.render(context.extensionUri, context, env, myIssues, storageManager);
         });
 
         const settingsCommand = vscode.commands.registerCommand(CMD_SETTINGS, async () => {
-            const settingsPanel = new SettingsPanel(context.extensionUri);
-            settingsPanel.show();
+            // Open Settings using static show
+            SettingsPanel.show(context.extensionUri, storageManager, context);
         });
 
         const applyChangesCommand = vscode.commands.registerCommand(CMD_APPLY_CHANGES, async () => {

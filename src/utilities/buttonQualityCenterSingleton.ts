@@ -8,7 +8,7 @@ export function getQualityCenterButtonInstance(): vscode.StatusBarItem {
         // Priority 10 to be rightmost among our three buttons
         // Order left-to-right on the Right side: LiveCheck (30) -> Write-off (20) -> Quality Center (10)
         qualityCenterButtonInstance = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 10);
-        qualityCenterButtonInstance.text = '$(issues) Quality Center';
+        qualityCenterButtonInstance.text = '$(library) Quality Center';
         qualityCenterButtonInstance.command = 'quick-clouds.myIssues';
     }
     return qualityCenterButtonInstance;
@@ -27,3 +27,6 @@ export async function updateQualityCenterButtonVisibility(storageManager: any): 
         qualityCenterButton.hide();
     }
 }
+
+// Export alias for backward compatibility
+export const updateQualityCenterVisibility = updateQualityCenterButtonVisibility;
