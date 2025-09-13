@@ -2,7 +2,7 @@
 	"name": "quick-clouds-for-salesforce",
 	"displayName": "Quick Clouds for Salesforce",
 	"description": "Checks for adherence to coding best practices for Salesforce.",
-	"version": "0.1.18",
+	"version": "0.1.19",
 	"license": "MIT",
 	"icon": "resources/logo.webp",
 	"engines": {
@@ -105,7 +105,9 @@
 	"scripts": {
 		"build:webview": "NODE_OPTIONS=--openssl-legacy-provider npm --prefix ./webview-ui run build:dev",
 		"build:vsix": "npm run build:webview && npx @vscode/vsce package --out quick-clouds-build-check.vsix",
-		"package": "./scripts/package.sh"
+		"package": "./scripts/package.sh",
+		"lint": "eslint .",
+		"lint:fix": "eslint . --fix"
 	},
 	"devDependencies": {
 		"@types/axios": "^0.14.4",
