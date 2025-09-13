@@ -237,13 +237,6 @@ function App() {
         setSelectedIssues([]);
 
         console.log('After selection - selectedIssue will be:', issue);
-
-        // Focus on reason select without scrolling
-        setTimeout(() => {
-            if (reasonSelectRef.current) {
-                reasonSelectRef.current.focus();
-            }
-        }, 100); // Small delay to ensure the state update has rendered
     };
 
     const handleSingleWriteOff = () => {
