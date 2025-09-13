@@ -131,6 +131,11 @@ class LocalStorageService {
     setLivecheckHistory(path, issues, timestamp) {
         return __awaiter(this, void 0, void 0, function* () {
             const db = yield this.getDb();
+            // Delete existing data for this file path to avoid duplicates
+            db.run(`DELETE FROM Issues WHERE history_id IN (SELECT id FROM LivecheckHistory WHERE path = ?)`, [path]);
+            db.run(`DELETE FROM WriteOffData WHERE history_id IN (SELECT id FROM LivecheckHistory WHERE path = ?)`, [path]);
+            db.run(`DELETE FROM LivecheckHistory WHERE path = ?`, [path]);
+            // Insert new data
             db.run(`INSERT INTO LivecheckHistory (path, timestamp) VALUES (?, ?)`, [path, timestamp]);
             // Get last inserted id
             const stmt = db.prepare(`SELECT last_insert_rowid() as id`);
