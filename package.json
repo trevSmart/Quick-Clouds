@@ -123,7 +123,7 @@
 	"publisher": "trevSmart",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/trevSmart/qc2.git"
+		"url": "https://github.com/trevSmart/Quick-Clouds.git"
 	},
 	"dependencies": {
 		"@vscode/webview-ui-toolkit": "^1.0.1",
