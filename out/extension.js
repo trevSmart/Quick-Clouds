@@ -37,6 +37,7 @@ exports.collection = exports.env = void 0;
 exports.activate = activate;
 exports.deactivate = deactivate;
 const vscode = __importStar(require("vscode"));
+const path = __importStar(require("path"));
 const env_2 = require("./env");
 const WriteOffMenuPanel_1 = require("./panels/WriteOffMenuPanel");
 const MyIssuesPanel_1 = require("./panels/MyIssuesPanel");
@@ -89,9 +90,15 @@ async function activate(context) {
             // Pass the write-off button and correct argument order
             await (0, executeLiveCheck_1.executeLiveCheck)(context, newWO, storageManager);
         });
-        const writeOffCommand = vscode.commands.registerCommand(constants_2.CMD_WRITE_OFF, async () => {
+        const writeOffCommand = vscode.commands.registerCommand(constants_2.CMD_WRITE_OFF, async (document, diagnostic) => {
+            const preselect = document && diagnostic
+                ? {
+                    fileName: path.basename(document.fileName),
+                    lineNumber: diagnostic.range.start.line + 1
+                }
+                : undefined;
             // Open Write-off panel using static render
-            WriteOffMenuPanel_1.WriteOffMenuPanel.render(context.extensionUri, context, exports.env, newWO, storageManager);
+            WriteOffMenuPanel_1.WriteOffMenuPanel.render(context.extensionUri, context, exports.env, newWO, storageManager, preselect);
         });
         const myIssuesCommand = vscode.commands.registerCommand(constants_2.CMD_MY_ISSUES, async () => {
             // Open Quality Center using static render

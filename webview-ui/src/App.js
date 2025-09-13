@@ -90,6 +90,15 @@ function App() {
                         if (typeof data.historyPath !== 'undefined') {
                             setHistoryPath(data.historyPath);
                         }
+                        if (data.preselect) {
+                            const { fileName, lineNumber } = data.preselect;
+                            const match = (data.issues || []).find(
+                                issue => issue.fileName === fileName && String(issue.lineNumber) === String(lineNumber)
+                            );
+                            if (match) {
+                                setSelectedIssue(match);
+                            }
+                        }
                     }
                     break;
                 case 'templatesData':
