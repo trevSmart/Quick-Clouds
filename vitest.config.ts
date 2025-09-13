@@ -59,8 +59,10 @@ export default defineConfig({
     setupFiles: ['./test/setup.ts'],
     
     // Mock configuration
-    deps: {
-      inline: ['vscode']
+    server: {
+      deps: {
+        inline: ['vscode']
+      }
     },
     
     // Global test configuration
@@ -79,8 +81,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),
-      '@test': resolve(__dirname, './test'),
-      'vscode': resolve(__dirname, './test/mocks/vscode-mock.ts')
+      '@test': resolve(__dirname, './test')
     }
   },
   
