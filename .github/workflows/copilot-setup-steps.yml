@@ -6,7 +6,7 @@ on:
       node_version:
         description: 'Node.js version to use'
         required: false
-        default: '18'
+        default: '20'
         type: choice
         options:
           - '18'
@@ -31,7 +31,7 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: ${{ github.event.inputs.node_version || '18' }}
+        node-version: ${{ github.event.inputs.node_version || '20' }}
         cache: 'npm'
 
     - name: Install project dependencies
@@ -45,15 +45,23 @@ jobs:
     - name: Install VSCE globally
       run: |
         echo "Installing @vscode/vsce globally..."
-        npm install -g @vscode/vsce
+        echo "Node.js version: $(node --version)"
+        echo "npm version: $(npm --version)"
+        npm install -g @vscode/vsce --force
         echo "VSCE version:"
         vsce --version
 
     - name: Verify VSCE installation
       run: |
         echo "Verifying VSCE installation..."
-        vsce --help | head -10
-        echo "VSCE is properly installed and ready to use"
+        if ! vsce --version; then
+          echo "Global VSCE installation failed, trying local installation..."
+          npm install @vscode/vsce
+          echo "Using npx to run VSCE..."
+          npx vsce --version
+        else
+          echo "VSCE is properly installed and ready to use"
+        fi
 
     - name: Install additional development tools
       run: |
@@ -80,7 +88,13 @@ jobs:
     - name: Test VSCE package command
       run: |
         echo "Testing VSCE package command..."
-        vsce package --no-dependencies --out quick-clouds-copilot-test.vsix
+        if command -v vsce >/dev/null 2>&1; then
+          echo "Using global VSCE installation..."
+          vsce package --no-dependencies --out quick-clouds-copilot-test.vsix
+        else
+          echo "Using npx VSCE..."
+          npx vsce package --no-dependencies --out quick-clouds-copilot-test.vsix
+        fi
         echo "VSIX file created successfully:"
         ls -la quick-clouds-copilot-test.vsix
 
@@ -97,7 +111,7 @@ jobs:
         echo "=========================================="
         echo "✅ Node.js $(node --version)"
         echo "✅ npm $(npm --version)"
-        echo "✅ VSCE $(vsce --version)"
+        echo "✅ VSCE $(command -v vsce >/dev/null 2>&1 && vsce --version || npx vsce --version)"
         echo "✅ TypeScript $(tsc --version)"
         echo "✅ ESLint $(eslint --version)"
         echo "✅ Project dependencies installed"
