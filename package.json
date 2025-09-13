@@ -2,7 +2,7 @@
 	"name": "quick-clouds-for-salesforce",
 	"displayName": "Quick Clouds for Salesforce",
 	"description": "Checks for adherence to coding best practices for Salesforce.",
-	"version": "0.1.52",
+	"version": "0.1.56",
 	"license": "MIT",
 	"icon": "resources/logo.webp",
 	"engines": {
@@ -77,7 +77,7 @@
 			}
 		],
 		"configuration": {
-			"title": "Quick Clouds",
+			"title": "Quick Clouds for Salesforce",
 			"properties": {
 				"QuickClouds.API-key": {
 					"type": "string",
