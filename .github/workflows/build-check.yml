@@ -28,17 +28,12 @@ jobs:
         cd webview-ui
         npm ci
 
-    - name: Build webview
-      run: |
-        cd webview-ui
-        npm run build:dev
-
     - name: Build VSIX package
       run: |
-        echo "Installing vsce globally..."
-        npm install -g @vscode/vsce
-        echo "Running build:vsix..."
-        npm run build:vsix
+        echo "Building webview..."
+        npm run build:webview
+        echo "Packaging VSIX with npx..."
+        npx @vscode/vsce package --out quick-clouds-build-check.vsix
 
     - name: Verify VSIX file exists
       run: |
