@@ -32,7 +32,7 @@ class WriteOffMenuPanel {
      * @param panel A reference to the webview panel
      * @param extensionUri The URI of the directory containing the extension
      */
-    constructor(panel, extensionUri, env, button, storageManager, context) {
+    constructor(panel, extensionUri, env, button, storageManager, context, preselectIssue) {
         const logger = logger_1.QuickCloudsLogger.getInstance();
         logger.info('WriteOffMenuPanel: Constructor called');
 
@@ -41,6 +41,7 @@ class WriteOffMenuPanel {
         this._button = button;
         this._storageManager = storageManager;
         this.context = context;
+        this._preselectIssue = preselectIssue;
 
         logger.info('WriteOffMenuPanel: Panel properties set');
 
@@ -65,7 +66,7 @@ class WriteOffMenuPanel {
      *
      * @param extensionUri The URI of the directory containing the extension.
      */
-    static render(extensionUri, context, env, button, storageManager) {
+    static render(extensionUri, context, env, button, storageManager, preselectIssue) {
         const logger = logger_1.QuickCloudsLogger.getInstance();
         logger.info('WriteOffMenuPanel: Render method called');
 
@@ -97,7 +98,7 @@ class WriteOffMenuPanel {
                 ],
             });
             logger.info('WriteOffMenuPanel: Panel created, initializing WriteOffMenuPanel');
-            WriteOffMenuPanel.currentPanel = new WriteOffMenuPanel(panel, extensionUri, env, button, storageManager, context);
+            WriteOffMenuPanel.currentPanel = new WriteOffMenuPanel(panel, extensionUri, env, button, storageManager, context, preselectIssue);
             logger.info('WriteOffMenuPanel: Panel initialization completed');
         }
     }
@@ -116,6 +117,7 @@ class WriteOffMenuPanel {
                 disposable.dispose();
             }
         }
+        this._preselectIssue = undefined;
     }
     /**
      * Defines and returns the HTML that should be rendered within the webview panel.
@@ -163,7 +165,9 @@ class WriteOffMenuPanel {
         // Matches src|href="(./)?static/..." or "static/..." or "/static/..."
         indexHtml = indexHtml.replace(/\b(href|src)="(\.\/)?static\/[^"]+"/g, (match) => {
             const valueMatch = match.match(/="([^"]+)"/);
-            if (!valueMatch) return match;
+            if (!valueMatch) {
+                return match;
+            }
             const original = valueMatch[1];
             const uri = toWebviewUri(original.replace(/^\//, ''));
             return match.replace(original, uri);
@@ -250,8 +254,11 @@ class WriteOffMenuPanel {
                 // Create the data structure expected by the webview
                 const woData = {
                     issues: lastScanIssues || [],
-                    historyId: historyId
+                    historyId: historyId,
                 };
+                if (this._preselectIssue) {
+                    woData.preselect = this._preselectIssue;
+                }
 
                 const responseData = { command: 'WOdata', data: JSON.stringify(woData) };
                 logger.info('WriteOffMenuPanel: Sending WOdata response: ' + JSON.stringify(responseData));
@@ -286,7 +293,7 @@ class WriteOffMenuPanel {
                     const fileName = data === null || data === void 0 ? void 0 : data.fileName;
                     const historyId = data === null || data === void 0 ? void 0 : data.historyId;
 
-                    if (!targetPath && historyId != null) {
+                    if (!targetPath && historyId !== null && historyId !== undefined) {
                         try {
                             const history = yield this._storageManager.getLivecheckHistory();
                             if (Array.isArray(history)) {

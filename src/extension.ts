@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import * as path from 'path';
 import { Env } from './env';
 import { WriteOffMenuPanel } from './panels/WriteOffMenuPanel';
 import { MyIssuesPanel } from './panels/MyIssuesPanel';
@@ -47,10 +48,19 @@ export async function activate(context: vscode.ExtensionContext) {
             await executeLiveCheck(context, newWO, storageManager);
         });
 
-        const writeOffCommand = vscode.commands.registerCommand(CMD_WRITE_OFF, async () => {
-            // Open Write-off panel using static render
-            WriteOffMenuPanel.render(context.extensionUri, context, env, newWO, storageManager);
-        });
+        const writeOffCommand = vscode.commands.registerCommand(
+            CMD_WRITE_OFF,
+            async (document?: vscode.TextDocument, diagnostic?: vscode.Diagnostic) => {
+                const preselect = document && diagnostic
+                    ? {
+                        fileName: path.basename(document.fileName),
+                        lineNumber: diagnostic.range.start.line + 1
+                    }
+                    : undefined;
+                // Open Write-off panel using static render
+                WriteOffMenuPanel.render(context.extensionUri, context, env, newWO, storageManager, preselect);
+            }
+        );
 
         const myIssuesCommand = vscode.commands.registerCommand(CMD_MY_ISSUES, async () => {
             // Open Quality Center using static render
