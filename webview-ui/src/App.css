@@ -322,7 +322,7 @@
 }
 
 .go-to-file-btn:hover {
-    background-color: var(--vscode-toolbar-hoverBackground, rgba(90,93,94,0.20));
+    background-color: var(--vscode-toolbar-hoverBackground, rgba(90, 93, 94, 0.20));
 }
 
 /* Codicon fallback if codicon font is not present */
@@ -332,7 +332,8 @@
 
 .go-to-file-btn .codicon:empty::before {
     /* Fallback glyph */
-    content: "\2197"; /* north east arrow */
+    content: "\2197";
+    /* north east arrow */
 }
 
 /* Severity badges */
@@ -522,7 +523,7 @@
 }
 
 .issues-counter {
-    padding: 15px 20px;
+    padding: 17px 20px;
     text-align: center;
     border-top: 1px solid var(--vscode-panel-border);
     background-color: var(--vscode-panel-background);
@@ -530,6 +531,6 @@
 
 .issues-counter p {
     margin: 0;
-    color: var(--vscode-descriptionForeground);
+    color: color-mix(in srgb, var(--vscode-foreground) 68%, #0000);
     font-size: 12px;
 }

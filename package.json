@@ -2,7 +2,7 @@
 	"name": "quick-clouds-for-salesforce",
 	"displayName": "Quick Clouds for Salesforce",
 	"description": "Checks for adherence to coding best practices for Salesforce.",
-	"version": "0.3.181",
+	"version": "0.3.188",
 	"license": "MIT",
 	"icon": "resources/logo.png",
 	"engines": {
@@ -96,7 +96,7 @@
 		"build:webview": "NODE_OPTIONS=--openssl-legacy-provider npm --prefix ./webview-ui run build:dev",
 		"build:webview:prod": "NODE_OPTIONS=--openssl-legacy-provider npm --prefix ./webview-ui run build",
 		"vscode:prepublish": "echo 'Skipping compilation for pre-built extension'",
-		"compile": "tsc -p ./",
+		"compile": "echo 'Skipping TypeScript compilation - using pre-compiled JavaScript files in out/ directory'",
 		"lint": "eslint src webview-ui/src media eslint.config.mjs --fix",
 		"package": "npm run build:webview && npm version patch --no-git-tag-version && VERSION=$(node -p \"require('./package.json').version\") && vsce package --out dist/quick-clouds-v$VERSION.vsix && code-insiders --install-extension dist/quick-clouds-v$VERSION.vsix --force",
 		"clean builds": "rm -f dist/quick-clouds-*.vsix"
@@ -111,7 +111,8 @@
 		"@vscode/test-electron": "^2.5.2",
 		"@vscode/vsce": "^3.6.0",
 		"eslint": "^9.35.0",
-		"typescript": "^5.9.2"
+		"typescript": "^5.9.2",
+		"@vscode/codicons": "^0.0.36"
 	},
 	"publisher": "trevSmart",
 	"repository": {
