@@ -66,9 +66,9 @@ function executeLiveCheck(context, newWO, storageManager) {
                     }
                 }
                 const parts: string[] = [];
-                if (counts.high) parts.push(`${counts.high} high`);
-                if (counts.medium) parts.push(`${counts.medium} medium`);
-                if (counts.low) parts.push(`${counts.low} low`);
+                if (counts.high) {parts.push(`${counts.high} high`);}
+                if (counts.medium) {parts.push(`${counts.medium} medium`);}
+                if (counts.low) {parts.push(`${counts.low} low`);}
                 const summary = parts.join(', ');
                 if (hasValidResult && qualityGatesPassed) {
                     if (totalIssues === 0) {
@@ -79,12 +79,12 @@ function executeLiveCheck(context, newWO, storageManager) {
                         vscode.window.showWarningMessage(warnMsg);
                     }
                     else {
-                        const message = `Live check FAILED. ${totalIssues} issues found (${summary})`;
+                        const message = `Live check FAILED. ${totalIssues} ${totalIssues === 1 ? 'issue' : 'issues'} found (${summary})`;
                         vscode.window.showErrorMessage(message);
                     }
                 }
                 else if (hasValidResult) {
-                    const message = `Live check FAILED. ${totalIssues} issues found (${summary})`;
+                    const message = `Live check FAILED. ${totalIssues} ${totalIssues === 1 ? 'issue' : 'issues'} found (${summary})`;
                     if (counts.high > 0) {
                         vscode.window.showErrorMessage(message);
                     }

@@ -412,7 +412,13 @@ function App() {
                                                 />
                                                 <div className="issue-details">
                                                     <div className="issue-line">
-                                                        {issue.fileName || 'Unknown file'}, line {issue.lineNumber}
+                                                        <button
+                                                            className="issue-link"
+                                                            title="Open file at this line"
+                                                            onClick={(e) => handleOpenInEditor(issue, e)}
+                                                        >
+                                                            {issue.fileName || 'Unknown file'}, line {issue.lineNumber}
+                                                        </button>
                                                         <button
                                                             className="go-to-file-btn"
                                                             title="Open file at this line"
@@ -457,7 +463,13 @@ function App() {
                                                 <span className="issue-rule">{issue.issueType}</span>
                                             </div>
                                             <div className="issue-line">
-                                                {formatIssueLine(issue)}
+                                                <button
+                                                    className="issue-link"
+                                                    title="Open file at this line"
+                                                    onClick={(e) => handleOpenInEditor(issue, e)}
+                                                >
+                                                    {formatIssueLine(issue)}
+                                                </button>
                                                 <button
                                                     className="go-to-file-btn"
                                                     title="Open file at this line"

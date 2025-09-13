@@ -8,6 +8,7 @@ import { executeLiveCheck } from './utilities/executeLiveCheck';
 import { generateCodeFix } from './utilities/generateCodeFix';
 import { validateApiKey } from './utilities/validateApiKey';
 import { initializeExtension } from './utilities/initializeExtension';
+import { restoreDiagnosticsFromStorage } from './utilities/restoreDiagnostics';
 import { createStatusBarItems } from './utilities/createStatusBarItems';
 import { OauthAuthentication } from './services/OauthAuthentication';
 import { uriHandler } from './utilities/uriHandler';
@@ -123,6 +124,13 @@ export async function activate(context: vscode.ExtensionContext) {
         }));
 
         logger.info('Quick Clouds Extension commands registered successfully');
+
+        // Restore diagnostics from stored history so issues are shown on startup
+        try {
+            await restoreDiagnosticsFromStorage(context, storageManager);
+        } catch (e) {
+            logger.warn('Diagnostics restore on activation failed');
+        }
 
     } catch (error) {
         const logger = QuickCloudsLogger.getInstance();

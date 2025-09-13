@@ -53,7 +53,7 @@ class CodeActionProvider implements vscode.CodeActionProvider {
                 // Show actions only for Quick Clouds diagnostics
                 const isQC = this.isQuickCloudsDiagnostic(diagnostic);
 
-                if (!isQC) continue;
+                if (!isQC) {continue;}
 
                 // Create write-off action with proper QuickFix kind for lightbulb
                 const writeOffAction = new vscode.CodeAction(
@@ -97,7 +97,7 @@ class CodeActionProvider implements vscode.CodeActionProvider {
 
     private isQuickCloudsDiagnostic(diagnostic: vscode.Diagnostic): boolean {
         const code = diagnostic.code;
-        if (!code) return false;
+        if (!code) {return false;}
 
         // When created by WriteIssues, code is an object with a stable `value`
         if (typeof code === 'object' && 'value' in code) {

@@ -52,6 +52,7 @@ const buttonLCSingleton_2 = require("./utilities/buttonLCSingleton");
 const buttonQualityCenterSingleton_2 = require("./utilities/buttonQualityCenterSingleton");
 const constants_2 = require("./constants");
 const logger_2 = require("./utilities/logger");
+const restoreDiagnostics_1 = require("./utilities/restoreDiagnostics");
 exports.env = env_2.Env.PROD;
 exports.collection = vscode.languages.createDiagnosticCollection('Quick Clouds');
 async function activate(context) {
@@ -142,6 +143,14 @@ async function activate(context) {
             }
         }));
         logger.info('Quick Clouds Extension commands registered successfully');
+
+        // Restore diagnostics from stored history so issues are shown on startup
+        try {
+            await (0, restoreDiagnostics_1.restoreDiagnosticsFromStorage)(context, storageManager);
+        }
+        catch (e) {
+            logger.warn('Diagnostics restore on activation failed');
+        }
     }
     catch (error) {
         const logger = logger_2.QuickCloudsLogger.getInstance();
