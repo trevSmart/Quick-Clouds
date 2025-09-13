@@ -51,7 +51,7 @@ function runLivecheck(context, storageManager) {
         }
         const { documentText, fullDocumentPath, documentPath, fileName } = documentDetails;
         if (!(0, IsElementToAnalize_1.default)(fileName)) {
-            vscode.window.showInformationMessage("This file is not supported by Quality Clouds scan");
+            vscode.window.showWarningMessage("This file is not supported by Quality Clouds scan");
             return { response: [], documentPath: fullDocumentPath };
         }
         const { authType } = yield (0, handleAuthenticationMethod_1.getAuthenticationStatus)(storageManager);

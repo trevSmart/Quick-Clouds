@@ -37,6 +37,8 @@ export class DebugMode {
      * Returns true if we are in DEBUG mode
      */
     public isDebug(): boolean {
+        // Always re-read the current setting to avoid stale state
+        this.detectDebugMode();
         return this.isDebugMode;
     }
 
@@ -44,6 +46,8 @@ export class DebugMode {
      * Returns true if we should simulate API calls instead of making real ones
      */
     public shouldSimulateApiCalls(): boolean {
+        // Keep behavior aligned with current setting at call time
+        this.detectDebugMode();
         return this.isDebugMode;
     }
 

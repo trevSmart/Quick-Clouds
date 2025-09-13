@@ -40,7 +40,7 @@ function runLivecheck(context, storageManager) {
         }
         const { documentText, fullDocumentPath, documentPath, fileName } = documentDetails;
         if (!(0, IsElementToAnalize_1.default)(fullDocumentPath)) {
-            vscode.window.showInformationMessage("This file is not supported by Quality Clouds scan");
+            vscode.window.showWarningMessage("This file is not supported by Quality Clouds scan");
             return { response: [], documentPath: fullDocumentPath };
         }
         const { authType } = yield (0, handleAuthenticationMethod_1.getAuthenticationStatus)(storageManager);
@@ -91,7 +91,7 @@ function runLivecheck(context, storageManager) {
                 const isDbg = dbg?.isDebug?.() === true;
                 if (isDbg) {
                     const before = Array.isArray(res.data.issues) ? res.data.issues.length : 0;
-                    const combined = dummyIssuesUtil.addDummyIssuesIfDebugMode(res.data.issues || [], true, fileName, fullDocumentPath);
+                    const combined = dummyIssuesUtil.addDummyIssuesIfDebugMode(res.data.issues || [], isDbg, fileName, fullDocumentPath);
                     res.data.issues = combined;
                     const added = res.data.issues.length - before;
                     logger.info(`Debug mode active: added ${added} dummy issues (file: ${fileName})`);

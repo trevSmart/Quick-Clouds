@@ -1,2 +1,424 @@
-.writeoff-container{padding:20px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Roboto",sans-serif;background-color:var(--vscode-editor-background);color:var(--vscode-editor-foreground);min-height:100vh}.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding-bottom:15px;border-bottom:1px solid var(--vscode-panel-border)}.header h1{margin:0;color:var(--vscode-editor-foreground);font-size:24px}.view-toggle{display:flex;grid-gap:15px;gap:15px}.view-toggle button{padding:8px 16px;border:1px solid var(--vscode-button-border);background-color:var(--vscode-button-background);color:var(--vscode-button-foreground);cursor:pointer;border-radius:4px;transition:all .2s}.view-toggle button:hover{background-color:var(--vscode-button-hoverBackground)}.view-toggle button.active{background-color:var(--vscode-button-secondaryBackground);color:var(--vscode-button-secondaryForeground)}.issues-section{border-radius:6px;overflow:hidden;margin-bottom:20px}.filters,.issues-section{background-color:var(--vscode-panel-background)}.filters{display:flex;grid-gap:20px;gap:20px;padding:15px 20px;border-bottom:1px solid var(--vscode-panel-border)}.filter-group:last-child{flex:1 1}.filter-group{display:flex;flex-direction:column;grid-gap:5px;gap:5px}.filter-group label{font-weight:500;font-size:12px;color:var(--vscode-descriptionForeground)}.filter-group input,.filter-group select{padding:6px 10px;border:1px solid var(--vscode-input-border);background-color:var(--vscode-input-background);color:var(--vscode-input-foreground);border-radius:4px;font-size:14px}.filter-group:first-child select{min-width:120px}.filter-group:last-child input{min-width:300px}.writeoff-form{margin-bottom:20px;padding:15px;background-color:var(--vscode-panel-background);border-radius:6px}.form-group{margin-bottom:15px}.form-group:last-child{margin-bottom:0}.form-group label{display:block;font-weight:500;margin-bottom:8px;color:var(--vscode-descriptionForeground)}.form-group input,.form-group select,.form-group textarea{width:100%;padding:8px 12px;border:1px solid var(--vscode-input-border);background-color:var(--vscode-input-background);color:var(--vscode-input-foreground);border-radius:4px;font-size:14px;font-family:inherit;box-sizing:border-box}.form-group textarea{resize:vertical;min-height:60px}.bulk-header{display:flex;justify-content:space-between;align-items:center;padding:15px 20px;background-color:var(--vscode-list-hoverBackground);border-bottom:1px solid var(--vscode-panel-border)}.bulk-header h3{margin:0;color:var(--vscode-editor-foreground)}.bulk-submit-btn{padding:10px 20px;background-color:var(--vscode-button-background);color:var(--vscode-button-foreground);border:1px solid var(--vscode-button-border);border-radius:4px;cursor:pointer;font-weight:500;transition:all .2s}.bulk-submit-btn:hover:not(:disabled){background-color:var(--vscode-button-hoverBackground)}.bulk-submit-btn:disabled{opacity:.6;cursor:not-allowed}.issues-list{max-height:400px;overflow-y:auto}.rule-group{border-bottom:1px solid var(--vscode-panel-border)}.rule-group:last-child{border-bottom:none}.rule-header{display:flex;justify-content:space-between;align-items:center;padding:12px 20px;background-color:var(--vscode-list-hoverBackground);border-bottom:1px solid var(--vscode-panel-border)}.rule-header h4{margin:0;color:var(--vscode-editor-foreground);font-size:16px}.select-all-btn{padding:6px 12px;background-color:var(--vscode-button-secondaryBackground);color:var(--vscode-button-secondaryForeground);border:1px solid var(--vscode-button-border);border-radius:4px;cursor:pointer;font-size:12px;transition:all .2s}.select-all-btn:hover{background-color:var(--vscode-button-secondaryHoverBackground)}.issues-grid{padding:10px 20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,300px));grid-gap:10px;gap:10px}.issue-item{display:flex;align-items:center;grid-gap:10px;gap:10px;padding:8px 12px;background-color:var(--vscode-editor-background);border:1px solid var(--vscode-panel-border);border-radius:4px;transition:all .2s;max-width:100%;overflow:hidden}.issue-item:hover{background-color:var(--vscode-list-hoverBackground)}.issue-item input[type=checkbox]{margin:0;cursor:pointer}.issue-details{flex:1 1;display:flex;flex-direction:column;grid-gap:2px;gap:2px}.issue-line{font-size:12px;color:var(--vscode-descriptionForeground)}.severity-badge{font-size:10px;padding:2px 6px;border-radius:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;display:inline-block;min-width:45px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.2)}.issue-details .severity-badge{align-self:flex-start;width:auto;max-width:-webkit-max-content;max-width:max-content}.severity-badge.severity-high{background-color:#dc3545;color:#fff;border:1px solid #c82333}.severity-badge.severity-medium{background-color:#fd7e14;color:#000;border:1px solid #e55a00}.severity-badge.severity-low{background-color:#ffc107;color:#212529;border:1px solid #e0a800}.severity-badge.severity-warning{background-color:#17a2b8;color:#fff;border:1px solid #138496}.severity-badge.severity-unknown{background-color:#6c757d;color:#fff;border:1px solid #5a6268}.issue-severity{font-size:11px;padding:2px 6px;border-radius:3px;font-weight:500;text-transform:uppercase}.issue-severity.High{background-color:var(--vscode-errorForeground);color:#fff}.issue-severity.Medium{background-color:var(--vscode-charts-orange);color:#fff}.issue-severity.Low{background-color:var(--vscode-charts-yellow);color:#000}.issue-severity.Warning{background-color:var(--vscode-charts-blue);color:#fff}.issue-element{font-size:13px;color:var(--vscode-editor-foreground);font-weight:500}.issue-item-single{display:flex;justify-content:space-between;align-items:center;padding:15px 20px;border-bottom:1px solid var(--vscode-panel-border);transition:all .2s}.issue-item-single:hover{background-color:var(--vscode-list-hoverBackground)}.issue-item-single:last-child{border-bottom:none}.issue-header{display:flex;grid-gap:10px;gap:10px;align-items:center;margin-bottom:5px}.issue-rule{font-weight:500;color:var(--vscode-editor-foreground)}.single-submit-btn{padding:8px 16px;background-color:var(--vscode-button-background);color:var(--vscode-button-foreground);border:1px solid var(--vscode-button-border);border-radius:4px;cursor:pointer;transition:all .2s}.single-submit-btn:hover:not(:disabled){background-color:var(--vscode-button-hoverBackground)}.single-submit-btn:disabled{opacity:.6;cursor:not-allowed}.footer{margin-top:20px;padding:10px 0;text-align:center;border-top:1px solid var(--vscode-panel-border);color:var(--vscode-descriptionForeground);font-size:12px}.issues-list::-webkit-scrollbar{width:8px}.issues-list::-webkit-scrollbar-track{background:var(--vscode-scrollbarSlider-background)}.issues-list::-webkit-scrollbar-thumb{background:var(--vscode-scrollbarSlider-hoverBackground);border-radius:4px}.issues-list::-webkit-scrollbar-thumb:hover{background:var(--vscode-scrollbarSlider-activeBackground)}
+.writeoff-container {
+    padding: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
+    background-color: var(--vscode-editor-background);
+    color: var(--vscode-editor-foreground);
+    min-height: 100vh
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--vscode-panel-border)
+}
+
+.header h1 {
+    margin: 0;
+    color: var(--vscode-editor-foreground);
+    font-size: 24px
+}
+
+.view-toggle {
+    display: flex;
+    grid-gap: 15px;
+    gap: 15px
+}
+
+.view-toggle button {
+    padding: 8px 16px;
+    border: 1px solid var(--vscode-button-border);
+    background-color: var(--vscode-button-background);
+    color: var(--vscode-button-foreground);
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all .2s
+}
+
+.view-toggle button:hover {
+    background-color: var(--vscode-button-hoverBackground)
+}
+
+.view-toggle button.active {
+    background-color: var(--vscode-button-secondaryBackground);
+    color: var(--vscode-button-secondaryForeground)
+}
+
+.issues-section {
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 20px
+}
+
+.filters,
+.issues-section {
+    background-color: var(--vscode-panel-background)
+}
+
+.filters {
+    display: flex;
+    grid-gap: 20px;
+    gap: 20px;
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--vscode-panel-border)
+}
+
+.filter-group:last-child {
+    flex: 1 1
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    grid-gap: 5px;
+    gap: 5px
+}
+
+.filter-group label {
+    font-weight: 500;
+    font-size: 12px;
+    color: var(--vscode-descriptionForeground)
+}
+
+.filter-group input,
+.filter-group select {
+    padding: 6px 10px;
+    border: 1px solid var(--vscode-input-border);
+    background-color: var(--vscode-input-background);
+    color: var(--vscode-input-foreground);
+    border-radius: 4px;
+    font-size: 14px
+}
+
+.filter-group:first-child select {
+    min-width: 120px
+}
+
+.filter-group:last-child input {
+    min-width: 300px
+}
+
+.writeoff-form {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: var(--vscode-panel-background);
+    border-radius: 6px
+}
+
+.form-group {
+    margin-bottom: 15px
+}
+
+.form-group:last-child {
+    margin-bottom: 0
+}
+
+.form-group label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: var(--vscode-descriptionForeground)
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--vscode-input-border);
+    background-color: var(--vscode-input-background);
+    color: var(--vscode-input-foreground);
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: inherit;
+    box-sizing: border-box
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 60px
+}
+
+.bulk-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background-color: var(--vscode-list-hoverBackground);
+    border-bottom: 1px solid var(--vscode-panel-border)
+}
+
+.bulk-header h3 {
+    margin: 0;
+    color: var(--vscode-editor-foreground)
+}
+
+.bulk-submit-btn {
+    padding: 10px 20px;
+    background-color: var(--vscode-button-background);
+    color: var(--vscode-button-foreground);
+    border: 1px solid var(--vscode-button-border);
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all .2s
+}
+
+.bulk-submit-btn:hover:not(:disabled) {
+    background-color: var(--vscode-button-hoverBackground)
+}
+
+.bulk-submit-btn:disabled {
+    opacity: .6;
+    cursor: not-allowed
+}
+
+.issues-list {
+    max-height: 400px;
+    overflow-y: auto
+}
+
+.rule-group {
+    border-bottom: 1px solid var(--vscode-panel-border)
+}
+
+.rule-group:last-child {
+    border-bottom: none
+}
+
+.rule-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 20px;
+    background-color: var(--vscode-list-hoverBackground);
+    border-bottom: 1px solid var(--vscode-panel-border)
+}
+
+.rule-header h4 {
+    margin: 0;
+    color: var(--vscode-editor-foreground);
+    font-size: 16px
+}
+
+.select-all-btn {
+    padding: 6px 12px;
+    background-color: var(--vscode-button-secondaryBackground);
+    color: var(--vscode-button-secondaryForeground);
+    border: 1px solid var(--vscode-button-border);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all .2s
+}
+
+.select-all-btn:hover {
+    background-color: var(--vscode-button-secondaryHoverBackground)
+}
+
+.issues-grid {
+    padding: 10px 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 300px));
+    grid-gap: 10px;
+    gap: 10px
+}
+
+.issue-item {
+    display: flex;
+    align-items: center;
+    grid-gap: 10px;
+    gap: 10px;
+    padding: 8px 12px;
+    background-color: var(--vscode-editor-background);
+    border: 1px solid var(--vscode-panel-border);
+    border-radius: 4px;
+    transition: all .2s;
+    max-width: 100%;
+    overflow: hidden
+}
+
+.issue-item:hover {
+    background-color: var(--vscode-list-hoverBackground)
+}
+
+.issue-item input[type=checkbox] {
+    margin: 0;
+    cursor: pointer
+}
+
+.issue-details {
+    flex: 1 1;
+    display: flex;
+    flex-direction: column;
+    grid-gap: 2px;
+    gap: 2px
+}
+
+.issue-line {
+    font-size: 12px;
+    color: var(--vscode-descriptionForeground)
+}
+
+.severity-badge {
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    display: inline-block;
+    min-width: 45px;
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .2)
+}
+
+.issue-details .severity-badge {
+    align-self: flex-start;
+    width: auto;
+    max-width: -webkit-max-content;
+    max-width: max-content
+}
+
+.severity-badge.severity-high {
+    background-color: #dc3545;
+    color: #fff;
+    border: 1px solid #c82333
+}
+
+.severity-badge.severity-medium {
+    background-color: #fd7e14;
+    color: #000;
+    border: 1px solid #ffa366
+}
+
+.severity-badge.severity-low {
+    background-color: #ffc107;
+    color: #212529;
+    border: 1px solid #e0a800
+}
+
+.severity-badge.severity-warning {
+    background-color: #17a2b8;
+    color: #fff;
+    border: 1px solid #138496
+}
+
+.severity-badge.severity-unknown {
+    background-color: #6c757d;
+    color: #fff;
+    border: 1px solid #5a6268
+}
+
+.issue-severity {
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-weight: 500;
+    text-transform: uppercase
+}
+
+.issue-severity.High {
+    background-color: var(--vscode-errorForeground);
+    color: #fff
+}
+
+.issue-severity.Medium {
+    background-color: var(--vscode-charts-orange);
+    color: #fff
+}
+
+.issue-severity.Low {
+    background-color: var(--vscode-charts-yellow);
+    color: #000
+}
+
+.issue-severity.Warning {
+    background-color: var(--vscode-charts-blue);
+    color: #fff
+}
+
+.issue-element {
+    font-size: 13px;
+    color: var(--vscode-editor-foreground);
+    font-weight: 500
+}
+
+.issue-item-single {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--vscode-panel-border);
+    transition: all .2s
+}
+
+.issue-item-single:hover {
+    background-color: var(--vscode-list-hoverBackground)
+}
+
+.issue-item-single:last-child {
+    border-bottom: none
+}
+
+.issue-header {
+    display: flex;
+    grid-gap: 10px;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 5px
+}
+
+.issue-rule {
+    font-weight: 500;
+    color: var(--vscode-editor-foreground)
+}
+
+.single-submit-btn {
+    padding: 8px 16px;
+    background-color: var(--vscode-button-background);
+    color: var(--vscode-button-foreground);
+    border: 1px solid var(--vscode-button-border);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all .2s
+}
+
+.single-submit-btn:hover:not(:disabled) {
+    background-color: var(--vscode-button-hoverBackground)
+}
+
+.single-submit-btn:disabled {
+    opacity: .6;
+    cursor: not-allowed
+}
+
+.footer {
+    margin-top: 20px;
+    padding: 10px 0;
+    text-align: center;
+    border-top: 1px solid var(--vscode-panel-border);
+    color: var(--vscode-descriptionForeground);
+    font-size: 12px
+}
+
+.issues-list::-webkit-scrollbar {
+    width: 8px
+}
+
+.issues-list::-webkit-scrollbar-track {
+    background: var(--vscode-scrollbarSlider-background)
+}
+
+.issues-list::-webkit-scrollbar-thumb {
+    background: var(--vscode-scrollbarSlider-hoverBackground);
+    border-radius: 4px
+}
+
+.issues-list::-webkit-scrollbar-thumb:hover {
+    background: var(--vscode-scrollbarSlider-activeBackground)
+}
+
 /*# sourceMappingURL=main.56449973.chunk.css.map */

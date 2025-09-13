@@ -38,17 +38,14 @@ const vscode = __importStar(require("vscode"));
 const buttonLCSingleton_2 = require("./buttonLCSingleton");
 const buttonQualityCenterSingleton_2 = require("./buttonQualityCenterSingleton");
 const constants_2 = require("../constants");
+const IsElementToAnalize_1 = require("./IsElementToAnalize");
 function createStatusBarItems(apiKeyStatus, authType, isAuthenticated = false, storageManager) {
     const buttonLC = (0, buttonLCSingleton_2.getButtonLCInstance)();
-    if (authType === 'apiKey') {
-        (apiKeyStatus && apiKeyStatus.statusCode === constants_2.HTTP_STATUS_OK) ? buttonLC.show() : buttonLC.hide();
-    }
-    else if (authType === 'credentials') {
-        isAuthenticated ? buttonLC.show() : buttonLC.hide();
-    }
-    else {
-        buttonLC.hide();
-    }
+    const activePath = vscode.window.activeTextEditor?.document?.uri?.fsPath || '';
+    const isSupportedFile = activePath ? (0, IsElementToAnalize_1.default)(activePath) : false;
+    const canShowByAuth = (authType === 'apiKey' && apiKeyStatus && apiKeyStatus.statusCode === constants_2.HTTP_STATUS_OK) ||
+        (authType === 'credentials' && isAuthenticated === true);
+    canShowByAuth && isSupportedFile ? buttonLC.show() : buttonLC.hide();
     // Check debug mode setting
     const debugMode = vscode.workspace.getConfiguration("QuickClouds").get("debugMode", false);
     // Priority 20 to sit between LiveCheck (30) and Quality Center (10)

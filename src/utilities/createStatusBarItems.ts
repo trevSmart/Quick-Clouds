@@ -1,18 +1,17 @@
 import * as vscode from 'vscode';
 import { getButtonLCInstance } from './buttonLCSingleton';
+import isElementToAnalize from './IsElementToAnalize';
 import { getQualityCenterButtonInstance, updateQualityCenterVisibility } from './buttonQualityCenterSingleton';
 import { HTTP_STATUS_OK } from '../constants';
 
 export function createStatusBarItems(apiKeyStatus: any, authType: string, isAuthenticated: boolean = false, storageManager?: any) {
     const buttonLC = getButtonLCInstance();
 
-    if (authType === 'apiKey') {
-        (apiKeyStatus && apiKeyStatus.statusCode === HTTP_STATUS_OK) ? buttonLC.show() : buttonLC.hide();
-    } else if (authType === 'credentials') {
-        isAuthenticated ? buttonLC.show() : buttonLC.hide();
-    } else {
-        buttonLC.hide();
-    }
+    const activePath = vscode.window.activeTextEditor?.document?.uri?.fsPath || '';
+    const isSupportedFile = activePath ? isElementToAnalize(activePath) : false;
+    const canShowByAuth = (authType === 'apiKey' && apiKeyStatus && apiKeyStatus.statusCode === HTTP_STATUS_OK) ||
+                          (authType === 'credentials' && isAuthenticated === true);
+    canShowByAuth && isSupportedFile ? buttonLC.show() : buttonLC.hide();
 
     // Check debug mode setting
     const debugMode = vscode.workspace.getConfiguration("QuickClouds").get("debugMode", false);

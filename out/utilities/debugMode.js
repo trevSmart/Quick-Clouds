@@ -66,12 +66,16 @@ class DebugMode {
      * Returns true if we are in DEBUG mode
      */
     isDebug() {
+        // Always re-read the current setting to avoid stale state
+        this.detectDebugMode();
         return this.isDebugMode;
     }
     /**
      * Returns true if we should simulate API calls instead of making real ones
      */
     shouldSimulateApiCalls() {
+        // Keep behavior aligned with current setting at call time
+        this.detectDebugMode();
         return this.isDebugMode;
     }
     /**

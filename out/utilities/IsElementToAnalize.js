@@ -15,8 +15,8 @@ function isElementToAnalize(fullPath) {
         if (/\/force-app\/.*\/triggers\/[^/]+\.trigger$/i.test(p)) {
             return true;
         }
-        // Aura JS
-        if (/\/force-app\/.*\/aura\/[^/]+\.js$/i.test(p)) {
+        // Aura JS (files live under aura/<ComponentName>/*.js)
+        if (/\/force-app\/.*\/aura\/[^/]+\/[^/]+\.js$/i.test(p)) {
             return true;
         }
         // LWC JS

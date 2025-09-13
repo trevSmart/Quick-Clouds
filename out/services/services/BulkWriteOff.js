@@ -105,6 +105,30 @@ class BulkWriteOffService {
         return grouped;
     }
     async requestWriteOff(issue, reason, description, env, storageManager, context) {
+        // Respect DEBUG mode: simulate instead of sending
+        try {
+            const dbg = require("../utilities/debugMode")?.DebugMode?.getInstance?.();
+            if (dbg?.shouldSimulateApiCalls?.()) {
+                dbg.log('BulkWriteOff: Simulating write-off request instead of making real API call', {
+                    issueId: issue.id,
+                    issueType: issue.issueType,
+                    reason,
+                    description,
+                    url: `${env}/api/v2/sf-live-check-issue/${issue.id}`
+                });
+                const simulatedResponse = {
+                    data: {
+                        attributes: {
+                            "write-off": {
+                                "write-off-status": "requested"
+                            }
+                        }
+                    }
+                };
+                return simulatedResponse.data;
+            }
+        } catch (_) { }
+
         const headers = {
             ...(await (0, getAuthHeader_1.getAuthHeader)(storageManager, context)),
             'Accept': 'application/vnd.api+json',

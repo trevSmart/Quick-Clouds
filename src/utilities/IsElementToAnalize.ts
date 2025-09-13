@@ -11,8 +11,8 @@ function isElementToAnalize(fullPath) {
         if (/\/force-app\/.*\/classes\/[^/]+\.cls$/i.test(p)) {return true;}
         // Apex triggers
         if (/\/force-app\/.*\/triggers\/[^/]+\.trigger$/i.test(p)) {return true;}
-        // Aura JS
-        if (/\/force-app\/.*\/aura\/[^/]+\.js$/i.test(p)) {return true;}
+        // Aura JS (files live under aura/<ComponentName>/*.js)
+        if (/\/force-app\/.*\/aura\/[^/]+\/[^/]+\.js$/i.test(p)) {return true;}
         // LWC JS
         if (/\/force-app\/.*\/lwc\/.*\.js$/i.test(p)) {return true;}
 

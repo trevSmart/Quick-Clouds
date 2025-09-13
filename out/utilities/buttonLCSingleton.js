@@ -37,6 +37,7 @@ exports.getButtonLCInstance = getButtonLCInstance;
 exports.updateButtonLCVisibility = updateButtonLCVisibility;
 const vscode = __importStar(require("vscode"));
 const constants_2 = require("../constants");
+const IsElementToAnalize_1 = require("./IsElementToAnalize");
 let buttonLCInstance = null;
 function getButtonLCInstance() {
     if (!buttonLCInstance) {
@@ -53,8 +54,11 @@ async function updateButtonLCVisibility(storageManager) {
     const authType = await storageManager.getUserData('authType');
     const apiKeyStatus = await storageManager.getUserData('apiKeyStatus');
     const isAuthenticated = await storageManager.getUserData('isAuthenticated');
-    const hasActiveEditor = !!vscode.window.activeTextEditor;
-    if (hasActiveEditor && ((authType === 'apiKey' && apiKeyStatus && apiKeyStatus.statusCode === constants_2.HTTP_STATUS_OK) ||
+    const activeEditor = vscode.window.activeTextEditor;
+    const hasActiveEditor = !!activeEditor;
+    const activePath = (activeEditor === null || activeEditor === void 0 ? void 0 : activeEditor.document?.uri?.fsPath) || '';
+    const isSupportedFile = hasActiveEditor ? (0, IsElementToAnalize_1.default)(activePath) : false;
+    if (hasActiveEditor && isSupportedFile && ((authType === 'apiKey' && apiKeyStatus && apiKeyStatus.statusCode === constants_2.HTTP_STATUS_OK) ||
         (authType === 'credentials' && isAuthenticated))) {
         buttonLC.show();
     }

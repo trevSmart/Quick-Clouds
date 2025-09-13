@@ -1,0 +1,6 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+  Use Context7 with context7CompatibleLibraryID "/microsoft/vscode-extension-samples"

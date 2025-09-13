@@ -25,6 +25,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.executeLiveCheck = void 0;
 const vscode = require("vscode");
+const path = require("path");
 const handleLicenseInfo_1 = require("./handleLicenseInfo");
 const GetWriteOffReasons_1 = require("../services/GetWriteOffReasons");
 const LiveCheck_1 = require("../services/LiveCheck");
@@ -33,10 +34,12 @@ const logger_1 = require("./logger");
 function executeLiveCheck(context, newWO, storageManager) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
+            const activeFile = vscode.window.activeTextEditor?.document?.fileName;
+            const fileLabel = activeFile ? ` for ${path.basename(activeFile)}` : '';
             yield vscode.window.withProgress({
                 location: vscode.ProgressLocation.Notification,
                 cancellable: false,
-                title: 'Running LiveCheck'
+                title: `Running live check${fileLabel}...`
             }, () => __awaiter(this, void 0, void 0, function* () {
                 const { response, documentPath, qualityGatesPassed } = yield (0, LiveCheck_1.runLivecheck)(context, storageManager);
                 // Log final results
@@ -59,10 +62,11 @@ function executeLiveCheck(context, newWO, storageManager) {
                     logger.info('ExecuteLiveCheck: No issues found, no write-off panel will be shown');
                 }
                 const totalIssues = response.length;
-                if (qualityGatesPassed) {
+                const hasValidResult = typeof qualityGatesPassed === 'boolean';
+                if (hasValidResult && qualityGatesPassed) {
                     vscode.window.showInformationMessage('Live check passed');
                 }
-                else {
+                else if (hasValidResult) {
                     const counts = { high: 0, medium: 0, low: 0 };
                     for (const issue of response) {
                         const severity = (issue.severity || '').toLowerCase();
@@ -76,7 +80,16 @@ function executeLiveCheck(context, newWO, storageManager) {
                             counts.low++;
                         }
                     }
-                    vscode.window.showInformationMessage(`Live check failed. ${totalIssues} issues (${counts.high} high, ${counts.medium} medium, ${counts.low} low)`);
+
+                    const message = `Live check failed. ${totalIssues} issues found (${counts.high} high, ${counts.medium} medium, ${counts.low} low)`;
+
+                    // Show error notification if there are high severity issues
+                    if (counts.high > 0) {
+                        vscode.window.showErrorMessage(message);
+                    } else if (totalIssues > 0) {
+                        // Show warning notification if there are issues but none are high severity
+                        vscode.window.showWarningMessage(message);
+                    }
                 }
             }));
         }

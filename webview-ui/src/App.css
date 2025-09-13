@@ -368,7 +368,7 @@
 .severity-badge.severity-medium {
     background-color: #ffa366;
     color: black;
-    border: 1px solid #e55a00;
+    border: 1px solid #ffa366;
 }
 
 .severity-badge.severity-low {
@@ -547,7 +547,7 @@
 }
 
 .severity-item.severity-medium {
-    color: #e55a00;
+    color: #ffa366;
 }
 
 .severity-item.severity-low {
