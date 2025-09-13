@@ -77,7 +77,8 @@ class LocalStorageService {
             const db = yield this.getDb();
             db.run('BEGIN TRANSACTION');
             try {
-                const tables = ['userData', 'LivecheckHistory', 'Issues', 'WriteOffData'];
+                // Only clear scan-related tables to preserve user settings
+                const tables = ['LivecheckHistory', 'Issues', 'WriteOffData'];
                 for (const table of tables) {
                     db.run(`DELETE FROM ${table}`);
                 }

@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.3.160] - 2025-01-26
 
 ### Fixed
-- Resolved error when running "Delete all data" command by clearing diagnostics and resetting stored data
+- Resolved error when running "Delete all data" by clearing scan history without wiping user settings
 
 ## [2.3.161] - 2025-01-26
 
