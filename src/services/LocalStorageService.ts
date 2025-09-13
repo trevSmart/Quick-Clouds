@@ -112,7 +112,16 @@ class LocalStorageService {
                     });
                 }
                 if (row.issue_data) {
-                    historyMap.get(row.id).issues.push(JSON.parse(row.issue_data));
+                    const issue = JSON.parse(row.issue_data);
+                    try {
+                        const path = require('path');
+                        const fileName = row.path ? path.basename(row.path) : undefined;
+                        if (fileName && !issue.fileName) {
+                            issue.fileName = fileName;
+                        }
+                    }
+                    catch (_) { }
+                    historyMap.get(row.id).issues.push(issue);
                 }
             }
             stmt.free();

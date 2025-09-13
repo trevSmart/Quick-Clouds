@@ -15,10 +15,13 @@ const extension_1 = require("../extension");
 function updateDiagnostics(document, response, context, storageManager) {
     return __awaiter(this, void 0, void 0, function* () {
         if (!document || !response) {
-            extension_1.collection.clear();
+            if (document) {
+                extension_1.collection.delete(document.uri);
+            }
             return;
         }
-        extension_1.collection.clear();
+        // Remove diagnostics only for the current document
+        extension_1.collection.delete(document.uri);
         const diagnosticsArray = [];
         const displayOnlyBlockerIssues = (yield storageManager.getUserData('OnlyBlockerIssues')) || false;
         if (!shouldWriteIssues(response)) {
