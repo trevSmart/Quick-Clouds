@@ -84,7 +84,7 @@ export async function activate(context: vscode.ExtensionContext) {
             try {
                 await storageManager.deleteAllData();
                 collection.clear();
-                vscode.window.showInformationMessage('All data has been deleted');
+                vscode.window.showInformationMessage('Live check issues cleared');
             } catch (error) {
                 logger.error('Failed to delete data', error);
                 vscode.window.showErrorMessage('Failed to delete data');

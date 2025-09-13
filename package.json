@@ -40,7 +40,7 @@
 			{
 				"command": "quick-clouds.deleteLCHistory",
 				"category": "Quick Clouds",
-				"title": "Clear issues"
+				"title": "Clear live check issues"
 			},
 			{
 				"command": "quick-clouds.writeoff",

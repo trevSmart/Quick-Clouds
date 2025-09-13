@@ -1,22 +1,22 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function (o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     var desc = Object.getOwnPropertyDescriptor(m, k);
     if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
+        desc = { enumerable: true, get: function () { return m[k]; } };
     }
     Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
+}) : (function (o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
 }));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function (o, v) {
     Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
+}) : function (o, v) {
     o["default"] = v;
 });
 var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
+    var ownKeys = function (o) {
         ownKeys = Object.getOwnPropertyNames || function (o) {
             var ar = [];
             for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
@@ -114,17 +114,17 @@ async function activate(context) {
         const discardChangesCommand = vscode.commands.registerCommand(constants_2.CMD_DISCARD_CHANGES, async () => {
             await (0, generateCodeFix_1.generateCodeFix)(storageManager, applyChangesButton, discardChangesButton, context, true);
         });
-         const deleteLCHistoryCommand = vscode.commands.registerCommand('quick-clouds.deleteLCHistory', async () => {
-             try {
-                 await storageManager.deleteAllData();
-                 exports.collection.clear();
-                 vscode.window.showInformationMessage('All data has been deleted');
-             }
-             catch (error) {
-                 logger.error('Failed to delete data', error);
-                 vscode.window.showErrorMessage('Failed to delete data');
-             }
-         });
+        const deleteLCHistoryCommand = vscode.commands.registerCommand('quick-clouds.deleteLCHistory', async () => {
+            try {
+                await storageManager.deleteAllData();
+                exports.collection.clear();
+                vscode.window.showInformationMessage('Live check issues cleared');
+            }
+            catch (error) {
+                logger.error('Failed to delete data', error);
+                vscode.window.showErrorMessage('Failed to delete data');
+            }
+        });
         const showLogsCommand = vscode.commands.registerCommand('quick-clouds.showLogs', () => {
             const logger = logger_2.QuickCloudsLogger.getInstance();
             logger.show();
