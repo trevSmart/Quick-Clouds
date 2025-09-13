@@ -59,7 +59,7 @@ describe('Issue Service', () => {
       id: 'test-1',
       message: 'Test message'
     })
-    
+
     expect(mockIssue.id).toBe('test-1')
   })
 })

@@ -29,7 +29,7 @@ export const vscodeMock = {
       dispose: vi.fn()
     }))
   },
-  
+
   workspace: {
     workspaceFolders: [
       {
@@ -58,30 +58,30 @@ export const vscodeMock = {
     save: vi.fn(),
     applyEdit: vi.fn()
   },
-  
+
   commands: {
     registerCommand: vi.fn(),
     executeCommand: vi.fn(),
     getCommands: vi.fn(() => Promise.resolve([]))
   },
-  
+
   Uri: {
     file: vi.fn((path: string) => ({ fsPath: path })),
     parse: vi.fn((uri: string) => ({ fsPath: uri }))
   },
-  
+
   Range: vi.fn((start: any, end: any) => ({ start, end })),
   Position: vi.fn((line: number, character: number) => ({ line, character })),
-  
+
   DiagnosticSeverity: {
     Error: 0,
     Warning: 1,
     Information: 2,
     Hint: 3
   },
-  
+
   Diagnostic: vi.fn(),
-  
+
   languages: {
     registerCodeActionsProvider: vi.fn(),
     createDiagnosticCollection: vi.fn(() => ({
@@ -90,12 +90,12 @@ export const vscodeMock = {
       dispose: vi.fn()
     }))
   },
-  
+
   extensions: {
     getExtension: vi.fn(),
     all: []
   },
-  
+
   env: {
     machineId: 'mock-machine-id',
     sessionId: 'mock-session-id',

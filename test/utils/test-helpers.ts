@@ -94,12 +94,12 @@ export function createMockFileSystem(files: Record<string, string>) {
     existsSync: vi.fn((path: string) => path in files),
     mkdirSync: vi.fn(),
     readdirSync: vi.fn((path: string) => {
-      const dirFiles = Object.keys(files).filter(file => 
+      const dirFiles = Object.keys(files).filter(file =>
         file.startsWith(path) && file !== path
       )
       return dirFiles.map(file => file.split('/').pop() || '')
     })
   }
-  
+
   return mockFs
 }

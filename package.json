@@ -111,7 +111,7 @@
 		"test": "vitest",
 		"test:run": "vitest run",
 		"test:ui": "vitest --ui",
-		"test:coverage": "vitest run --coverage",
+		"test:coverage": "vitest run --reporter=verbose",
 		"test:watch": "vitest --watch"
 	},
 	"devDependencies": {
