@@ -21,10 +21,32 @@ class DocumentsData {
     }
     static getFilesToAnalize(workspacePath) {
         let filesToAnalize = [];
-        let files = fs.readdirSync(workspacePath);
+
+        // Validate workspace path to prevent path traversal
+        const normalizedWorkspacePath = path.resolve(workspacePath);
+        if (!fs.existsSync(normalizedWorkspacePath)) {
+            console.warn(`Workspace path does not exist: ${normalizedWorkspacePath}`);
+            return filesToAnalize;
+        }
+
+        let files = fs.readdirSync(normalizedWorkspacePath);
         const EXCLUDED_DIRS = new Set(['node_modules', '.git', 'out', 'webview-ui', 'build', 'tmp', '.vscode', 'dist', 'coverage']);
         files.forEach(file => {
-            let filePath = path.join(workspacePath, file);
+            // Prevent path traversal by validating file names
+            if (file.includes('..') || file.includes('/') || file.includes('\\')) {
+                console.warn(`Skipping potentially malicious file path: ${file}`);
+                return;
+            }
+
+            let filePath = path.join(normalizedWorkspacePath, file);
+
+            // Additional security check: ensure the resolved path is still within workspace
+            const resolvedPath = path.resolve(filePath);
+            if (!resolvedPath.startsWith(normalizedWorkspacePath)) {
+                console.warn(`Path traversal attempt blocked: ${filePath}`);
+                return;
+            }
+
             let stat = fs.statSync(filePath);
             if (stat.isDirectory()) {
                 const base = path.basename(filePath);

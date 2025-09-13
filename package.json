@@ -19,7 +19,9 @@
 		"Analysis",
 		"Automated code review",
 		"Best practice",
-		"Static code analysis"
+		"Static code analysis",
+		"Security",
+		"Code quality"
 	],
 	"activationEvents": [
 		"onStartupFinished"

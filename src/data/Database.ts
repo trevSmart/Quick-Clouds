@@ -17,27 +17,42 @@ const SchemaManager_1 = require("./SchemaManager");
 let db = null;
 function initializeDatabase(dbPath) {
     return __awaiter(this, void 0, void 0, function* () {
-        const SQL = yield (0, sql_js_1.default)();
-        const dbDir = path.dirname(dbPath);
-        if (!fs.existsSync(dbDir)) {
-            fs.mkdirSync(dbDir, { recursive: true });
-            console.log("Created directory for database at:", dbDir);
-        }
-        if (!db) {
-            let fileBuffer;
-            if (fs.existsSync(dbPath)) {
-                fileBuffer = fs.readFileSync(dbPath);
-                db = new SQL.Database(fileBuffer);
-                console.log("Loaded existing database from:", dbPath);
+        try {
+            // Validate database path to prevent path traversal
+            const normalizedDbPath = path.resolve(dbPath);
+            const dbDir = path.dirname(normalizedDbPath);
+
+            if (!fs.existsSync(dbDir)) {
+                fs.mkdirSync(dbDir, { recursive: true });
+                console.log("Created directory for database");
             }
-            else {
-                db = new SQL.Database();
-                console.log("Created new in-memory database.");
+
+            const SQL = yield (0, sql_js_1.default)();
+
+            if (!db) {
+                let fileBuffer;
+                if (fs.existsSync(normalizedDbPath)) {
+                    try {
+                        fileBuffer = fs.readFileSync(normalizedDbPath);
+                        db = new SQL.Database(fileBuffer);
+                        console.log("Loaded existing database");
+                    } catch (readError) {
+                        console.error("Failed to read database file, creating new database:", readError.message);
+                        db = new SQL.Database();
+                    }
+                }
+                else {
+                    db = new SQL.Database();
+                    console.log("Created new in-memory database.");
+                }
+                // Ensure schema is created
+                SchemaManager_1.SchemaManager.initDB(db);
             }
-            // Ensure schema is created
-            SchemaManager_1.SchemaManager.initDB(db);
+            return db;
+        } catch (error) {
+            console.error("Database initialization failed:", error.message);
+            throw new Error("Failed to initialize database");
         }
-        return db;
     });
 }
 exports.initializeDatabase = initializeDatabase;

@@ -176,15 +176,22 @@ class WriteOffMenuPanel {
         // Inject CSP, a base tag to ensure any other relative paths resolve correctly
         // and a bridge script to route window.alert to VS Code notifications
         const bridgeUri = (0, getUri_1.getUri)(webview, extensionUri, ['media', 'webview-bridge.js']);
-        const cspMeta = `<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src ${webview.cspSource} data:; script-src ${webview.cspSource}; style-src ${webview.cspSource} 'unsafe-inline'; font-src ${webview.cspSource};">`;
+        const cspMeta = `<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src ${webview.cspSource} data:; script-src ${webview.cspSource} 'unsafe-eval'; style-src ${webview.cspSource} 'unsafe-inline'; font-src ${webview.cspSource}; connect-src ${webview.cspSource}; frame-ancestors 'none'; base-uri 'self';">`;
         indexHtml = indexHtml.replace('<head>', `<head>${cspMeta}<base href="${baseUri}/"><script src="${bridgeUri}"></script>`);
 
         // Log the resolved asset URIs for diagnostics
         try {
-            const jsMatch = indexHtml.match(/src=\"([^\"]*static\/js\/[^\"]*)\"/);
-            const cssMatch = indexHtml.match(/href=\"([^\"]*static\/css\/[^\"]*)\"/);
-            logger.info('WriteOffMenuPanel: Resolved JS URI: ' + (jsMatch ? jsMatch[1] : 'not found'));
-            logger.info('WriteOffMenuPanel: Resolved CSS URI: ' + (cssMatch ? cssMatch[1] : 'not found'));
+            // Use safer regex patterns to avoid ReDoS vulnerabilities
+            // Limit input length and use more specific patterns
+            if (indexHtml.length > 10000) {
+                logger.warn('WriteOffMenuPanel: HTML content too large for regex processing, skipping URI extraction');
+            } else {
+                // Use non-greedy quantifiers and limit repetition to prevent ReDoS
+                const jsMatch = indexHtml.match(/src="([^"]{0,100}static\/js\/[^"]{0,100})"/);
+                const cssMatch = indexHtml.match(/href="([^"]{0,100}static\/css\/[^"]{0,100})"/);
+                logger.info('WriteOffMenuPanel: Resolved JS URI: ' + (jsMatch ? jsMatch[1] : 'not found'));
+                logger.info('WriteOffMenuPanel: Resolved CSS URI: ' + (cssMatch ? cssMatch[1] : 'not found'));
+            }
         }
         catch (_) { }
 

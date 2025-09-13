@@ -28,13 +28,23 @@ class LocalStorageService {
     }
     getUserData(key) {
         return __awaiter(this, void 0, void 0, function* () {
+            // Validate key input to prevent injection
+            if (!key || typeof key !== 'string' || key.length > 255) {
+                throw new Error('Invalid key: must be a non-empty string with max 255 characters');
+            }
+
             const db = yield this.getDb();
             const stmt = db.prepare(`SELECT value FROM userData WHERE key = ?`);
             stmt.bind([key]);
             let result = null;
             if (stmt.step()) {
                 const row = stmt.getAsObject();
-                result = row.value ? JSON.parse(row.value) : null;
+                try {
+                    result = row.value ? JSON.parse(row.value) : null;
+                } catch (parseError) {
+                    console.error(`Failed to parse stored data for key ${key}:`, parseError);
+                    result = null;
+                }
             }
             stmt.free();
             return result;
@@ -42,8 +52,18 @@ class LocalStorageService {
     }
     setUserData(key, value) {
         return __awaiter(this, void 0, void 0, function* () {
-            const db = yield this.getDb();
+            // Validate key input to prevent injection
+            if (!key || typeof key !== 'string' || key.length > 255) {
+                throw new Error('Invalid key: must be a non-empty string with max 255 characters');
+            }
+
+            // Validate value size to prevent DoS
             const serializedValue = JSON.stringify(value);
+            if (serializedValue.length > 1024 * 1024) { // 1MB limit
+                throw new Error('Value too large: maximum 1MB allowed');
+            }
+
+            const db = yield this.getDb();
             db.run(`INSERT OR REPLACE INTO userData (key, value) VALUES (?, ?)`, [key, serializedValue]);
             (0, Database_1.saveDatabase)(db, this.dbPath);
             this.changeEmitter.emit(key, value);
