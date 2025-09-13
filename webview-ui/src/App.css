@@ -330,7 +330,7 @@
     font: 16px/1 codicon, monospace;
 }
 
-.go-to-file-btn .codicon:empty::before {
+.go-to-file-btn .codicon:not([class*="codicon-"]):empty::before {
     /* Fallback glyph */
     content: "\2197";
     /* north east arrow */

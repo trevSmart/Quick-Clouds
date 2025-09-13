@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import '@vscode/codicons/dist/codicon.css';
 import './App.css';
 
 // Acquire VS Code API once per webview and cache on window

@@ -91,7 +91,9 @@ class WriteOffMenuPanel {
                 // Restrict local resources to the webview build folder and media
                 localResourceRoots: [
                     vscode_1.Uri.joinPath(extensionUri, 'webview-ui', 'build'),
-                    vscode_1.Uri.joinPath(extensionUri, 'media')
+                    vscode_1.Uri.joinPath(extensionUri, 'media'),
+                    vscode_1.Uri.joinPath(extensionUri, 'resources'),
+                    vscode_1.Uri.joinPath(extensionUri, 'node_modules', '@vscode', 'codicons', 'dist')
                 ],
             });
             logger.info('WriteOffMenuPanel: Panel created, initializing WriteOffMenuPanel');
@@ -135,8 +137,8 @@ class WriteOffMenuPanel {
         const buildDirFsPath = path.join(extensionUri.fsPath, 'webview-ui', 'build');
         const indexPath = path.join(buildDirFsPath, 'index.html');
 
-        // Compute base URI for resolving relative assets
-        const baseUri = (0, getUri_1.getUri)(webview, extensionUri, ['webview-ui', 'build']);
+        // Compute base directory URI for resolving assets when building absolute webview URIs
+        const baseBuildUri = (0, getUri_1.getUri)(webview, extensionUri, ['webview-ui', 'build']);
 
         let indexHtml = '';
         try {
@@ -149,21 +151,26 @@ class WriteOffMenuPanel {
             return `<!DOCTYPE html><html><body><h3>QC2 Write-Off UI missing</h3><p>index.html not found under webview-ui/build.</p></body></html>`;
         }
 
-        // Rewrite asset URLs to webview URIs
-        const replaceUrl = (match, p1) => {
-            const clean = p1.replace(/^\//, ''); // strip leading '/'
-            const uri = (0, getUri_1.getUri)(webview, extensionUri, ['webview-ui', 'build', ...clean.split('/')]);
-            return match.replace(p1, String(uri));
+        // Helper to convert an attribute value that points to a build asset into a webview URI
+        const toWebviewUri = (rawPath) => {
+            // Normalize variations like ./static/..., /static/..., or static/...
+            const clean = String(rawPath).replace(/^\.?\/?/, '');
+            const parts = clean.split('/');
+            return String((0, getUri_1.getUri)(webview, extensionUri, ['webview-ui', 'build', ...parts]));
         };
 
-        // Replace href/src pointing to /static/... and /favicon.ico
-        indexHtml = indexHtml
-            .replace(/(href|src)="\/static\/(.*?)"/g, (m) => {
-            // m looks like href="/static/..." or src="/static/..."
-            const pathPart = m.match(/"(\/static\/.*?)"/)[1];
-            return replaceUrl(m, pathPart);
-        })
-            .replace(/href="\/favicon\.ico"/g, () => {
+        // Rewrite all href/src that reference build assets to absolute webview URIs
+        // Matches src|href="(./)?static/..." or "static/..." or "/static/..."
+        indexHtml = indexHtml.replace(/\b(href|src)="(\.\/)?static\/[^"]+"/g, (match) => {
+            const valueMatch = match.match(/="([^"]+)"/);
+            if (!valueMatch) return match;
+            const original = valueMatch[1];
+            const uri = toWebviewUri(original.replace(/^\//, ''));
+            return match.replace(original, uri);
+        });
+
+        // Rewrite favicon if present
+        indexHtml = indexHtml.replace(/href="\/favicon\.ico"/g, () => {
             const favPath = path.join(buildDirFsPath, 'favicon.ico');
             if (fs.existsSync(favPath)) {
                 const favUri = (0, getUri_1.getUri)(webview, extensionUri, ['webview-ui', 'build', 'favicon.ico']);
@@ -176,8 +183,11 @@ class WriteOffMenuPanel {
         // Inject CSP, a base tag to ensure any other relative paths resolve correctly
         // and a bridge script to route window.alert to VS Code notifications
         const bridgeUri = (0, getUri_1.getUri)(webview, extensionUri, ['media', 'webview-bridge.js']);
+        // Load Codicons CSS from packaged resources directory
+        const codiconCssUri = (0, getUri_1.getUri)(webview, extensionUri, ['resources', 'codicon.css']);
+        // Note: do not set a <base> tag; it violates base-uri 'self' and breaks resource loading
         const cspMeta = `<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src ${webview.cspSource} data:; script-src ${webview.cspSource} 'unsafe-eval'; style-src ${webview.cspSource} 'unsafe-inline'; font-src ${webview.cspSource}; connect-src ${webview.cspSource}; frame-ancestors 'none'; base-uri 'self';">`;
-        indexHtml = indexHtml.replace('<head>', `<head>${cspMeta}<base href="${baseUri}/"><script src="${bridgeUri}"></script>`);
+        indexHtml = indexHtml.replace('<head>', `<head>${cspMeta}<link rel="stylesheet" href="${codiconCssUri}"><script src="${bridgeUri}"></script>`);
 
         // Log the resolved asset URIs for diagnostics
         try {
