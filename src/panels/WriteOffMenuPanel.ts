@@ -279,6 +279,74 @@ class WriteOffMenuPanel {
                 setTimeout(() => WriteOffMenuPanel.currentPanel.dispose(), 300);
                 button.hide();
             }
+            if (command === 'openFileAtLine') {
+                try {
+                    const lineNumber = Number((data === null || data === void 0 ? void 0 : data.lineNumber) || 1);
+                    let targetPath = (data === null || data === void 0 ? void 0 : data.historyPath) || null;
+                    const fileName = data === null || data === void 0 ? void 0 : data.fileName;
+                    const historyId = data === null || data === void 0 ? void 0 : data.historyId;
+
+                    if (!targetPath && historyId != null) {
+                        try {
+                            const history = yield this._storageManager.getLivecheckHistory();
+                            if (Array.isArray(history)) {
+                                const entry = history.find((h) => String(h === null || h === void 0 ? void 0 : h.id) === String(historyId));
+                                if (entry && entry.path) {
+                                    targetPath = entry.path;
+                                }
+                            }
+                        }
+                        catch (e) {
+                            logger.warn('WriteOffMenuPanel: getLivecheckHistory failed: ' + (e === null || e === void 0 ? void 0 : e.message));
+                        }
+                    }
+
+                    if (!targetPath && fileName) {
+                        try {
+                            const matches = yield vscode.workspace.findFiles('**/' + fileName, '**/node_modules/**', 5);
+                            if (matches && matches.length > 0) {
+                                targetPath = matches[0].fsPath;
+                            }
+                        }
+                        catch (_) { }
+                    }
+
+                    if (!targetPath) {
+                        vscode.window.showWarningMessage('Quick Clouds: Could not resolve file path to open.');
+                        return;
+                    }
+
+                    let opened = false;
+                    try {
+                        const docUri = vscode_1.Uri.file(targetPath);
+                        yield vscode.workspace.openTextDocument(docUri);
+                        yield vscode.commands.executeCommand('vscode.open', docUri, {
+                            selection: new vscode_1.Range(new vscode_1.Position(Math.max(0, lineNumber - 1), 0), new vscode_1.Position(Math.max(0, lineNumber - 1), 0))
+                        });
+                        opened = true;
+                    } catch (_) {}
+
+                    if (!opened && fileName) {
+                        const matches2 = yield vscode.workspace.findFiles('**/' + fileName, '**/node_modules/**', 5);
+                        if (matches2 && matches2.length) {
+                            const docUri2 = matches2[0];
+                            yield vscode.workspace.openTextDocument(docUri2);
+                            yield vscode.commands.executeCommand('vscode.open', docUri2, {
+                                selection: new vscode_1.Range(new vscode_1.Position(Math.max(0, lineNumber - 1), 0), new vscode_1.Position(Math.max(0, lineNumber - 1), 0))
+                            });
+                            opened = true;
+                        }
+                    }
+
+                    if (!opened) {
+                        vscode.window.showWarningMessage('Quick Clouds: Could not open the file in the editor.');
+                    }
+                }
+                catch (e) {
+                    logger.error('WriteOffMenuPanel: openFileAtLine failed: ' + (e === null || e === void 0 ? void 0 : e.message));
+                }
+                return;
+            }
             if (command === "bulkWriteoffRequest") {
                 try {
                     const debugMode = require('../utilities/debugMode');
