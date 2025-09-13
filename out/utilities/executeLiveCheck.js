@@ -63,31 +63,38 @@ function executeLiveCheck(context, newWO, storageManager) {
                 }
                 const totalIssues = response.length;
                 const hasValidResult = typeof qualityGatesPassed === 'boolean';
+                const counts = { high: 0, medium: 0, low: 0 };
+                for (const issue of response) {
+                    const severity = (issue.severity || '').toLowerCase();
+                    if (severity === 'high') {
+                        counts.high++;
+                    }
+                    else if (severity === 'medium') {
+                        counts.medium++;
+                    }
+                    else if (severity === 'low') {
+                        counts.low++;
+                    }
+                }
                 if (hasValidResult && qualityGatesPassed) {
-                    vscode.window.showInformationMessage('Live check passed');
+                    if (totalIssues === 0) {
+                        vscode.window.showInformationMessage('Live check passed');
+                    }
+                    else if (counts.high === 0) {
+                        const warnMsg = `Live check passed with issues (${counts.medium} medium, ${counts.low} low)`;
+                        vscode.window.showWarningMessage(warnMsg);
+                    }
+                    else {
+                        const message = `Live check failed. ${totalIssues} issues found (${counts.high} high, ${counts.medium} medium, ${counts.low} low)`;
+                        vscode.window.showErrorMessage(message);
+                    }
                 }
                 else if (hasValidResult) {
-                    const counts = { high: 0, medium: 0, low: 0 };
-                    for (const issue of response) {
-                        const severity = (issue.severity || '').toLowerCase();
-                        if (severity === 'high') {
-                            counts.high++;
-                        }
-                        else if (severity === 'medium') {
-                            counts.medium++;
-                        }
-                        else if (severity === 'low') {
-                            counts.low++;
-                        }
-                    }
-
                     const message = `Live check failed. ${totalIssues} issues found (${counts.high} high, ${counts.medium} medium, ${counts.low} low)`;
-
-                    // Show error notification if there are high severity issues
                     if (counts.high > 0) {
                         vscode.window.showErrorMessage(message);
-                    } else if (totalIssues > 0) {
-                        // Show warning notification if there are issues but none are high severity
+                    }
+                    else if (totalIssues > 0) {
                         vscode.window.showWarningMessage(message);
                     }
                 }
