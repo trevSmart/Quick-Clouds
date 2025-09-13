@@ -101,16 +101,17 @@ function runLivecheck(context, storageManager) {
             }
 
             storageManager.setUserData("qualityGatesActive", (0, EvaluateQualityGates_1.default)(res.data.qualityGates));
+            const qualityGatesPassed = res.data.qualityGates.length === 0 || res.data.qualityGates[0].passed;
             let historyId = yield (0, GenerateIssuesHistory_1.default)(res.data.issues, fullDocumentPath, storageManager);
             logger.info('LiveCheck: Issues saved to history with ID: ' + historyId);
             (0, GenerateWOdata_1.default)(context, res.data.issues, documentText, extension_1.env, historyId, storageManager);
             const allowCompletionOnFail = (_d = (_c = res.data.qualityGates[0]) === null || _c === void 0 ? void 0 : _c.allowCompletionOnFail) !== null && _d !== void 0 ? _d : true;
             storageManager.setUserData("allowCompletionOnFail", allowCompletionOnFail);
-            return res.data.issues;
+            return { issues: res.data.issues, qualityGatesPassed };
         });
         try {
-            const response = yield doRequest();
-            return { response, documentPath: fullDocumentPath };
+            const { issues: response, qualityGatesPassed } = yield doRequest();
+            return { response, documentPath: fullDocumentPath, qualityGatesPassed };
         }
         catch (error) {
             const logger = logger_1.QuickCloudsLogger.getInstance();

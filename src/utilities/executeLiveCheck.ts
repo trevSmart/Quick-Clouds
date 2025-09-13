@@ -24,7 +24,7 @@ function executeLiveCheck(context, newWO, storageManager) {
                 cancellable: false,
                 title: 'Running LiveCheck'
             }, () => __awaiter(this, void 0, void 0, function* () {
-                const { response, documentPath } = yield (0, LiveCheck_1.runLivecheck)(context, storageManager);
+                const { response, documentPath, qualityGatesPassed } = yield (0, LiveCheck_1.runLivecheck)(context, storageManager);
 
                 // Log final results
                 const logger = logger_1.QuickCloudsLogger.getInstance();
@@ -40,11 +40,32 @@ function executeLiveCheck(context, newWO, storageManager) {
                     newWO.show();
                 }
                 if (response.length > 0) {
-                    vscode.window.showInformationMessage("LiveCheck completed");
                     (0, GetWriteOffReasons_1.default)(storageManager, context);
                     yield (0, handleLicenseInfo_1.handleLicenseInfo)(storageManager, context);
-                } else {
+                }
+                else {
                     logger.info('ExecuteLiveCheck: No issues found, no write-off panel will be shown');
+                }
+
+                const totalIssues = response.length;
+                if (qualityGatesPassed) {
+                    vscode.window.showInformationMessage('Live check passed');
+                }
+                else {
+                    const counts = { high: 0, medium: 0, low: 0 };
+                    for (const issue of response) {
+                        const severity = (issue.severity || '').toLowerCase();
+                        if (severity === 'high') {
+                            counts.high++;
+                        }
+                        else if (severity === 'medium') {
+                            counts.medium++;
+                        }
+                        else if (severity === 'low') {
+                            counts.low++;
+                        }
+                    }
+                    vscode.window.showInformationMessage(`Live check failed. ${totalIssues} issues (${counts.high} high, ${counts.medium} medium, ${counts.low} low)`);
                 }
             }));
         }

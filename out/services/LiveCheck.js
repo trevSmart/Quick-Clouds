@@ -2,18 +2,22 @@
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try {
-            step(generator.next(value));
+        function fulfilled(value) {
+            try {
+                step(generator.next(value));
+            }
+            catch (e) {
+                reject(e);
+            }
         }
-        catch (e) {
-            reject(e);
-        } }
-        function rejected(value) { try {
-            step(generator["throw"](value));
+        function rejected(value) {
+            try {
+                step(generator["throw"](value));
+            }
+            catch (e) {
+                reject(e);
+            }
         }
-        catch (e) {
-            reject(e);
-        } }
         function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
@@ -110,16 +114,17 @@ function runLivecheck(context, storageManager) {
                 logger.error('Failed to add dummy issues in debug mode', e);
             }
             storageManager.setUserData("qualityGatesActive", (0, EvaluateQualityGates_1.default)(res.data.qualityGates));
+            const qualityGatesPassed = res.data.qualityGates.length === 0 || res.data.qualityGates[0].passed;
             let historyId = yield (0, GenerateIssuesHistory_1.default)(res.data.issues, fullDocumentPath, storageManager);
             logger.info('LiveCheck: Issues saved to history with ID: ' + historyId);
             (0, GenerateWOdata_1.default)(context, res.data.issues, documentText, extension_1.env, historyId, storageManager);
             const allowCompletionOnFail = (_d = (_c = res.data.qualityGates[0]) === null || _c === void 0 ? void 0 : _c.allowCompletionOnFail) !== null && _d !== void 0 ? _d : true;
             storageManager.setUserData("allowCompletionOnFail", allowCompletionOnFail);
-            return res.data.issues;
+            return { issues: res.data.issues, qualityGatesPassed };
         });
         try {
-            const response = yield doRequest();
-            return { response, documentPath: fullDocumentPath };
+            const { issues: response, qualityGatesPassed } = yield doRequest();
+            return { response, documentPath: fullDocumentPath, qualityGatesPassed };
         }
         catch (error) {
             const logger = logger_1.QuickCloudsLogger.getInstance();
