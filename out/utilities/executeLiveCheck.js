@@ -93,12 +93,12 @@ function executeLiveCheck(context, newWO, storageManager) {
                         vscode.window.showWarningMessage(warnMsg);
                     }
                     else {
-                        const message = `Live check FAILED. ${totalIssues} ${totalIssues === 1 ? 'issue' : 'issues'} found (${summary})`;
+                        const message = `Live check FAILED with ${totalIssues} ${totalIssues === 1 ? 'issue' : 'issues'} found (${summary})`;
                         vscode.window.showErrorMessage(message);
                     }
                 }
                 else if (hasValidResult) {
-                    const message = `Live check FAILED. ${totalIssues} ${totalIssues === 1 ? 'issue' : 'issues'} found (${summary})`;
+                    const message = `Live check FAILED with ${totalIssues} ${totalIssues === 1 ? 'issue' : 'issues'} found (${summary})`;
                     if (counts.high > 0) {
                         vscode.window.showErrorMessage(message);
                     }
