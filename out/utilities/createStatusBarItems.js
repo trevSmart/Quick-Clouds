@@ -75,10 +75,15 @@ function createStatusBarItems(apiKeyStatus, authType, isAuthenticated = false, s
             : 'API Key not valid. Click to validate or update your API Key.';
     }
     const loginButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
-    loginButton.text = '$(account) Quality Clouds';
+    // Align label with TS source and branding
+    loginButton.text = '$(account) Quick Clouds settings';
     loginButton.command = 'quick-clouds.settings';
     loginButton.tooltip = tooltip;
-    loginButton.show();
+    // Respect `QuickClouds.showSettingsButton` setting
+    const showSettingsButton = vscode.workspace
+        .getConfiguration('QuickClouds')
+        .get('showSettingsButton', true);
+    showSettingsButton ? loginButton.show() : loginButton.hide();
     const myIssues = (0, buttonQualityCenterSingleton_2.getQualityCenterButtonInstance)();
     if (storageManager) {
         (0, buttonQualityCenterSingleton_2.updateQualityCenterVisibility)(storageManager);

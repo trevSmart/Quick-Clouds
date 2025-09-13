@@ -65,7 +65,23 @@ async function activate(context) {
         vscode.window.onDidChangeActiveTextEditor(() => {
             (0, buttonLCSingleton_2.updateButtonLCVisibility)(storageManager);
         });
-        const { newWO, myIssues, applyChangesButton, discardChangesButton } = (0, createStatusBarItems_1.createStatusBarItems)(apiKeyStatus, authType, isAuthenticated, storageManager);
+        const { newWO, myIssues, applyChangesButton, discardChangesButton, loginButton } = (0, createStatusBarItems_1.createStatusBarItems)(apiKeyStatus, authType, isAuthenticated, storageManager);
+
+        // React to configuration changes (status bar visibility, debug mode)
+        const cfgListener = vscode.workspace.onDidChangeConfiguration((e) => {
+            if (e.affectsConfiguration('QuickClouds.showSettingsButton')) {
+                const showSettingsButton = vscode.workspace.getConfiguration('QuickClouds').get('showSettingsButton', true);
+                showSettingsButton ? loginButton.show() : loginButton.hide();
+            }
+            if (e.affectsConfiguration('QuickClouds.showQualityCenterButton')) {
+                (0, buttonQualityCenterSingleton_2.updateQualityCenterVisibility)(storageManager);
+            }
+            if (e.affectsConfiguration('QuickClouds.debugMode')) {
+                const debugMode = vscode.workspace.getConfiguration('QuickClouds').get('debugMode', false);
+                debugMode ? newWO.show() : newWO.hide();
+            }
+        });
+        context.subscriptions.push(cfgListener);
         const validateAPIKeyCommand = vscode.commands.registerCommand(constants_2.CMD_VALIDATE_APIKEY, async (apiKeyFromWebview) => {
             await (0, validateApiKey_1.validateApiKey)(storageManager, buttonLC, context, apiKeyFromWebview);
         });

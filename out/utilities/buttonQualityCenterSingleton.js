@@ -54,8 +54,12 @@ async function updateQualityCenterButtonVisibility(storageManager) {
     const authType = await storageManager.getUserData('authType');
     const apiKeyStatus = await storageManager.getUserData('apiKeyStatus');
     const isAuthenticated = await storageManager.getUserData('isAuthenticated');
-    if ((authType === 'apiKey' && apiKeyStatus && apiKeyStatus.statusCode === constants_2.HTTP_STATUS_OK) ||
-        (authType === 'credentials' && isAuthenticated)) {
+    const showQualityCenterButton = vscode.workspace
+        .getConfiguration('QuickClouds')
+        .get('showQualityCenterButton', true);
+    if (showQualityCenterButton &&
+        ((authType === 'apiKey' && apiKeyStatus && apiKeyStatus.statusCode === constants_2.HTTP_STATUS_OK) ||
+            (authType === 'credentials' && isAuthenticated))) {
         qualityCenterButton.show();
     }
     else {
