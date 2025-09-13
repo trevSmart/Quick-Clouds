@@ -9,33 +9,33 @@ on:
 jobs:
   build-check:
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      
+
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '18'
         cache: 'npm'
-        
+
     - name: Install dependencies
       run: npm ci
-      
+
     - name: Install webview dependencies
       run: |
         cd webview-ui
         npm ci
-        
+
     - name: Build webview
       run: |
         cd webview-ui
         npm run build:dev
-        
+
     - name: Build VSIX package
       run: npm run build:vsix
-      
+
     - name: Verify VSIX file exists
       run: |
         if [ ! -f "quick-clouds-build-check.vsix" ]; then
@@ -43,7 +43,7 @@ jobs:
           exit 1
         fi
         echo "VSIX build successful"
-        
+
     - name: Upload VSIX artifact
       uses: actions/upload-artifact@v4
       with:
