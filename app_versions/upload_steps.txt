@@ -10,4 +10,4 @@ Upload .vsix to VS Marketplace
         1. npm install
         2. vsce publish -p ${token_in_vault} --allow-missing-repository
 
-VSCE Publisher -| https://marketplace.visualstudio.com/manage/publishers/qualityclouds
+VSCE Publisher -| https://marketplace.visualstudio.com/manage/publishers/trevSmart

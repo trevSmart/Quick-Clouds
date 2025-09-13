@@ -18,6 +18,7 @@ export function createStatusBarItems(apiKeyStatus: any, authType: string, isAuth
     const debugMode = vscode.workspace.getConfiguration("QuickCloudsConfiguration").get("debugMode", false);
 
     const newWO = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 2);
+    // Use a widely supported codicon for comments
     newWO.text = '$(comment-unresolved) Write off';
     newWO.command = 'quick-clouds.writeoff';
 

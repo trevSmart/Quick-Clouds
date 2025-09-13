@@ -5,6 +5,12 @@ All notable changes to Quick Clouds will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.159] - 2025-01-25
+
+### Fixed
+- Fixed LWC JavaScript file detection issue where LWC `.js` files were incorrectly identified as unsupported
+- Updated regex pattern in `IsElementToAnalize.ts` from `/\/force-app\/.*\/lwc\/[^/]+\.js$/i` to `/\/force-app\/.*\/lwc\/.*\.js$/i` to properly handle LWC component folder structure
+
 ## [2.3.66] - 2024-01-12
 
 ### Changed

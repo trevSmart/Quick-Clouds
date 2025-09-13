@@ -29,7 +29,7 @@ class SettingsPanel {
         this.storageManager = storageManager;
         this._extensionUri = extensionUri;
         this.context = context;
-        this._panel = vscode.window.createWebviewPanel('qualitycloudsSettings', 'Quality Clouds Settings', column, {
+        this._panel = vscode.window.createWebviewPanel('qualitycloudsSettings', 'Quick Clouds Settings', column, {
             enableScripts: true,
             localResourceRoots: [vscode.Uri.joinPath(extensionUri, 'media'), vscode.Uri.joinPath(extensionUri, 'webview-ui', 'build')]
         });
@@ -142,7 +142,7 @@ class SettingsPanel {
                 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${this._panel.webview.cspSource} 'unsafe-inline'; script-src ${this._panel.webview.cspSource}; img-src ${this._panel.webview.cspSource} data:; connect-src *;">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <link rel="stylesheet" type="text/css" href="${styleUri}">
-                <title>Quality Clouds Settings</title>
+                <title>Quick Clouds Settings</title>
             </head>
             <body>
                 <div id="root"></div>

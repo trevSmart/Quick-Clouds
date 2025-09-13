@@ -6,6 +6,7 @@ let buttonLCInstance: vscode.StatusBarItem | null = null;
 export function getButtonLCInstance(): vscode.StatusBarItem {
     if (!buttonLCInstance) {
         buttonLCInstance = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 1);
+        // Use a guaranteed codicon. `search-fuzzy` isn't available in all VS Code versions.
         buttonLCInstance.text = '$(search-fuzzy) LiveCheck';
         buttonLCInstance.command = 'quick-clouds.check';
     }

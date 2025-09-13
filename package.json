@@ -2,7 +2,7 @@
 	"name": "quick-clouds-for-salesforce",
 	"displayName": "Quick Clouds for Salesforce",
 	"description": "Checks for adherence to coding best practices for Salesforce.",
-	"version": "2.3.157",
+	"version": "2.3.165",
 	"license": "MIT",
 	"icon": "resources/logo.png",
 	"engines": {
@@ -33,7 +33,7 @@
 			{
 				"command": "quick-clouds.check",
 				"category": "Quick Clouds",
-				"title": "Salesforce Quality Live Check"
+				"title": "Quick Clouds Live Check"
 			},
 			{
 				"command": "quick-clouds.deleteLCHistory",

@@ -36,7 +36,7 @@ function runLivecheck(context, storageManager) {
             return { response: [], documentPath: '' };
         }
         const { documentText, fullDocumentPath, documentPath, fileName } = documentDetails;
-        if (!(0, IsElementToAnalize_1.default)(fileName)) {
+        if (!(0, IsElementToAnalize_1.default)(fullDocumentPath)) {
             vscode.window.showInformationMessage("This file is not supported by Quality Clouds scan");
             return { response: [], documentPath: fullDocumentPath };
         }
@@ -51,7 +51,7 @@ function runLivecheck(context, storageManager) {
         if (authType === 'credentials') {
             const selectedProject = yield storageManager.getUserData('selectedProject');
             if (!selectedProject) {
-                vscode.window.showInformationMessage("Please go to Quality Clouds settings and select a project.");
+                vscode.window.showInformationMessage("Please go to Quick Clouds settings and select a project.");
                 return { response: [], documentPath: fullDocumentPath };
             }
             if (!selectedProject.attributes || !selectedProject.attributes['main-instance-id']) {

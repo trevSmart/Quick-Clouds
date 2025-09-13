@@ -18,7 +18,7 @@ import { CMD_VALIDATE_APIKEY, CMD_LIVECHECK, CMD_WRITE_OFF, CMD_MY_ISSUES, CMD_S
 import { QuickCloudsLogger } from './utilities/logger';
 
 export const env = Env.PROD;
-export const collection = vscode.languages.createDiagnosticCollection('Quality Clouds');
+export const collection = vscode.languages.createDiagnosticCollection('Quick Clouds');
 
 export async function activate(context: vscode.ExtensionContext) {
     const logger = QuickCloudsLogger.getInstance();
