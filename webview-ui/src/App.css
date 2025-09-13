@@ -534,17 +534,12 @@
 .issues-counter p {
     margin: 0;
     color: color-mix(in srgb, var(--vscode-foreground) 68%, #0000);
-    font-size: 12px;
+    font-size: 13px;
+    letter-spacing: 0.3px;
 }
 
 .severity-breakdown {
-    font-size: 11px;
     color: color-mix(in srgb, var(--vscode-foreground) 50%, #0000);
-    font-weight: normal;
-}
-
-.severity-item {
-    font-weight: 500;
 }
 
 .severity-item.severity-high {

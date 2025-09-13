@@ -472,30 +472,31 @@ function App() {
                         {issues.length > 0 && (
                             <span className="severity-breakdown">
                                 {severityStats.high > 0 && (
-                                    <span className="severity-item severity-high">
-                                        {' '}{severityStats.high} high
-                                    </span>
+                                    <>
+                                        {' '}<span className="severity-item severity-high">{severityStats.high} high</span>
+                                    </>
                                 )}
                                 {severityStats.medium > 0 && (
-                                    <span className="severity-item severity-medium">
-                                        {severityStats.high > 0 ? ', ' : ' '}{severityStats.medium} medium
-                                    </span>
+                                    <>
+                                        {severityStats.high > 0 ? ', ' : ' '}<span className="severity-item severity-medium">{severityStats.medium} medium</span>
+                                    </>
                                 )}
                                 {severityStats.low > 0 && (
-                                    <span className="severity-item severity-low">
-                                        {(severityStats.high > 0 || severityStats.medium > 0) ? ' and ' : ' '}{severityStats.low} low
-                                    </span>
+                                    <>
+                                        {(severityStats.high > 0 || severityStats.medium > 0) ? ' and ' : ' '}<span className="severity-item severity-low">{severityStats.low} low</span>
+                                    </>
                                 )}
                                 {severityStats.warning > 0 && (
-                                    <span className="severity-item severity-warning">
-                                        {(severityStats.high > 0 || severityStats.medium > 0 || severityStats.low > 0) ? ', ' : ' '}{severityStats.warning} warning
-                                    </span>
+                                    <>
+                                        {(severityStats.high > 0 || severityStats.medium > 0 || severityStats.low > 0) ? ', ' : ' '}<span className="severity-item severity-warning">{severityStats.warning} warning</span>
+                                    </>
                                 )}
                                 {severityStats.unknown > 0 && (
-                                    <span className="severity-item severity-unknown">
-                                        {(severityStats.high > 0 || severityStats.medium > 0 || severityStats.low > 0 || severityStats.warning > 0) ? ', ' : ' '}{severityStats.unknown} unknown
-                                    </span>
+                                    <>
+                                        {(severityStats.high > 0 || severityStats.medium > 0 || severityStats.low > 0 || severityStats.warning > 0) ? ', ' : ' '}<span className="severity-item severity-unknown">{severityStats.unknown} unknown</span>
+                                    </>
                                 )}
+                                .
                             </span>
                         )}
                     </p>

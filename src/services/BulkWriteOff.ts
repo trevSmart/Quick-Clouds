@@ -3,6 +3,7 @@ import axios from 'axios';
 import { getAuthHeader } from '../utilities/getAuthHeader';
 import { QC_CLIENT_HEADER, QC_CLIENT_NAME } from '../constants';
 import { ApiService } from './ApiService';
+import { DebugMode } from '../utilities/debugMode';
 
 export interface Issue {
     id: string;
@@ -164,6 +165,36 @@ export class BulkWriteOffService {
         storageManager: any,
         context: vscode.ExtensionContext
     ): Promise<any> {
+        const debugMode = DebugMode.getInstance();
+
+        // Check if we're in debug mode
+        if (debugMode.shouldSimulateApiCalls()) {
+            debugMode.log('BulkWriteOff: Simulating write-off request instead of making real API call');
+            debugMode.log('BulkWriteOff: Simulated data:', {
+                issueId: issue.id,
+                issueType: issue.issueType,
+                reason: reason,
+                description: description,
+                url: `${env}/api/v2/sf-live-check-issue/${issue.id}`
+            });
+
+            // Simulate a successful response
+            const simulatedResponse = {
+                data: {
+                    attributes: {
+                        "write-off": {
+                            "write-off-status": "requested"
+                        }
+                    }
+                }
+            };
+
+            debugMode.log('BulkWriteOff: Simulated response:', simulatedResponse);
+
+            return simulatedResponse.data;
+        }
+
+        // Original implementation for non-debug mode
         const headers = {
             ...(await getAuthHeader(storageManager, context)),
             'Accept': 'application/vnd.api+json',
