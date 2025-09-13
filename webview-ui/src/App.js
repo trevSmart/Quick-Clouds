@@ -142,6 +142,42 @@ function App() {
         return groups;
     }, {});
 
+    // Calculate severity statistics
+    const getSeverityStats = (issuesList) => {
+        const stats = {
+            high: 0,
+            medium: 0,
+            low: 0,
+            warning: 0,
+            unknown: 0
+        };
+
+        issuesList.forEach(issue => {
+            const severity = (issue.severity || '').toLowerCase();
+            switch (severity) {
+                case 'high':
+                    stats.high++;
+                    break;
+                case 'medium':
+                    stats.medium++;
+                    break;
+                case 'low':
+                    stats.low++;
+                    break;
+                case 'warning':
+                    stats.warning++;
+                    break;
+                default:
+                    stats.unknown++;
+                    break;
+            }
+        });
+
+        return stats;
+    };
+
+    const severityStats = getSeverityStats(issues);
+
     const handleIssueSelect = (issueId, isSelected) => {
         if (isSelected) {
             setSelectedIssues(prev => [...prev, issueId]);
@@ -431,13 +467,38 @@ function App() {
 
                 {/* Move the counter inside the issues container */}
                 <div className="issues-counter">
-                    {viewMode === 'single' ? (
-                        <p>
-                            {selectedIssue ? `Selected: ${formatIssueLine(selectedIssue)}` : 'No issue selected'} | Total: {issues.length} issues
-                        </p>
-                    ) : (
-                        <p>Selected: {selectedIssues.length} issues | Total: {issues.length} issues</p>
-                    )}
+                    <p>
+                        {issues.length} issues:
+                        {issues.length > 0 && (
+                            <span className="severity-breakdown">
+                                {severityStats.high > 0 && (
+                                    <span className="severity-item severity-high">
+                                        {' '}{severityStats.high} high
+                                    </span>
+                                )}
+                                {severityStats.medium > 0 && (
+                                    <span className="severity-item severity-medium">
+                                        {severityStats.high > 0 ? ', ' : ' '}{severityStats.medium} medium
+                                    </span>
+                                )}
+                                {severityStats.low > 0 && (
+                                    <span className="severity-item severity-low">
+                                        {(severityStats.high > 0 || severityStats.medium > 0) ? ' and ' : ' '}{severityStats.low} low
+                                    </span>
+                                )}
+                                {severityStats.warning > 0 && (
+                                    <span className="severity-item severity-warning">
+                                        {(severityStats.high > 0 || severityStats.medium > 0 || severityStats.low > 0) ? ', ' : ' '}{severityStats.warning} warning
+                                    </span>
+                                )}
+                                {severityStats.unknown > 0 && (
+                                    <span className="severity-item severity-unknown">
+                                        {(severityStats.high > 0 || severityStats.medium > 0 || severityStats.low > 0 || severityStats.warning > 0) ? ', ' : ' '}{severityStats.unknown} unknown
+                                    </span>
+                                )}
+                            </span>
+                        )}
+                    </p>
                 </div>
             </div>
 

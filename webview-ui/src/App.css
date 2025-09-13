@@ -536,3 +536,33 @@
     color: color-mix(in srgb, var(--vscode-foreground) 68%, #0000);
     font-size: 12px;
 }
+
+.severity-breakdown {
+    font-size: 11px;
+    color: color-mix(in srgb, var(--vscode-foreground) 50%, #0000);
+    font-weight: normal;
+}
+
+.severity-item {
+    font-weight: 500;
+}
+
+.severity-item.severity-high {
+    color: #c82333;
+}
+
+.severity-item.severity-medium {
+    color: #e55a00;
+}
+
+.severity-item.severity-low {
+    color: #e0a800;
+}
+
+.severity-item.severity-warning {
+    color: #138496;
+}
+
+.severity-item.severity-unknown {
+    color: #5a6268;
+}
