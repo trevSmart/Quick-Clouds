@@ -22,14 +22,14 @@ export class DebugMode {
      * Detects if we are in DEBUG mode based on VSCode settings
      */
     private detectDebugMode(): void {
-        // Check the QC2 debug setting from VSCode configuration
-        const config = vscode.workspace.getConfiguration('QC2Configuration');
+        // Check the Quick Clouds debug setting from VSCode configuration
+        const config = vscode.workspace.getConfiguration('QuickClouds');
         this.isDebugMode = config.get('debugMode', false);
 
         // Log the detection result
         console.log('DebugMode: Detection result:', {
             debugModeSetting: this.isDebugMode,
-            source: 'QC2Configuration.debugMode'
+            source: 'QuickClouds.debugMode'
         });
     }
 

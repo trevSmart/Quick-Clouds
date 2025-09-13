@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 	<PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
 		<Metadata>
-			<Identity Language="en-US" Id="qc2" Version="2.3.1" Publisher="QualityClouds" />
-			<DisplayName>QC2</DisplayName>
+			<Identity Language="en-US" Id="qc2" Version="2.3.1" Publisher="trevSmart" />
+			<DisplayName>Quick Clouds for Salesforce</DisplayName>
 			<Description xml:space="preserve">Checks for adherence to coding best practices for Salesforce.</Description>
 			<Tags>Quality,salesforce,Apex,Analysis,Automated code review,Best practice,Static code analysis</Tags>
 			<Categories>Linters,Language Packs</Categories>

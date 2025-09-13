@@ -54,12 +54,12 @@ class SettingsPanel {
                     }
                     return;
                 case 'startLogin':
-                    yield vscode.commands.executeCommand('qc2.login');
+                    yield vscode.commands.executeCommand('quick-clouds.login');
                     const postLoginAuthStatus = yield (0, handleAuthenticationMethod_1.getAuthenticationStatus)(this.storageManager);
                     this._panel.webview.postMessage({ command: "authStatus", data: postLoginAuthStatus });
                     return;
                 case 'gatherProjects':
-                    vscode.commands.executeCommand('qc2.gatherProjects');
+                    vscode.commands.executeCommand('quick-clouds.gatherProjects');
                     const projects = yield this.storageManager.getUserData('projects');
                     this._panel.webview.postMessage({ command: "showProjects", data: projects });
                     return;
@@ -88,7 +88,7 @@ class SettingsPanel {
                 case 'validateApiKey':
                     const apikey = message.value;
                     yield this.storageManager.setUserData('apiKey', apikey);
-                    yield vscode.commands.executeCommand('qc2.validateAPIKey', apikey); // pass apiKey as argument
+                    yield vscode.commands.executeCommand('quick-clouds.validateAPIKey', apikey); // pass apiKey as argument
                     const updatedApiKeyStatus = yield this.storageManager.getUserData('apiKeyStatus');
                     this._panel.webview.postMessage({ command: "apiKeyStatus", data: updatedApiKeyStatus });
                     const updatedAuthStatus = yield (0, handleAuthenticationMethod_1.getAuthenticationStatus)(this.storageManager);

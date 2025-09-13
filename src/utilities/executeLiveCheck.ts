@@ -27,7 +27,7 @@ function executeLiveCheck(context, newWO, storageManager) {
                 const { response, documentPath } = yield (0, LiveCheck_1.runLivecheck)(context, storageManager);
 
                 // Log final results
-                const logger = logger_1.QC2Logger.getInstance();
+                const logger = logger_1.QuickCloudsLogger.getInstance();
                 logger.info('ExecuteLiveCheck: LiveCheck completed successfully');
                 logger.info('ExecuteLiveCheck: Final issues count: ' + (response ? response.length : 'No response'));
                 logger.info('ExecuteLiveCheck: Document path: ' + documentPath);
@@ -49,7 +49,7 @@ function executeLiveCheck(context, newWO, storageManager) {
             }));
         }
         catch (error) {
-            const logger = logger_1.QC2Logger.getInstance();
+            const logger = logger_1.QuickCloudsLogger.getInstance();
             logger.error('ExecuteLiveCheck failed:', error);
 
             // Enhanced error message

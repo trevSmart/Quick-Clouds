@@ -1,8 +1,8 @@
 {
-	"name": "qc2",
-	"displayName": "QC2",
+	"name": "quick-clouds-for-salesforce",
+	"displayName": "Quick Clouds for Salesforce",
 	"description": "Checks for adherence to coding best practices for Salesforce.",
-	"version": "2.3.146",
+	"version": "2.3.157",
 	"license": "MIT",
 	"icon": "resources/logo.png",
 	"engines": {
@@ -31,58 +31,58 @@
 	"contributes": {
 		"commands": [
 			{
-				"command": "qc2.check",
-				"category": "QC2",
+				"command": "quick-clouds.check",
+				"category": "Quick Clouds",
 				"title": "Salesforce Quality Live Check"
 			},
 			{
-				"command": "qc2.deleteLCHistory",
-				"category": "QC2",
+				"command": "quick-clouds.deleteLCHistory",
+				"category": "Quick Clouds",
 				"title": "Delete all data"
 			},
 			{
-				"command": "qc2.writeoff",
-				"category": "QC2",
+				"command": "quick-clouds.writeoff",
+				"category": "Quick Clouds",
 				"title": "Request an issue write off"
 			},
 			{
-				"command": "qc2.myIssues",
-				"category": "QC2",
+				"command": "quick-clouds.myIssues",
+				"category": "Quick Clouds",
 				"title": "Quality Center"
 			},
 			{
-				"command": "qc2.validateAPIKey",
-				"category": "QC2",
-				"title": "Validate QC2 API key"
+				"command": "quick-clouds.validateAPIKey",
+				"category": "Quick Clouds",
+				"title": "Validate Quick Clouds API key"
 			},
 			{
-				"command": "qc2.applyChanges",
+				"command": "quick-clouds.applyChanges",
 				"title": "Apply changes"
 			},
 			{
-				"command": "qc2.discardChanges",
+				"command": "quick-clouds.discardChanges",
 				"title": "Discard changes"
 			},
 			{
-				"command": "qc2.settings",
-				"category": "QC2",
-				"title": "Open QC2 Settings"
+				"command": "quick-clouds.settings",
+				"category": "Quick Clouds",
+				"title": "Open Quick Clouds Settings"
 			},
 			{
-				"command": "qc2.showLogs",
-				"category": "QC2",
-				"title": "Show QC2 Logs"
+				"command": "quick-clouds.showLogs",
+				"category": "Quick Clouds",
+				"title": "Show Quick Clouds Logs"
 			}
 		],
 		"configuration": {
-			"title": "QC2 Configuration",
+			"title": "Quick Clouds",
 			"properties": {
-				"QC2Configuration.API-key": {
+				"QuickClouds.API-key": {
 					"type": "string",
 					"default": "",
-					"description": "QC2 API Key"
+					"description": "Quick Clouds API Key"
 				},
-				"QC2Configuration.debugMode": {
+				"QuickClouds.debugMode": {
 					"type": "boolean",
 					"default": false,
 					"description": "Enable debug mode to simulate write-off requests instead of sending them to the server"
@@ -96,8 +96,8 @@
 		"vscode:prepublish": "echo 'Skipping compilation for pre-built extension'",
 		"compile": "tsc -p ./",
 		"lint": "eslint src webview-ui/src media eslint.config.mjs --fix",
-		"package": "npm run build:webview && npm version patch --no-git-tag-version && VERSION=$(node -p \"require('./package.json').version\") && vsce package --out dist/qc2-v$VERSION.vsix && code-insiders --install-extension dist/qc2-v$VERSION.vsix",
-		"clean builds": "rm -f dist/qc2-*.vsix"
+		"package": "npm run build:webview && npm version patch --no-git-tag-version && VERSION=$(node -p \"require('./package.json').version\") && vsce package --out dist/quick-clouds-v$VERSION.vsix && code-insiders --install-extension dist/quick-clouds-v$VERSION.vsix",
+		"clean builds": "rm -f dist/quick-clouds-*.vsix"
 	},
 	"devDependencies": {
 		"@types/axios": "^0.14.4",
@@ -111,10 +111,10 @@
 		"eslint": "^9.35.0",
 		"typescript": "^5.9.2"
 	},
-	"publisher": "QualityClouds",
+	"publisher": "trevSmart",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/QualityClouds/qc2.git"
+		"url": "https://github.com/trevSmart/qc2.git"
 	},
 	"dependencies": {
 		"@vscode/webview-ui-toolkit": "^1.0.1",

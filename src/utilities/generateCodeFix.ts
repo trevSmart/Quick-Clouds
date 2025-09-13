@@ -43,7 +43,7 @@ function generateCodeFix(document, diagnostic, storageManager, applyChangesButto
                 vscode.window.showInformationMessage(`Recommendation powered by Azure OpenAI ChatGPT.
                  AI-generated code may be wrong.
                  Ensure that you understand and test the recommended fix before applying it.`);
-                const applyCommand = vscode.commands.registerCommand('qc2.applyChanges', () => __awaiter(this, void 0, void 0, function* () {
+                const applyCommand = vscode.commands.registerCommand('quick-clouds.applyChanges', () => __awaiter(this, void 0, void 0, function* () {
                     yield applyChangesToOriginal(document, fixedUri);
                     yield discardAndClose(fixedUri);
                     applyChangesButton.hide();
@@ -54,7 +54,7 @@ function generateCodeFix(document, diagnostic, storageManager, applyChangesButto
                     applyCommand.dispose();
                     discardCommand.dispose();
                 }));
-                const discardCommand = vscode.commands.registerCommand('qc2.discardChanges', () => __awaiter(this, void 0, void 0, function* () {
+                const discardCommand = vscode.commands.registerCommand('quick-clouds.discardChanges', () => __awaiter(this, void 0, void 0, function* () {
                     yield discardAndClose(fixedUri);
                     applyChangesButton.hide();
                     discardChangesButton.hide();

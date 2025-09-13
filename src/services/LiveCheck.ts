@@ -70,7 +70,7 @@ function runLivecheck(context, storageManager) {
             const res = yield axios_1.default.post(url, body, { headers });
 
             // Log the issues returned by the API
-            const logger = logger_1.QC2Logger.getInstance();
+            const logger = logger_1.QuickCloudsLogger.getInstance();
             logger.info('LiveCheck API Response: Issues count = ' + (res.data.issues ? res.data.issues.length : 'No issues'));
             if (res.data.issues && res.data.issues.length > 0) {
                 logger.info('LiveCheck API Response: First issue sample: ' + JSON.stringify(res.data.issues[0], null, 2));
@@ -95,7 +95,7 @@ function runLivecheck(context, storageManager) {
             return { response, documentPath: fullDocumentPath };
         }
         catch (error) {
-            const logger = logger_1.QC2Logger.getInstance();
+            const logger = logger_1.QuickCloudsLogger.getInstance();
 
             if (axios_1.default.isAxiosError(error)) {
                 const authType = yield storageManager.getUserData('authType');

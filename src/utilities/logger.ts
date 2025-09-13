@@ -1,21 +1,18 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.QC2Logger = void 0;
-const vscode = require("vscode");
+import * as vscode from 'vscode';
 
-class QC2Logger {
-    private static instance: QC2Logger;
+export class QuickCloudsLogger {
+    private static instance: QuickCloudsLogger;
     private outputChannel: vscode.OutputChannel;
 
     private constructor() {
-        this.outputChannel = vscode.window.createOutputChannel('QC2');
+        this.outputChannel = vscode.window.createOutputChannel('Quick Clouds');
     }
 
-    public static getInstance(): QC2Logger {
-        if (!QC2Logger.instance) {
-            QC2Logger.instance = new QC2Logger();
+    public static getInstance(): QuickCloudsLogger {
+        if (!QuickCloudsLogger.instance) {
+            QuickCloudsLogger.instance = new QuickCloudsLogger();
         }
-        return QC2Logger.instance;
+        return QuickCloudsLogger.instance;
     }
 
     public log(message: string, level: 'INFO' | 'WARN' | 'ERROR' = 'INFO'): void {
@@ -25,7 +22,7 @@ class QC2Logger {
         this.outputChannel.appendLine(logMessage);
 
         // Also log to console for development
-        console.log(`QC2: ${logMessage}`);
+        console.log(`Quick Clouds: ${logMessage}`);
 
         // Show output channel for errors
         if (level === 'ERROR') {
@@ -64,5 +61,3 @@ class QC2Logger {
         this.outputChannel.clear();
     }
 }
-
-exports.QC2Logger = QC2Logger;

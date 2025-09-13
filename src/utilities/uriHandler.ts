@@ -29,7 +29,7 @@ class QualityCloudsUriHandler {
             yield this.context.globalState.update('qualityclouds.oauthState', undefined);
             if (otp) {
                 yield this.context.secrets.store('qualityclouds.otp', otp);
-                yield vscode.commands.executeCommand('qc2.getToken');
+                yield vscode.commands.executeCommand('quick-clouds.getToken');
             }
             else {
                 vscode.window.showErrorMessage('Authentication failed: No OTP found');

@@ -33,7 +33,7 @@ class WriteOffMenuPanel {
      * @param extensionUri The URI of the directory containing the extension
      */
     constructor(panel, extensionUri, env, button, storageManager, context) {
-        const logger = logger_1.QC2Logger.getInstance();
+        const logger = logger_1.QuickCloudsLogger.getInstance();
         logger.info('WriteOffMenuPanel: Constructor called');
 
         this._disposables = [];
@@ -66,7 +66,7 @@ class WriteOffMenuPanel {
      * @param extensionUri The URI of the directory containing the extension.
      */
     static render(extensionUri, context, env, button, storageManager) {
-        const logger = logger_1.QC2Logger.getInstance();
+        const logger = logger_1.QuickCloudsLogger.getInstance();
         logger.info('WriteOffMenuPanel: Render method called');
 
         if (WriteOffMenuPanel.currentPanel) {
@@ -127,7 +127,7 @@ class WriteOffMenuPanel {
      * rendered within the webview panel
      */
     _getWebviewContent(webview, extensionUri) {
-        const logger = logger_1.QC2Logger.getInstance();
+        const logger = logger_1.QuickCloudsLogger.getInstance();
         logger.info('WriteOffMenuPanel: Generating webview content from build/index.html');
 
         const fs = require('fs');
@@ -200,7 +200,7 @@ class WriteOffMenuPanel {
      * @param context A reference to the extension context
      */
     _setWebviewMessageListener(webview, env, button) {
-        const logger = logger_1.QC2Logger.getInstance();
+        const logger = logger_1.QuickCloudsLogger.getInstance();
         logger.info('WriteOffMenuPanel: Setting up message listener');
 
         webview.onDidReceiveMessage((message) => __awaiter(this, void 0, void 0, function* () {

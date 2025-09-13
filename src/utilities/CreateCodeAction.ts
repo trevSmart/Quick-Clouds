@@ -51,7 +51,7 @@ class CodeActionProvider {
         for (const diagnostic of context.diagnostics) {
             const action = new vscode.CodeAction(`Get QC Copilot Suggestion`, vscode.CodeActionKind.QuickFix);
             action.command = {
-                command: 'qc2.getAISuggestion',
+                command: 'quick-clouds.getAISuggestion',
                 title: 'Get QC Copilot Suggestion',
                 arguments: [document, diagnostic]
             };

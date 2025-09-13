@@ -38,7 +38,7 @@ class MyIssuesPanel {
         this._panel = panel;
         this._button = button;
         this._storageManager = storageManager;
-        this._logger = logger_1.QC2Logger.getInstance();
+        this._logger = logger_1.QuickCloudsLogger.getInstance();
 
         this._logger.info('MyIssuesPanel constructor called');
 
@@ -59,7 +59,7 @@ class MyIssuesPanel {
      * @param extensionUri The URI of the directory containing the extension.
      */
     static render(extensionUri, context, env, button, storageManager) {
-        const logger = logger_1.QC2Logger.getInstance();
+        const logger = logger_1.QuickCloudsLogger.getInstance();
         logger.info('MyIssuesPanel.render called');
 
         if (MyIssuesPanel.currentPanel) {
