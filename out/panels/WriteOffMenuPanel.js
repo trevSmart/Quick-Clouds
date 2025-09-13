@@ -224,24 +224,24 @@ class WriteOffMenuPanel {
             }
             if (command === "webviewLoaded") {
                 logger.info('WriteOffMenuPanel: Webview loaded message received');
-                const historyId = yield this._storageManager.getLastScanHistoryId();
-                logger.info('WriteOffMenuPanel: Last scan history ID: ' + historyId);
-                let lastScanIssues = null;
-                if (historyId !== null) {
-                    lastScanIssues = yield this._storageManager.getLastScanIssuesFromHistoryId(historyId);
-                    logger.info('WriteOffMenuPanel: Issues retrieved: ' + (lastScanIssues ? lastScanIssues.length : 'No issues'));
-                    if (lastScanIssues && lastScanIssues.length > 0) {
-                        logger.info('WriteOffMenuPanel: First issue sample: ' + JSON.stringify(lastScanIssues[0], null, 2));
+                let issues = [];
+                try {
+                    const history = yield this._storageManager.getLivecheckHistory();
+                    if (Array.isArray(history)) {
+                        for (const entry of history) {
+                            const path = require('path');
+                            const fileName = entry.path ? path.basename(entry.path) : undefined;
+                            for (const issue of entry.issues || []) {
+                                issues.push(Object.assign(Object.assign({}, issue), { historyId: entry.id, historyPath: entry.path, fileName: issue.fileName || fileName }));
+                            }
+                        }
                     }
                 }
-                else {
-                    logger.info('WriteOffMenuPanel: No history ID found');
+                catch (e) {
+                    logger.warn('WriteOffMenuPanel: getLivecheckHistory failed: ' + (e === null || e === void 0 ? void 0 : e.message));
                 }
-                // Create the data structure expected by the webview
-                const woData = {
-                    issues: lastScanIssues || [],
-                    historyId: historyId
-                };
+                logger.info('WriteOffMenuPanel: Total issues retrieved: ' + issues.length);
+                const woData = { issues: issues };
                 if (this._preselectIssue) {
                     woData.preselect = this._preselectIssue;
                 }
