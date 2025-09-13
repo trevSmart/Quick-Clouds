@@ -13,51 +13,44 @@ exports.registerCodeActionProvider = void 0;
 const vscode = require("vscode");
 function registerCodeActionProvider(context, storageManager) {
     return __awaiter(this, void 0, void 0, function* () {
-        function updateCodeActionProvider() {
-            return __awaiter(this, void 0, void 0, function* () {
-                const hasQCCopilot = (yield storageManager.getUserData('hasQCCopilot')) || false;
-                if (hasQCCopilot) {
-                    if (!CodeActionProvider.currentProvider) {
-                        const provider = new CodeActionProvider();
-                        CodeActionProvider.currentProvider = provider;
-                        const disposable = vscode.languages.registerCodeActionsProvider('*', provider, {
-                            providedCodeActionKinds: CodeActionProvider.providedCodeActionKinds
-                        });
-                        context.subscriptions.push(disposable);
-                        provider.disposables.push(disposable);
-                    }
-                }
-                else {
-                    if (CodeActionProvider.currentProvider) {
-                        CodeActionProvider.currentProvider.dispose();
-                        CodeActionProvider.currentProvider = null;
-                    }
-                }
-            });
-        }
-        yield updateCodeActionProvider();
-        storageManager.onDidChangeUserData('hasQCCopilot', () => __awaiter(this, void 0, void 0, function* () {
-            yield updateCodeActionProvider();
-        }));
+        const provider = new CodeActionProvider(storageManager);
+        const disposable = vscode.languages.registerCodeActionsProvider('*', provider, {
+            providedCodeActionKinds: CodeActionProvider.providedCodeActionKinds
+        });
+        context.subscriptions.push(disposable);
+        provider.disposables.push(disposable);
     });
 }
 exports.registerCodeActionProvider = registerCodeActionProvider;
 class CodeActionProvider {
-    constructor() {
+    constructor(storageManager) {
         this.disposables = [];
+        this._storageManager = storageManager;
     }
     provideCodeActions(document, range, context, token) {
-        const actions = [];
-        for (const diagnostic of context.diagnostics) {
-            const action = new vscode.CodeAction(`Get QC Copilot Suggestion`, vscode.CodeActionKind.QuickFix);
-            action.command = {
-                command: 'quick-clouds.getAISuggestion',
-                title: 'Get QC Copilot Suggestion',
-                arguments: [document, diagnostic]
-            };
-            actions.push(action);
-        }
-        return actions;
+        return __awaiter(this, void 0, void 0, function* () {
+            const actions = [];
+            const hasQCCopilot = (yield this._storageManager.getUserData('hasQCCopilot')) || false;
+            for (const diagnostic of context.diagnostics) {
+                const writeOffAction = new vscode.CodeAction(`Request write-off`, vscode.CodeActionKind.QuickFix);
+                writeOffAction.command = {
+                    command: 'quick-clouds.writeoff',
+                    title: 'Request write-off',
+                    arguments: [document, diagnostic]
+                };
+                actions.push(writeOffAction);
+                if (hasQCCopilot) {
+                    const action = new vscode.CodeAction(`Get QC Copilot Suggestion`, vscode.CodeActionKind.QuickFix);
+                    action.command = {
+                        command: 'quick-clouds.getAISuggestion',
+                        title: 'Get QC Copilot Suggestion',
+                        arguments: [document, diagnostic]
+                    };
+                    actions.push(action);
+                }
+            }
+            return actions;
+        });
     }
     dispose() {
         for (const disposable of this.disposables) {
@@ -67,5 +60,4 @@ class CodeActionProvider {
     }
 }
 CodeActionProvider.providedCodeActionKinds = [vscode.CodeActionKind.QuickFix];
-CodeActionProvider.currentProvider = null;
 //# sourceMappingURL=CreateCodeAction.js.map
