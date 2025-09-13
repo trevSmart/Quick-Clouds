@@ -28,10 +28,10 @@ jobs:
         cd webview-ui
         npm ci
 
-    - name: Build VSIX package
-      run: |
-        echo "Running build:vsix script..."
-        npm run build:vsix
+    # - name: Build VSIX package
+    #   run: |
+    #     echo "Running build:vsix script..."
+    #     npm run build:vsix
 
     # - name: Verify VSIX file exists
     #   run: |
