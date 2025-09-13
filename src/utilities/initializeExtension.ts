@@ -12,6 +12,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.initializeExtension = void 0;
 const vscode = require("vscode");
 const Database_1 = require("../data/Database");
+const fs = require("fs");
+const path = require("path");
 const LocalStorageService_1 = require("../services/LocalStorageService");
 const MementoStorageService_1 = require("../services/MementoStorageService");
 const MigrationService_1 = require("../services/MigrationService");
@@ -23,11 +25,38 @@ function initializeExtension(context) {
     return __awaiter(this, void 0, void 0, function* () {
         const dbPath = `${context.globalStorageUri.fsPath}/data.sql`;
         let storageManager;
+        // Attempt to migrate DB from old extension ID (pre-rename)
         try {
-            (0, Database_1.initializeDatabase)(dbPath);
+            const dir = path.dirname(dbPath);
+            if (!fs.existsSync(dir)) {
+                fs.mkdirSync(dir, { recursive: true });
+            }
+            if (!fs.existsSync(dbPath)) {
+                const globalStorageRoot = path.dirname(context.globalStorageUri.fsPath);
+                const oldIds = [
+                    'qualityclouds.livecheckqualityforsalesforce',
+                    'QualityClouds.livecheckqualityforsalesforce',
+                    'qualityclouds.quick-clouds-for-salesforce',
+                    'QualityClouds.quick-clouds-for-salesforce'
+                ];
+                for (const id of oldIds) {
+                    const candidate = path.join(globalStorageRoot, id, 'data.sql');
+                    try {
+                        if (fs.existsSync(candidate)) {
+                            fs.copyFileSync(candidate, dbPath);
+                            break;
+                        }
+                    } catch (_) { }
+                }
+            }
+        } catch (_) { }
+        try {
+            // Initialize DB and use file-backed storage
+            yield (0, Database_1.initializeDatabase)(dbPath);
             storageManager = new LocalStorageService_1.LocalStorageService(dbPath);
         }
         catch (error) {
+            // Fallback: use Memento when DB is unavailable
             storageManager = new MementoStorageService_1.MementoStorageService(context.globalState);
         }
         yield (0, CreateCodeAction_1.registerCodeActionProvider)(context, storageManager);

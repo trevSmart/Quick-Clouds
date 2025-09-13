@@ -5,7 +5,8 @@ let qualityCenterButtonInstance: vscode.StatusBarItem | null = null;
 
 export function getQualityCenterButtonInstance(): vscode.StatusBarItem {
     if (!qualityCenterButtonInstance) {
-        qualityCenterButtonInstance = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 2);
+        // Priority 3 to appear to the right of LiveCheck (1) and Write-off (2)
+        qualityCenterButtonInstance = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 3);
         qualityCenterButtonInstance.text = '$(issues) Quality Center';
         qualityCenterButtonInstance.command = 'quick-clouds.myIssues';
     }
