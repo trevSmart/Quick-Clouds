@@ -161,8 +161,9 @@ class WriteOffMenuPanel {
         indexHtml = indexHtml
             .replace(/\b(href|src)=["'](?:\.\/|\/)?static\/[^"]+["']/g, (m) => {
             const valueMatch = m.match(/=["']([^"']+)["']/);
-            if (!valueMatch)
+            if (!valueMatch) {
                 return m;
+            }
             const original = valueMatch[1];
             const uri = toWebviewUri(original.replace(/^\//, ''));
             return m.replace(original, uri);

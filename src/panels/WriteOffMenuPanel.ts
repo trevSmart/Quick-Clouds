@@ -163,7 +163,9 @@ class WriteOffMenuPanel {
         // Matches src|href="(./)?static/..." or "static/..." or "/static/..."
         indexHtml = indexHtml.replace(/\b(href|src)="(\.\/)?static\/[^"]+"/g, (match) => {
             const valueMatch = match.match(/="([^"]+)"/);
-            if (!valueMatch) return match;
+            if (!valueMatch) {
+                return match;
+            }
             const original = valueMatch[1];
             const uri = toWebviewUri(original.replace(/^\//, ''));
             return match.replace(original, uri);
