@@ -1,0 +1,119 @@
+name: Copilot Environment Setup
+
+on:
+  workflow_dispatch:
+    inputs:
+      node_version:
+        description: 'Node.js version to use'
+        required: false
+        default: '18'
+        type: choice
+        options:
+          - '18'
+          - '20'
+          - '21'
+  push:
+    branches: [ main ]
+    paths:
+      - '.github/workflows/copilot-setup.yml'
+      - 'package.json'
+      - 'package-lock.json'
+
+jobs:
+  copilot-setup:
+    runs-on: ubuntu-latest
+    name: Setup Copilot Development Environment
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ github.event.inputs.node_version || '18' }}
+        cache: 'npm'
+
+    - name: Install project dependencies
+      run: npm ci
+
+    - name: Install webview dependencies
+      run: |
+        cd webview-ui
+        npm ci
+
+    - name: Install VSCE globally
+      run: |
+        echo "Installing @vscode/vsce globally..."
+        npm install -g @vscode/vsce
+        echo "VSCE version:"
+        vsce --version
+
+    - name: Verify VSCE installation
+      run: |
+        echo "Verifying VSCE installation..."
+        vsce --help | head -10
+        echo "VSCE is properly installed and ready to use"
+
+    - name: Install additional development tools
+      run: |
+        echo "Installing additional development tools..."
+        npm install -g typescript
+        npm install -g eslint
+        echo "TypeScript version:"
+        tsc --version
+        echo "ESLint version:"
+        eslint --version
+
+    - name: Verify project structure
+      run: |
+        echo "Verifying project structure..."
+        echo "Package.json exists:"
+        ls -la package.json
+        echo "Source directory exists:"
+        ls -la src/
+        echo "Webview UI directory exists:"
+        ls -la webview-ui/
+        echo "Out directory exists:"
+        ls -la out/
+
+    - name: Test VSCE package command
+      run: |
+        echo "Testing VSCE package command..."
+        vsce package --no-dependencies --out quick-clouds-copilot-test.vsix
+        echo "VSIX file created successfully:"
+        ls -la quick-clouds-copilot-test.vsix
+
+    - name: Cleanup test files
+      run: |
+        echo "Cleaning up test files..."
+        rm -f quick-clouds-copilot-test.vsix
+        echo "Cleanup completed"
+
+    - name: Setup summary
+      run: |
+        echo "=========================================="
+        echo "Copilot Environment Setup Complete!"
+        echo "=========================================="
+        echo "✅ Node.js $(node --version)"
+        echo "✅ npm $(npm --version)"
+        echo "✅ VSCE $(vsce --version)"
+        echo "✅ TypeScript $(tsc --version)"
+        echo "✅ ESLint $(eslint --version)"
+        echo "✅ Project dependencies installed"
+        echo "✅ Webview dependencies installed"
+        echo "=========================================="
+        echo "Environment is ready for Copilot development!"
+        echo "You can now use VSCE commands to package the extension."
+        echo "=========================================="
+
+    - name: Upload environment info
+      uses: actions/upload-artifact@v4
+      with:
+        name: copilot-environment-info
+        path: |
+          package.json
+          package-lock.json
+          webview-ui/package.json
+          webview-ui/package-lock.json
+        retention-days: 30

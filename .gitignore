@@ -125,3 +125,6 @@ __patch.tmp
 .vscode-test/
 *.vsix
 node_modules
+
+# Old files
+old/

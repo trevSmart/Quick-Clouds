@@ -21,5 +21,12 @@ You need to provide a valid API key to connect the Quality Clouds ruleset agains
 To obtain an API key, contact your Quality Clouds admin.
 If you're an admin, check out our [Administering API keys](https://docs.qualityclouds.com/display/QCD/Administering+API+keys) article.
 
+Available settings:
+
+- `QuickClouds.API-key`: Quick Clouds API Key.
+- `QuickClouds.showSettingsButton`: Show Quick Clouds settings in the status bar (default: true).
+- `QuickClouds.showQualityCenterButton`: Show Quality Center in the status bar (default: true).
+- `QuickClouds.debugMode`: Enable debug mode to simulate write-off requests instead of sending them to the server.
+
 ## Supported configuration element (CE) types
 You can check the following types of CEs: Classes, Triggers, Pages, Components, Objects, Reports, Workflows, Javascript.

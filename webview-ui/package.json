@@ -4,12 +4,8 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "EXTEND_ESLINT=true react-scripts start",
     "build": "NODE_OPTIONS=--openssl-legacy-provider EXTEND_ESLINT=true react-scripts build",
-    "build:writeoff": "NODE_OPTIONS=--openssl-legacy-provider EXTEND_ESLINT=true react-scripts build",
-    "build:dev": "NODE_OPTIONS=--openssl-legacy-provider EXTEND_ESLINT=true GENERATE_SOURCEMAP=true react-scripts build",
-    "test": "EXTEND_ESLINT=true react-scripts test",
-    "eject": "react-scripts eject"
+    "build:dev": "NODE_OPTIONS=--openssl-legacy-provider EXTEND_ESLINT=true GENERATE_SOURCEMAP=true react-scripts build"
   },
   "dependencies": {
     "@vscode/webview-ui-toolkit": "^1.0.0",

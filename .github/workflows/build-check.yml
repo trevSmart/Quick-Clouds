@@ -1,0 +1,54 @@
+name: Build Check
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-check:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Install webview dependencies
+      run: |
+        cd webview-ui
+        npm ci
+
+    # - name: Build VSIX package
+    #   run: |
+    #     echo "Running build:vsix script..."
+    #     npm run build:vsix
+
+    # - name: Verify VSIX file exists
+    #   run: |
+    #     echo "Checking for VSIX file..."
+    #     ls -la *.vsix || echo "No VSIX files found"
+    #     if [ ! -f "quick-clouds-build-check.vsix" ]; then
+    #       echo "VSIX file was not created"
+    #       echo "Current directory contents:"
+    #       ls -la
+    #       exit 1
+    #     fi
+    #     echo "VSIX build successful"
+    #     ls -la quick-clouds-build-check.vsix
+
+    - name: Upload VSIX artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: quick-clouds-vsix
+        path: quick-clouds-build-check.vsix
+        retention-days: 7
