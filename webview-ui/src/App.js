@@ -42,8 +42,6 @@ function App() {
     const [ruleFilter, setRuleFilter] = useState('');
     const [viewMode, setViewMode] = useState('single'); // 'bulk' or 'single'
     const [loading, setLoading] = useState(false);
-    const [historyId, setHistoryId] = useState(null);
-    const [historyPath, setHistoryPath] = useState(null);
 
     // Reference to the reason select element
     const reasonSelectRef = useRef(null);
@@ -84,12 +82,6 @@ function App() {
                             console.log('First issue sample:', data.issues[0]);
                         }
                         setIssues(data.issues || []);
-                        if (typeof data.historyId !== 'undefined') {
-                            setHistoryId(data.historyId);
-                        }
-                        if (typeof data.historyPath !== 'undefined') {
-                            setHistoryPath(data.historyPath);
-                        }
                         if (data.preselect) {
                             const { fileName, lineNumber } = data.preselect;
                             const match = (data.issues || []).find(
@@ -204,8 +196,8 @@ function App() {
             vscode.postMessage({
                 command: 'openFileAtLine',
                 data: {
-                    historyId,
-                    historyPath, // optional hint for backend
+                    historyId: issue.historyId,
+                    historyPath: issue.historyPath,
                     fileName: issue.fileName,
                     lineNumber: issue.lineNumber
                 }

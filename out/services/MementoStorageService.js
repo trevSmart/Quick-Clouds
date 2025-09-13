@@ -62,14 +62,16 @@ class MementoStorageService {
     setLivecheckHistory(path, issues, timestamp) {
         return __awaiter(this, void 0, void 0, function* () {
             const history = yield this.getLivecheckHistory();
-            const newId = history.length > 0 ? history[history.length - 1].id + 1 : 1;
-            history.push({
+            const filtered = history.filter(h => h.path !== path);
+            const maxId = filtered.reduce((max, h) => Math.max(max, h.id), 0);
+            const newId = maxId + 1;
+            filtered.push({
                 id: newId,
                 path,
                 timestamp,
                 issues,
             });
-            yield this.memento.update('LivecheckHistory', history);
+            yield this.memento.update('LivecheckHistory', filtered);
             return newId;
         });
     }

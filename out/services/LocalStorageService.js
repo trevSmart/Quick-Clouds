@@ -120,7 +120,16 @@ class LocalStorageService {
                     });
                 }
                 if (row.issue_data) {
-                    historyMap.get(row.id).issues.push(JSON.parse(row.issue_data));
+                    const issue = JSON.parse(row.issue_data);
+                    try {
+                        const path = require('path');
+                        const fileName = row.path ? path.basename(row.path) : undefined;
+                        if (fileName && !issue.fileName) {
+                            issue.fileName = fileName;
+                        }
+                    }
+                    catch (_) { }
+                    historyMap.get(row.id).issues.push(issue);
                 }
             }
             stmt.free();
@@ -130,8 +139,10 @@ class LocalStorageService {
     setLivecheckHistory(path, issues, timestamp) {
         return __awaiter(this, void 0, void 0, function* () {
             const db = yield this.getDb();
+            db.run(`DELETE FROM Issues WHERE history_id IN (SELECT id FROM LivecheckHistory WHERE path = ?)`, [path]);
+            db.run(`DELETE FROM WriteOffData WHERE history_id IN (SELECT id FROM LivecheckHistory WHERE path = ?)`, [path]);
+            db.run(`DELETE FROM LivecheckHistory WHERE path = ?`, [path]);
             db.run(`INSERT INTO LivecheckHistory (path, timestamp) VALUES (?, ?)`, [path, timestamp]);
-            // Get last inserted id
             const stmt = db.prepare(`SELECT last_insert_rowid() as id`);
             stmt.step();
             const row = stmt.getAsObject();
