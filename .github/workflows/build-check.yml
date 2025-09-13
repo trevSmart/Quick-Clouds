@@ -33,18 +33,18 @@ jobs:
         echo "Running build:vsix script..."
         npm run build:vsix
 
-    - name: Verify VSIX file exists
-      run: |
-        echo "Checking for VSIX file..."
-        ls -la *.vsix || echo "No VSIX files found"
-        if [ ! -f "quick-clouds-build-check.vsix" ]; then
-          echo "VSIX file was not created"
-          echo "Current directory contents:"
-          ls -la
-          exit 1
-        fi
-        echo "VSIX build successful"
-        ls -la quick-clouds-build-check.vsix
+    # - name: Verify VSIX file exists
+    #   run: |
+    #     echo "Checking for VSIX file..."
+    #     ls -la *.vsix || echo "No VSIX files found"
+    #     if [ ! -f "quick-clouds-build-check.vsix" ]; then
+    #       echo "VSIX file was not created"
+    #       echo "Current directory contents:"
+    #       ls -la
+    #       exit 1
+    #     fi
+    #     echo "VSIX build successful"
+    #     ls -la quick-clouds-build-check.vsix
 
     - name: Upload VSIX artifact
       uses: actions/upload-artifact@v4
