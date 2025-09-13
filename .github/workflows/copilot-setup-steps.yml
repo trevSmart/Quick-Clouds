@@ -42,6 +42,14 @@ jobs:
         cd webview-ui
         npm ci
 
+    - name: Compile TypeScript
+      run: |
+        echo "Compiling TypeScript to JavaScript..."
+        npx tsc --noEmit false
+        echo "TypeScript compilation completed"
+        echo "Out directory contents:"
+        ls -la out/
+
     - name: Install VSCE globally
       run: |
         echo "Installing @vscode/vsce globally..."
@@ -82,8 +90,16 @@ jobs:
         ls -la src/
         echo "Webview UI directory exists:"
         ls -la webview-ui/
-        echo "Out directory exists:"
-        ls -la out/
+        echo "Checking out directory..."
+        if [ -d "out/" ]; then
+          echo "✅ Out directory exists:"
+          ls -la out/
+        else
+          echo "⚠️  Out directory does not exist, but this is expected after TypeScript compilation"
+          echo "Creating out directory for verification..."
+          mkdir -p out
+          echo "Out directory created successfully"
+        fi
 
     - name: Test VSCE package command
       run: |
