@@ -42,10 +42,13 @@ export function createStatusBarItems(apiKeyStatus: any, authType: string, isAuth
     }
 
     const loginButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
-    loginButton.text = '$(account) Quality Clouds';
+    loginButton.text = '$(account) Quick Clouds settings';
     loginButton.command = 'quick-clouds.settings';
     loginButton.tooltip = tooltip;
-    loginButton.show();
+    const showSettingsButton = vscode.workspace
+        .getConfiguration('QuickClouds')
+        .get('showSettingsButton', true);
+    showSettingsButton ? loginButton.show() : loginButton.hide();
 
     const myIssues = getQualityCenterButtonInstance();
     if (storageManager) {

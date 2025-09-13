@@ -79,16 +79,26 @@
 		"configuration": {
 			"title": "Quick Clouds",
 			"properties": {
-				"QuickClouds.API-key": {
-					"type": "string",
-					"default": "",
-					"description": "Quick Clouds API Key"
-				},
-				"QuickClouds.debugMode": {
-					"type": "boolean",
-					"default": false,
-					"description": "Enable debug mode to simulate write-off requests instead of sending them to the server"
-				}
+                                "QuickClouds.API-key": {
+                                        "type": "string",
+                                        "default": "",
+                                        "description": "Quick Clouds API Key"
+                                },
+                                "QuickClouds.showSettingsButton": {
+                                        "type": "boolean",
+                                        "default": true,
+                                        "description": "Show Quick Clouds settings in the status bar"
+                                },
+                                "QuickClouds.showQualityCenterButton": {
+                                        "type": "boolean",
+                                        "default": true,
+                                        "description": "Show Quality Center in the status bar"
+                                },
+                                "QuickClouds.debugMode": {
+                                        "type": "boolean",
+                                        "default": false,
+                                        "description": "Enable debug mode to simulate write-off requests instead of sending them to the server"
+                                }
 			}
 		}
 	},
