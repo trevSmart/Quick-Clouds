@@ -81,7 +81,7 @@ class WriteOffMenuPanel {
             // Panel view type
             "showWriteOffMenu",
             // Panel title
-            "Write off menu",
+            "Write-off menu",
             // The editor column the panel should be displayed in
             vscode_1.ViewColumn.One,
             // Extra panel configurations

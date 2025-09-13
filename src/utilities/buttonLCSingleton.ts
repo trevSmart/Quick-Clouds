@@ -5,9 +5,10 @@ let buttonLCInstance: vscode.StatusBarItem | null = null;
 
 export function getButtonLCInstance(): vscode.StatusBarItem {
     if (!buttonLCInstance) {
-        buttonLCInstance = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 1);
-        // Use a guaranteed codicon. `search-fuzzy` isn't available in all VS Code versions.
-        buttonLCInstance.text = '$(search-fuzzy) LiveCheck';
+        // Higher priority appears more to the left on the Right side
+        // Set to 30 to keep order: LiveCheck (30) -> Write-off (20) -> Quality Center (10)
+        buttonLCInstance = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 30);
+        buttonLCInstance.text = 'Live check';
         buttonLCInstance.command = 'quick-clouds.check';
     }
     return buttonLCInstance;

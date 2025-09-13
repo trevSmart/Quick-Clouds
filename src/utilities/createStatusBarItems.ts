@@ -17,12 +17,13 @@ export function createStatusBarItems(apiKeyStatus: any, authType: string, isAuth
     // Check debug mode setting
     const debugMode = vscode.workspace.getConfiguration("QuickCloudsConfiguration").get("debugMode", false);
 
-    const newWO = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 2);
+    // Priority 20 to sit between LiveCheck (30) and Quality Center (10)
+    const newWO = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 20);
     // Use a widely supported codicon for comments
-    newWO.text = '$(comment-unresolved) Write off';
+    newWO.text = '$(comment-unresolved) Write-off';
     newWO.command = 'quick-clouds.writeoff';
 
-    // Show write off button if debug mode is enabled, otherwise hide it
+    // Show write-off button if debug mode is enabled, otherwise hide it
     if (debugMode) {
         newWO.show();
     } else {

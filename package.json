@@ -2,7 +2,7 @@
 	"name": "quick-clouds-for-salesforce",
 	"displayName": "Quick Clouds for Salesforce",
 	"description": "Checks for adherence to coding best practices for Salesforce.",
-	"version": "2.3.167",
+	"version": "2.3.169",
 	"license": "MIT",
 	"icon": "resources/logo.png",
 	"engines": {
@@ -43,7 +43,7 @@
 			{
 				"command": "quick-clouds.writeoff",
 				"category": "Quick Clouds",
-				"title": "Request an issue write off"
+				"title": "Request an issue write-off"
 			},
 			{
 				"command": "quick-clouds.myIssues",

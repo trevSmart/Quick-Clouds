@@ -68,16 +68,16 @@ function createRelatedInformation(document, line, element) {
     if (writeOff.writeOffStatus === WRITE_OFF_APPROVED && writeOff.expirationDate) {
         const date = new Date(writeOff.expirationDate);
         return [
-            new vscode.DiagnosticRelatedInformation(new vscode.Location(document.uri, new vscode.Range(line, 0, line, 0)), `Write off status is ${writeOff.writeOffStatus} by ${writeOff.validator} until ${date.toDateString()} with the reason ${writeOff.validationReason}`)
+            new vscode.DiagnosticRelatedInformation(new vscode.Location(document.uri, new vscode.Range(line, 0, line, 0)), `Write-off status is ${writeOff.writeOffStatus} by ${writeOff.validator} until ${date.toDateString()} with the reason ${writeOff.validationReason}`)
         ];
     }
     if (writeOff.writeOffStatus === WRITE_OFF_REJECTED) {
         return [
-            new vscode.DiagnosticRelatedInformation(new vscode.Location(document.uri, new vscode.Range(line, 0, line, 0)), `Write off status is ${writeOff.writeOffStatus} by ${writeOff.validator} with the reason ${writeOff.validationReason}`)
+            new vscode.DiagnosticRelatedInformation(new vscode.Location(document.uri, new vscode.Range(line, 0, line, 0)), `Write-off status is ${writeOff.writeOffStatus} by ${writeOff.validator} with the reason ${writeOff.validationReason}`)
         ];
     }
     return [
-        new vscode.DiagnosticRelatedInformation(new vscode.Location(document.uri, new vscode.Range(line, 0, line, 0)), `Write off status is ${writeOff.writeOffStatus} with the reason ${writeOff.requestReason} requested by ${writeOff.requester} on ${writeOff.requestedDate} with description ${writeOff.requestDescription}`)
+        new vscode.DiagnosticRelatedInformation(new vscode.Location(document.uri, new vscode.Range(line, 0, line, 0)), `Write-off status is ${writeOff.writeOffStatus} with the reason ${writeOff.requestReason} requested by ${writeOff.requester} on ${writeOff.requestedDate} with description ${writeOff.requestDescription}`)
     ];
 }
 //# sourceMappingURL=WriteIssues.js.map

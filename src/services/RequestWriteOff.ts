@@ -23,7 +23,7 @@ function requestWriteoff(data, env, storageManager, context) {
         const doRequest = () => __awaiter(this, void 0, void 0, function* () {
             let res = yield axios_1.default.patch(urlWR, JSON.stringify(dataWO), { headers });
             if (res.data) {
-                vscode.window.showInformationMessage("Write off is " +
+                vscode.window.showInformationMessage("Write-off is " +
                     res.data.data.attributes["write-off"]["write-off-status"]);
             }
             return res.data.data;

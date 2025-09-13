@@ -5,7 +5,7 @@ export class QuickCloudsLogger {
     private outputChannel: vscode.OutputChannel;
 
     private constructor() {
-        this.outputChannel = vscode.window.createOutputChannel('Quick Clouds');
+        this.outputChannel = vscode.window.createOutputChannel('Quick Clouds for Salesforce');
     }
 
     public static getInstance(): QuickCloudsLogger {
