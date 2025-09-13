@@ -103,15 +103,15 @@ jobs:
           echo "Checking for main extension file..."
           if [ -f "out/extension.js" ]; then
             echo "✅ Main extension file exists: out/extension.js"
+            echo "Extension file size: $(wc -c < out/extension.js) bytes"
           else
-            echo "⚠️  Main extension file missing: out/extension.js"
+            echo "❌ Main extension file missing: out/extension.js"
+            exit 1
           fi
         else
-          echo "❌ Out directory missing - this should contain pre-compiled JavaScript files"
-          echo "Creating minimal out directory structure for testing..."
-          mkdir -p out
-          echo "module.exports = { activate: () => {}, deactivate: () => {} };" > out/extension.js
-          echo "Minimal extension.js created for testing"
+          echo "❌ Out directory missing - pre-compiled JavaScript files are required"
+          echo "This project uses pre-compiled JavaScript files that should be included in the repository"
+          exit 1
         fi
 
     - name: Test VSCE package command
@@ -119,12 +119,13 @@ jobs:
         echo "Testing VSCE package command..."
         echo "Verifying extension structure..."
         if [ ! -f "out/extension.js" ]; then
-          echo "Creating minimal extension.js for testing..."
-          mkdir -p out
-          echo "module.exports = { activate: () => {}, deactivate: () => {} };" > out/extension.js
+          echo "❌ Extension file missing: out/extension.js"
+          echo "Pre-compiled JavaScript files are required for this project"
+          exit 1
         fi
         echo "Extension structure ready:"
         ls -la out/extension.js
+        echo "Extension file size: $(wc -c < out/extension.js) bytes"
         if command -v vsce >/dev/null 2>&1; then
           echo "Using global VSCE installation..."
           vsce package --no-dependencies --out quick-clouds-copilot-test.vsix
@@ -134,6 +135,7 @@ jobs:
         fi
         echo "VSIX file created successfully:"
         ls -la quick-clouds-copilot-test.vsix
+        echo "VSIX file size: $(wc -c < quick-clouds-copilot-test.vsix) bytes"
 
     - name: Cleanup test files
       run: |
