@@ -72,6 +72,25 @@ class LocalStorageService {
     onDidChangeUserData(key, listener) {
         this.changeEmitter.on(key, listener);
     }
+    deleteAllData() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const db = yield this.getDb();
+            db.run('BEGIN TRANSACTION');
+            try {
+                // Only clear scan-related tables to preserve user settings
+                const tables = ['LivecheckHistory', 'Issues', 'WriteOffData'];
+                for (const table of tables) {
+                    db.run(`DELETE FROM ${table}`);
+                }
+                db.run('COMMIT');
+                (0, Database_1.saveDatabase)(db, this.dbPath);
+            }
+            catch (error) {
+                db.run('ROLLBACK');
+                throw error;
+            }
+        });
+    }
     getLivecheckHistory() {
         return __awaiter(this, void 0, void 0, function* () {
             const db = yield this.getDb();

@@ -81,8 +81,14 @@ export async function activate(context: vscode.ExtensionContext) {
         });
 
         const deleteLCHistoryCommand = vscode.commands.registerCommand('quick-clouds.deleteLCHistory', async () => {
-            await storageManager.deleteAllData();
-            vscode.window.showInformationMessage('All data has been deleted');
+            try {
+                await storageManager.deleteAllData();
+                collection.clear();
+                vscode.window.showInformationMessage('All data has been deleted');
+            } catch (error) {
+                logger.error('Failed to delete data', error);
+                vscode.window.showErrorMessage('Failed to delete data');
+            }
         });
 
         const showLogsCommand = vscode.commands.registerCommand('quick-clouds.showLogs', () => {

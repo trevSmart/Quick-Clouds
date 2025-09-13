@@ -114,10 +114,17 @@ async function activate(context) {
         const discardChangesCommand = vscode.commands.registerCommand(constants_2.CMD_DISCARD_CHANGES, async () => {
             await (0, generateCodeFix_1.generateCodeFix)(storageManager, applyChangesButton, discardChangesButton, context, true);
         });
-        const deleteLCHistoryCommand = vscode.commands.registerCommand('quick-clouds.deleteLCHistory', async () => {
-            await storageManager.deleteAllData();
-            vscode.window.showInformationMessage('All data has been deleted');
-        });
+         const deleteLCHistoryCommand = vscode.commands.registerCommand('quick-clouds.deleteLCHistory', async () => {
+             try {
+                 await storageManager.deleteAllData();
+                 exports.collection.clear();
+                 vscode.window.showInformationMessage('All data has been deleted');
+             }
+             catch (error) {
+                 logger.error('Failed to delete data', error);
+                 vscode.window.showErrorMessage('Failed to delete data');
+             }
+         });
         const showLogsCommand = vscode.commands.registerCommand('quick-clouds.showLogs', () => {
             const logger = logger_2.QuickCloudsLogger.getInstance();
             logger.show();
