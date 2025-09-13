@@ -15,6 +15,17 @@ export function getButtonLCInstance(): vscode.StatusBarItem {
     return buttonLCInstance;
 }
 
+export function setButtonLCSpinning(isSpinning: boolean): void {
+    const buttonLC = getButtonLCInstance();
+    if (isSpinning) {
+        buttonLC.text = '$(loading~spin) Live check';
+        buttonLC.tooltip = 'Live check in progress...';
+    } else {
+        buttonLC.text = 'Live check';
+        buttonLC.tooltip = undefined;
+    }
+}
+
 export async function updateButtonLCVisibility(storageManager: any): Promise<void> {
     const buttonLC = getButtonLCInstance();
     const authType = await storageManager.getUserData('authType');

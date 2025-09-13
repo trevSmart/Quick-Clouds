@@ -111,7 +111,6 @@ class WriteOffMenuPanel {
      */
     dispose() {
         WriteOffMenuPanel.currentPanel = undefined;
-        this._button.hide();
         // Dispose of the current webview panel
         this._panel.dispose();
         // Dispose of all disposables (i.e. commands) for the current webview panel
@@ -271,7 +270,6 @@ class WriteOffMenuPanel {
                 catch (_) { }
                 (0, RequestWriteOff_1.default)(data, env, this._storageManager, this.context);
                 setTimeout(() => WriteOffMenuPanel.currentPanel.dispose(), 300);
-                button.hide();
             }
             if (command === 'openFileAtLine') {
                 try {

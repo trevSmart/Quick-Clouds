@@ -32,12 +32,16 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getButtonLCInstance = getButtonLCInstance;
+exports.setButtonLCSpinning = setButtonLCSpinning;
 exports.updateButtonLCVisibility = updateButtonLCVisibility;
 const vscode = __importStar(require("vscode"));
-const constants_2 = require("../constants");
-const IsElementToAnalize_1 = require("./IsElementToAnalize");
+const constants_1 = require("../constants");
+const IsElementToAnalize_1 = __importDefault(require("./IsElementToAnalize"));
 let buttonLCInstance = null;
 function getButtonLCInstance() {
     if (!buttonLCInstance) {
@@ -49,16 +53,28 @@ function getButtonLCInstance() {
     }
     return buttonLCInstance;
 }
+function setButtonLCSpinning(isSpinning) {
+    const buttonLC = getButtonLCInstance();
+    if (isSpinning) {
+        buttonLC.text = '$(loading~spin) Live check';
+        buttonLC.tooltip = 'Live check in progress...';
+    }
+    else {
+        buttonLC.text = 'Live check';
+        buttonLC.tooltip = undefined;
+    }
+}
 async function updateButtonLCVisibility(storageManager) {
+    var _a, _b;
     const buttonLC = getButtonLCInstance();
     const authType = await storageManager.getUserData('authType');
     const apiKeyStatus = await storageManager.getUserData('apiKeyStatus');
     const isAuthenticated = await storageManager.getUserData('isAuthenticated');
     const activeEditor = vscode.window.activeTextEditor;
     const hasActiveEditor = !!activeEditor;
-    const activePath = (activeEditor === null || activeEditor === void 0 ? void 0 : activeEditor.document?.uri?.fsPath) || '';
+    const activePath = ((_b = (_a = activeEditor === null || activeEditor === void 0 ? void 0 : activeEditor.document) === null || _a === void 0 ? void 0 : _a.uri) === null || _b === void 0 ? void 0 : _b.fsPath) || '';
     const isSupportedFile = hasActiveEditor ? (0, IsElementToAnalize_1.default)(activePath) : false;
-    if (hasActiveEditor && isSupportedFile && ((authType === 'apiKey' && apiKeyStatus && apiKeyStatus.statusCode === constants_2.HTTP_STATUS_OK) ||
+    if (hasActiveEditor && isSupportedFile && ((authType === 'apiKey' && apiKeyStatus && apiKeyStatus.statusCode === constants_1.HTTP_STATUS_OK) ||
         (authType === 'credentials' && isAuthenticated))) {
         buttonLC.show();
     }
@@ -66,4 +82,3 @@ async function updateButtonLCVisibility(storageManager) {
         buttonLC.hide();
     }
 }
-//# sourceMappingURL=buttonLCSingleton.js.map
