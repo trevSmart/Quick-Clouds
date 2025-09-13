@@ -2,9 +2,9 @@
 	"name": "quick-clouds-for-salesforce",
 	"displayName": "Quick Clouds for Salesforce",
 	"description": "Checks for adherence to coding best practices for Salesforce.",
-	"version": "0.1.2",
+	"version": "0.1.17",
 	"license": "MIT",
-	"icon": "resources/logo.png",
+	"icon": "resources/logo.webp",
 	"engines": {
 		"vscode": "^1.64.0"
 	},
@@ -79,37 +79,32 @@
 		"configuration": {
 			"title": "Quick Clouds",
 			"properties": {
-                                "QuickClouds.API-key": {
-                                        "type": "string",
-                                        "default": "",
-                                        "description": "Quick Clouds API Key"
-                                },
-                                "QuickClouds.showSettingsButton": {
-                                        "type": "boolean",
-                                        "default": true,
-                                        "description": "Show Quick Clouds settings in the status bar"
-                                },
-                                "QuickClouds.showQualityCenterButton": {
-                                        "type": "boolean",
-                                        "default": true,
-                                        "description": "Show Quality Center in the status bar"
-                                },
-                                "QuickClouds.debugMode": {
-                                        "type": "boolean",
-                                        "default": false,
-                                        "description": "Enable debug mode to simulate write-off requests instead of sending them to the server"
-                                }
+				"QuickClouds.API-key": {
+					"type": "string",
+					"default": "",
+					"description": "Quick Clouds API Key"
+				},
+				"QuickClouds.showSettingsButton": {
+					"type": "boolean",
+					"default": true,
+					"description": "Show Quick Clouds settings in the status bar"
+				},
+				"QuickClouds.showQualityCenterButton": {
+					"type": "boolean",
+					"default": true,
+					"description": "Show Quality Center in the status bar"
+				},
+				"QuickClouds.debugMode": {
+					"type": "boolean",
+					"default": false,
+					"description": "Enable debug mode to simulate write-off requests instead of sending them to the server"
+				}
 			}
 		}
 	},
 	"scripts": {
 		"build:webview": "NODE_OPTIONS=--openssl-legacy-provider npm --prefix ./webview-ui run build:dev",
-		"build:webview:prod": "NODE_OPTIONS=--openssl-legacy-provider npm --prefix ./webview-ui run build",
-		"vscode:prepublish": "echo 'Skipping compilation for pre-built extension'",
-		"compile": "echo 'Skipping TypeScript compilation - using pre-compiled JavaScript files in out/ directory'",
-		"lint": "eslint src webview-ui/src media eslint.config.mjs --fix",
-		"package": "npm run build:webview && npm version patch --no-git-tag-version && VERSION=$(node -p \"require('./package.json').version\") && vsce package --out dist/quick-clouds-v$VERSION.vsix && code-insiders --install-extension dist/quick-clouds-v$VERSION.vsix --force",
-		"clean builds": "rm -f dist/quick-clouds-*.vsix"
+		"package": "./scripts/package.sh"
 	},
 	"devDependencies": {
 		"@types/axios": "^0.14.4",
