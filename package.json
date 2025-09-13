@@ -104,8 +104,8 @@
 	},
 	"scripts": {
 		"build:webview": "NODE_OPTIONS=--openssl-legacy-provider npm --prefix ./webview-ui run build:dev",
-		"build:vsix": "npm run build:webview && npx @vscode/vsce package --out quick-clouds-build-check.vsix",
-		"package": "./scripts/package.sh",
+                "build:vsix": "npm run build:webview && NODE_OPTIONS=\"--require ./scripts/vsce-file-polyfill.js\" npx @vscode/vsce package --out quick-clouds-build-check.vsix",
+                "package": "./scripts/package.sh",
 		"lint": "eslint .",
 		"lint:fix": "eslint . --fix"
 	},

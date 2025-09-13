@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Resolved error when running "Delete all data" command by clearing diagnostics and resetting stored data
 
+## [2.3.161] - 2025-01-26
+
+### Fixed
+- Added polyfill for missing `File` global so VSIX packaging works in Node.js 18 environments
+
 ## [2.3.159] - 2025-01-25
 
 ### Fixed
