@@ -88,6 +88,12 @@ function App() {
         return element ? `${base}: ${element}` : base;
     };
 
+    // Only count real issues (exclude informational entries)
+    function isRealIssue(issue) {
+        const sev = (issue?.severity || '').toLowerCase();
+        return sev === 'high' || sev === 'medium' || sev === 'low' || sev === 'warning';
+    }
+
     useEffect(() => {
         // Listen for messages from the extension
         window.addEventListener('message', event => {
@@ -148,8 +154,13 @@ function App() {
     }, []);
 
     const filteredIssues = issues.filter(issue => {
+        // Only show real issues (exclude informational entries from the list)
+        if (!isRealIssue(issue)) {
+            return false;
+        }
+
         // First filter by severity
-        const matchesSeverity = severityFilter === 'all' || issue.severity.toLowerCase() === severityFilter.toLowerCase();
+        const matchesSeverity = severityFilter === 'all' || (issue.severity || '').toLowerCase() === severityFilter.toLowerCase();
 
         if (!matchesSeverity) {
             return false;
@@ -257,7 +268,8 @@ function App() {
         return stats;
     };
 
-    const severityStats = getSeverityStats(issues);
+    const realIssues = issues.filter(isRealIssue);
+    const severityStats = getSeverityStats(realIssues);
 
     const handleIssueSelect = (issueId, isSelected) => {
         if (isSelected) {
@@ -479,6 +491,14 @@ function App() {
                     </div>
                 </div>
 
+                {/* If there are info messages but no real issues, show a friendly banner */}
+                {realIssues.length === 0 && issues.some(it => (it?.severity || '').toLowerCase() === 'info') && (
+                    <div className="info-banner">
+                        <span className="codicon codicon-info" aria-hidden="true"></span>
+                        <span>Online checks completed. No issues detected.</span>
+                    </div>
+                )}
+
                 {viewMode === 'bulk' ? (
                     <div className="bulk-mode">
                         <div className="bulk-header">
@@ -635,8 +655,8 @@ function App() {
                 {/* Move the counter inside the issues container */}
                 <div className="issues-counter">
                     <p>
-                        {issues.length} issues:
-                        {issues.length > 0 && (
+                        {realIssues.length} issues:
+                        {realIssues.length > 0 && (
                             <span className="severity-breakdown">
                                 {severityStats.high > 0 && (
                                     <>

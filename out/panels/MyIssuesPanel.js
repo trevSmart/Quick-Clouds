@@ -238,6 +238,13 @@ class MyIssuesPanel {
                     return;
                 }
                 const command = message.command;
+                if (command === 'webviewError') {
+                    const src = message && message.source ? ` (${message.source})` : '';
+                    const msg = message && message.message ? String(message.message) : 'Unknown webview error';
+                    const stack = message && message.stack ? `\nStack: ${String(message.stack)}` : '';
+                    this._logger.error(`Webview error in MyIssuesPanel${src}: ${msg}${stack}`);
+                    return;
+                }
                 let myIssuesData;
                 if (command === "webviewLoaded") {
                     this._logger.info('Processing webviewLoaded command');

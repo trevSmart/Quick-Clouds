@@ -40,6 +40,16 @@ class SettingsPanel {
         this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
         this._panel.webview.onDidReceiveMessage((message) => __awaiter(this, void 0, void 0, function* () {
             var _a;
+            if (message && message.command === 'webviewError') {
+                try {
+                    const src = message && message.source ? ` (${message.source})` : '';
+                    const msg = message && message.message ? String(message.message) : 'Unknown webview error';
+                    const stack = message && message.stack ? `\nStack: ${String(message.stack)}` : '';
+                    const { QuickCloudsLogger } = require('../utilities/logger');
+                    QuickCloudsLogger.getInstance().error(`Webview error in SettingsPanel${src}: ${msg}${stack}`);
+                } catch(_) {}
+                return;
+            }
             switch (message.command) {
                 case 'webviewLoaded':
                     const currentAuthStatus = yield (0, handleAuthenticationMethod_1.getAuthenticationStatus)(this.storageManager);

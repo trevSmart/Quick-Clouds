@@ -18,6 +18,7 @@ import { getButtonLCInstance, updateButtonLCVisibility } from './utilities/butto
 import { updateQualityCenterVisibility } from './utilities/buttonQualityCenterSingleton';
 import { CMD_VALIDATE_APIKEY, CMD_LIVECHECK, CMD_WRITE_OFF, CMD_MY_ISSUES, CMD_SETTINGS, CMD_APPLY_CHANGES, CMD_DISCARD_CHANGES } from './constants';
 import { QuickCloudsLogger } from './utilities/logger';
+import { installGlobalErrorHandlers } from './utilities/globalErrorHandlers';
 
 export const env = Env.PROD;
 export const collection = vscode.languages.createDiagnosticCollection('Quick Clouds');
@@ -27,6 +28,9 @@ export async function activate(context: vscode.ExtensionContext) {
     logger.info('Quick Clouds Extension activated');
 
     try {
+        // Install global error handlers early so any failure gets logged
+        installGlobalErrorHandlers(context);
+
         const { apiKeyStatus, storageManager, authType, isAuthenticated } = await initializeExtension(context);
 
         const buttonLC = getButtonLCInstance();

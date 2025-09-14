@@ -274,6 +274,14 @@ class WriteOffMenuPanel {
             const command = message.command;
             const data = message.data;
 
+            if (command === 'webviewError') {
+                const src = message && message.source ? ` (${message.source})` : '';
+                const msg = message && message.message ? String(message.message) : 'Unknown webview error';
+                const stack = message && message.stack ? `\nStack: ${String(message.stack)}` : '';
+                logger.error(`Webview error in WriteOffMenuPanel${src}: ${msg}${stack}`);
+                return;
+            }
+
             if (command === 'notify') {
                 vscode_1.window.showInformationMessage(String((message === null || message === void 0 ? void 0 : message.message) || (data === null || data === void 0 ? void 0 : data.message) || 'Notice'));
                 return;

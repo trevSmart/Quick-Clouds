@@ -7,6 +7,7 @@ import { updateDiagnostics } from './UpdateDiagnostics';
 import { QuickCloudsLogger } from './logger';
 import { setButtonLCSpinning } from './buttonLCSingleton';
 import { WriteOffMenuPanel } from '../panels/WriteOffMenuPanel';
+import { env } from '../extension';
 
 // Prevent concurrent Live Check runs
 let liveCheckInProgress = false;
@@ -49,6 +50,16 @@ export async function executeLiveCheck(context: vscode.ExtensionContext, newWO: 
             }
         } catch (e: any) {
             logger.warn('ExecuteLiveCheck: Failed to refresh Write-off panel: ' + (e?.message));
+            // Fallback: if refresh fails or crashes the webview, rebuild the panel
+            try {
+                if ((WriteOffMenuPanel as any).currentPanel) {
+                    (WriteOffMenuPanel as any).closeAll();
+                    WriteOffMenuPanel.render(context.extensionUri, context, env, newWO, storageManager);
+                    logger.info('ExecuteLiveCheck: Write-off panel reloaded as fallback');
+                }
+            } catch (e2: any) {
+                logger.error('ExecuteLiveCheck: Failed to reload Write-off panel: ' + (e2?.message));
+            }
         }
         if (response.length > 0) {
             GetWriteOffReasons(storageManager, context);
@@ -57,10 +68,15 @@ export async function executeLiveCheck(context: vscode.ExtensionContext, newWO: 
             logger.info('ExecuteLiveCheck: No issues found, no write-off panel will be shown');
         }
 
-        const totalIssues = response.length;
+        // Only count real issues (exclude informational entries)
+        const realIssues = response.filter((i: any) => {
+            const sev = (i?.severity || '').toLowerCase();
+            return sev === 'high' || sev === 'medium' || sev === 'low';
+        });
+        const totalIssues = realIssues.length;
         const hasValidResult = typeof qualityGatesPassed === 'boolean';
         const counts = { high: 0, medium: 0, low: 0 };
-        for (const issue of response) {
+        for (const issue of realIssues) {
             const severity = (issue.severity || '').toLowerCase();
             if (severity === 'high') {
                 counts.high++;

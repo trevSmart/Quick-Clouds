@@ -28,7 +28,13 @@ function getProjects(env, storageManager, context) {
         };
         const doRequest = () => __awaiter(this, void 0, void 0, function* () {
             const response = yield axios_1.default.request(options);
-            storageManager.setUserData('projects', response.data.data);
+            try {
+                yield storageManager.setUserData('projects', response.data.data);
+            }
+            catch (cacheErr) {
+                const msg = cacheErr && cacheErr.message ? cacheErr.message : String(cacheErr);
+                console.warn('getProjects: failed to cache projects:', msg);
+            }
             return response.data.data;
         });
         try {

@@ -66,10 +66,10 @@ class LocalStorageService {
             if (!key || typeof key !== 'string' || key.length > 255) {
                 throw new Error('Invalid key: must be a non-empty string with max 255 characters');
             }
-            // Validate value size to prevent DoS
+            // Serialize value. Allow large payloads but warn if unusually big (>8MB)
             const serializedValue = JSON.stringify(value);
-            if (serializedValue.length > 1024 * 1024) { // 1MB limit
-                throw new Error('Value too large: maximum 1MB allowed');
+            if (serializedValue.length > 8 * 1024 * 1024) {
+                console.warn('LocalStorageService.setUserData: payload exceeds 8MB; consider pruning or compressing.');
             }
             const db = yield this.getDb();
             db.run(`INSERT OR REPLACE INTO userData (key, value) VALUES (?, ?)`, [key, serializedValue]);

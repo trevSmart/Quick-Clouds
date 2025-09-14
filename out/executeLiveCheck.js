@@ -32,6 +32,7 @@ const LiveCheck_1 = require("../services/LiveCheck");
 const UpdateDiagnostics_1 = require("./UpdateDiagnostics");
 const logger_1 = require("./logger");
 const WriteOffMenuPanel_1 = require("./panels/WriteOffMenuPanel");
+const extension_1 = require("./extension");
 // Simple in-memory lock to prevent concurrent runs
 let __qcLiveCheckInProgress = false;
 function executeLiveCheck(context, newWO, storageManager) {
@@ -69,15 +70,29 @@ function executeLiveCheck(context, newWO, storageManager) {
                 catch (e) {
                     const logger = logger_1.QuickCloudsLogger.getInstance();
                     logger.warn('ExecuteLiveCheck: Failed to refresh Write-off panel: ' + (e === null || e === void 0 ? void 0 : e.message));
+                    try {
+                        if (WriteOffMenuPanel_1.WriteOffMenuPanel.currentPanel) {
+                            WriteOffMenuPanel_1.WriteOffMenuPanel.closeAll();
+                            WriteOffMenuPanel_1.WriteOffMenuPanel.render(context.extensionUri, context, extension_1.env, newWO, storageManager);
+                            logger.info('ExecuteLiveCheck: Write-off panel reloaded as fallback');
+                        }
+                    }
+                    catch (e2) {
+                        logger.error('ExecuteLiveCheck: Failed to reload Write-off panel: ' + (e2 === null || e2 === void 0 ? void 0 : e2.message));
+                    }
                 }
                 if (response.length > 0) {
                     (0, GetWriteOffReasons_1.default)(storageManager, context);
                     yield (0, handleLicenseInfo_1.handleLicenseInfo)(storageManager, context);
                 }
-                const totalIssues = response.length;
+                const realIssues = response.filter((i) => {
+                    const sev = (i?.severity || '').toLowerCase();
+                    return sev === 'high' || sev === 'medium' || sev === 'low';
+                });
+                const totalIssues = realIssues.length;
                 const hasValidResult = typeof qualityGatesPassed === 'boolean';
                 const counts = { high: 0, medium: 0, low: 0 };
-                for (const issue of response) {
+                for (const issue of realIssues) {
                     const severity = (issue.severity || '').toLowerCase();
                     if (severity === 'high') {
                         counts.high++;

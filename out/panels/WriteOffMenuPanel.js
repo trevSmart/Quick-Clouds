@@ -218,6 +218,14 @@ class WriteOffMenuPanel {
             logger.info('WriteOffMenuPanel: Received message: ' + JSON.stringify(message));
             const command = message.command;
             const data = message.data;
+
+            if (command === 'webviewError') {
+                const src = message && message.source ? ` (${message.source})` : '';
+                const msg = message && message.message ? String(message.message) : 'Unknown webview error';
+                const stack = message && message.stack ? `\nStack: ${String(message.stack)}` : '';
+                logger.error(`Webview error in WriteOffMenuPanel${src}: ${msg}${stack}`);
+                return;
+            }
             if (command === 'notify') {
                 vscode_1.window.showInformationMessage(String((message === null || message === void 0 ? void 0 : message.message) || (data === null || data === void 0 ? void 0 : data.message) || 'Notice'));
                 return;
@@ -249,7 +257,15 @@ class WriteOffMenuPanel {
                     logger.warn('WriteOffMenuPanel: getLivecheckHistory failed: ' + (e === null || e === void 0 ? void 0 : e.message));
                 }
                 logger.info('WriteOffMenuPanel: Total issues retrieved: ' + issues.length);
-                const woData = { issues: issues };
+                // Filter out non-actionable informational entries before sending to webview
+                const realIssues = issues.filter((it) => {
+                    const sev = (it && it.severity ? String(it.severity) : '').toLowerCase();
+                    return sev === 'high' || sev === 'medium' || sev === 'low' || sev === 'warning';
+                });
+                if (realIssues.length !== issues.length) {
+                    logger.info('WriteOffMenuPanel: Filtered informational entries. Real issues: ' + realIssues.length);
+                }
+                const woData = { issues: realIssues };
                 if (this._preselectIssue) {
                     woData.preselect = this._preselectIssue;
                 }
@@ -389,4 +405,52 @@ class WriteOffMenuPanel {
     }
 }
 exports.WriteOffMenuPanel = WriteOffMenuPanel;
+// Hot‑patch: add refreshData so other modules can trigger a data reload on the open panel
+WriteOffMenuPanel.prototype.refreshData = function () {
+    return __awaiter(this, void 0, void 0, function* () {
+        const logger = logger_1.QuickCloudsLogger.getInstance();
+        try {
+            logger.info('WriteOffMenuPanel: refreshData invoked (hot‑patch)');
+            let issues = [];
+            try {
+                const history = yield this._storageManager.getLivecheckHistory();
+                let statusMap = {};
+                try {
+                    statusMap = (yield this._storageManager.getWriteOffStatusMap()) || {};
+                }
+                catch (_) { }
+                if (Array.isArray(history)) {
+                    for (const entry of history) {
+                        const path = require('path');
+                        const fileName = entry.path ? path.basename(entry.path) : undefined;
+                        for (const issue of entry.issues || []) {
+                            const key1 = issue && issue.id ? String(issue.id) : undefined;
+                            const key2 = issue && issue.uuid ? String(issue.uuid) : undefined;
+                            const localStatus = (key1 && statusMap[key1]) || (key2 && statusMap[key2]) || undefined;
+                            issues.push(Object.assign(Object.assign({}, issue), { historyId: entry.id, historyPath: entry.path, fileName: issue.fileName || fileName, localWriteOffStatus: localStatus }));
+                        }
+                    }
+                }
+            }
+            catch (e) {
+                logger.warn('WriteOffMenuPanel: refreshData getLivecheckHistory failed: ' + (e === null || e === void 0 ? void 0 : e.message));
+            }
+            const woData = { issues: issues };
+            if (this._preselectIssue) {
+                woData.preselect = this._preselectIssue;
+            }
+            const payload = { command: 'WOdata', data: JSON.stringify(woData) };
+            logger.info('WriteOffMenuPanel: refreshData sending WOdata (' + issues.length + ' issues)');
+            try {
+                this._panel.webview.postMessage(payload);
+            }
+            catch (e) {
+                logger.warn('WriteOffMenuPanel: refreshData postMessage failed: ' + (e === null || e === void 0 ? void 0 : e.message));
+            }
+        }
+        catch (e) {
+            logger.error('WriteOffMenuPanel: refreshData failed: ' + (e === null || e === void 0 ? void 0 : e.message));
+        }
+    });
+};
 //# sourceMappingURL=WriteOffMenuPanel.js.map

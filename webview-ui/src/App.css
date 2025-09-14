@@ -68,6 +68,18 @@
     border: 1px solid var(--vscode-tab-border);
 }
 
+/* Non-issue informational banner */
+.info-banner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    background: var(--vscode-editor-background);
+    border-bottom: 1px solid var(--vscode-panel-border);
+    color: var(--vscode-descriptionForeground);
+}
+.info-banner .codicon { font-size: 16px; }
+
 .section-title {
     margin-bottom: 10px;
     padding-top: 17px;

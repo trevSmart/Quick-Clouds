@@ -53,12 +53,15 @@ const buttonQualityCenterSingleton_2 = require("./utilities/buttonQualityCenterS
 const constants_2 = require("./constants");
 const logger_2 = require("./utilities/logger");
 const restoreDiagnostics_1 = require("./utilities/restoreDiagnostics");
+const globalErrorHandlers_1 = require("./utilities/globalErrorHandlers");
 exports.env = env_2.Env.PROD;
 exports.collection = vscode.languages.createDiagnosticCollection('Quick Clouds');
 async function activate(context) {
     const logger = logger_2.QuickCloudsLogger.getInstance();
     logger.info('Quick Clouds Extension activated');
     try {
+        // Install global error handlers early so any failure gets logged
+        (0, globalErrorHandlers_1.installGlobalErrorHandlers)(context);
         const { apiKeyStatus, storageManager, authType, isAuthenticated } = await (0, initializeExtension_1.initializeExtension)(context);
         const buttonLC = (0, buttonLCSingleton_2.getButtonLCInstance)();
         await (0, buttonLCSingleton_2.updateButtonLCVisibility)(storageManager);

@@ -42,7 +42,13 @@ function getRules(storageManager, context, instanceIdOverride) {
         const doRequest = () => __awaiter(this, void 0, void 0, function* () {
             let response = yield axios_1.default.request(options);
             let rules = response.data.data;
-            storageManager.setUserData('bestPractices', rules);
+            try {
+                yield storageManager.setUserData('bestPractices', rules);
+            }
+            catch (cacheErr) {
+                const msg = cacheErr && cacheErr.message ? cacheErr.message : String(cacheErr);
+                console.warn('getRules: failed to cache bestPractices:', msg);
+            }
             return rules;
         });
         try {
