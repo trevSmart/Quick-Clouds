@@ -191,15 +191,22 @@ function App() {
             const sortedIssues = groupedIssues[fileName].sort((a, b) => {
                 // Define severity priority (higher number = higher priority)
                 const severityPriority = {
-                    'High': 4,
-                    'Medium': 3,
-                    'Low': 2,
-                    'Warning': 1,
-                    'Unknown': 0
+                    'HIGH': 4,
+                    'MEDIUM': 3,
+                    'LOW': 2,
+                    'WARNING': 1,
+                    'UNKNOWN': 0,
+                    // Also handle lowercase versions
+                    'high': 4,
+                    'medium': 3,
+                    'low': 2,
+                    'warning': 1,
+                    'unknown': 0
                 };
 
                 const aSeverity = severityPriority[a.severity] || 0;
                 const bSeverity = severityPriority[b.severity] || 0;
+
 
                 // First sort by severity (descending)
                 if (aSeverity !== bSeverity) {

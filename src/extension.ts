@@ -85,7 +85,14 @@ export async function activate(context: vscode.ExtensionContext) {
             try {
                 await storageManager.deleteAllData();
                 collection.clear();
-                vscode.window.showInformationMessage('Live check issues cleared');
+                // Refresh Write-off panel if it is currently open
+                try {
+                    if (WriteOffMenuPanel.currentPanel && typeof (WriteOffMenuPanel.currentPanel as any).refreshData === 'function') {
+                        await (WriteOffMenuPanel.currentPanel as any).refreshData();
+                    }
+                } catch (_) { }
+
+                vscode.window.showInformationMessage('All issues cleared');
             } catch (error) {
                 logger.error('Failed to delete data', error);
                 vscode.window.showErrorMessage('Failed to delete data');

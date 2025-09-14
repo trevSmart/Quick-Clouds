@@ -81,7 +81,7 @@ async function activate(context) {
             if (e.affectsConfiguration('QuickClouds.debugMode')) {
                 const debugMode = vscode.workspace.getConfiguration('QuickClouds').get('debugMode', false);
                 debugMode ? newWO.show() : newWO.hide();
-                // When disabling debug mode, clear any previously injected dummy issues
+                // When disabling debug mode, ensure any debug-only artifacts are cleared
                 if (!debugMode) {
                     (async () => {
                         try {
@@ -90,10 +90,7 @@ async function activate(context) {
                             if (typeof storageManager.removeDummyIssues === 'function') {
                                 await storageManager.removeDummyIssues();
                             }
-                            // Reset debug dummy injection tracker (if present)
-                            if (global.__qc_debug_dummy_added_for_path) {
-                                try { delete global.__qc_debug_dummy_added_for_path; } catch (_) {}
-                            }
+                            // No-op: dummy issue injection has been removed
                             // Refresh diagnostics to reflect updated storage
                             exports.collection.clear();
                             try {
@@ -148,7 +145,15 @@ async function activate(context) {
             try {
                 await storageManager.deleteAllData();
                 exports.collection.clear();
-                vscode.window.showInformationMessage('Live check issues cleared');
+                try {
+                    if (WriteOffMenuPanel_1.WriteOffMenuPanel.currentPanel &&
+                        WriteOffMenuPanel_1.WriteOffMenuPanel.currentPanel._panel &&
+                        WriteOffMenuPanel_1.WriteOffMenuPanel.currentPanel._panel.webview) {
+                        WriteOffMenuPanel_1.WriteOffMenuPanel.currentPanel._panel.webview.postMessage({ command: 'WOdata', data: JSON.stringify({ issues: [] }) });
+                    }
+                }
+                catch (_a) { }
+                vscode.window.showInformationMessage('All issues cleared');
             }
             catch (error) {
                 logger.error('Failed to delete data', error);

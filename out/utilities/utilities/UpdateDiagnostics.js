@@ -45,7 +45,28 @@ function shouldIncludeIssue(issue, displayOnlyBlockerIssues) {
     return (displayOnlyBlockerIssues && issue.qualityGateBreaker) || !displayOnlyBlockerIssues;
 }
 function sortDiagnostics(diagnostics) {
-    return diagnostics.sort((a, b) => b.message.localeCompare(a.message));
+    return diagnostics.sort((a, b) => {
+        // Define severity priority (higher number = higher priority)
+        const severityPriority = {
+            'Error': 4,
+            'Warning': 3,
+            'Information': 2,
+            'Hint': 1
+        };
+
+        const aSeverity = severityPriority[a.severity] || 0;
+        const bSeverity = severityPriority[b.severity] || 0;
+
+        // First sort by severity (descending)
+        if (aSeverity !== bSeverity) {
+            return bSeverity - aSeverity;
+        }
+
+        // Then sort by line number (descending)
+        const aLine = a.range.start.line;
+        const bLine = b.range.start.line;
+        return bLine - aLine;
+    });
 }
 function shouldWriteIssues(issues) {
     return issues.some(issue => issue.issueType && !issue.issueType.toString().trim().startsWith('0.-'));

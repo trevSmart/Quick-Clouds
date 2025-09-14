@@ -23,9 +23,7 @@ const handleAuthenticationMethod_1 = require("../utilities/handleAuthenticationM
 const ApiService_1 = require("./ApiService");
 const constants_1 = require("../constants");
 const logger_1 = require("../utilities/logger");
-// Debug mode and dummy issues utilities
-const debugMode = require("../utilities/debugMode");
-const dummyIssuesUtil = require("../utilities/generateDummyIssues");
+// Debug mode no longer injects dummy issues
 function runLivecheck(context, storageManager) {
     var _a, _b;
     return __awaiter(this, void 0, void 0, function* () {
@@ -85,20 +83,7 @@ function runLivecheck(context, storageManager) {
                 logger.info('LiveCheck API Response: No issues found in response');
             }
 
-            // If debug mode is enabled, append 3 dummy issues (High, Medium, Low)
-            try {
-                const dbg = debugMode && debugMode.DebugMode ? debugMode.DebugMode.getInstance() : undefined;
-                const isDbg = dbg?.isDebug?.() === true;
-                if (isDbg) {
-                    const before = Array.isArray(res.data.issues) ? res.data.issues.length : 0;
-                    const combined = dummyIssuesUtil.addDummyIssuesIfDebugMode(res.data.issues || [], isDbg, fileName, fullDocumentPath);
-                    res.data.issues = combined;
-                    const added = res.data.issues.length - before;
-                    logger.info(`Debug mode active: added ${added} dummy issues (file: ${fileName})`);
-                }
-            } catch (e) {
-                logger.error('Failed to add dummy issues in debug mode', e);
-            }
+            // Dummy issue injection removed: debug mode must not alter API issues
 
             storageManager.setUserData("qualityGatesActive", (0, EvaluateQualityGates_1.default)(res.data.qualityGates));
             const qualityGatesPassed = res.data.qualityGates.length === 0 || res.data.qualityGates[0].passed;

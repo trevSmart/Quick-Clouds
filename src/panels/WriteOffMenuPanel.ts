@@ -60,6 +60,51 @@ class WriteOffMenuPanel {
         this._setWebviewMessageListener(this._panel.webview, env, button);
         logger.info('WriteOffMenuPanel: Message listener set up successfully');
     }
+
+    /**
+     * Rebuilds the issues payload from storage and sends it to the webview.
+     * Useful when external actions (like clearing history) require the UI to refresh.
+     */
+    public async refreshData() {
+        const logger = logger_1.QuickCloudsLogger.getInstance();
+        try {
+            logger.info('WriteOffMenuPanel: Refreshing data after external change');
+            let issues: any[] = [];
+            try {
+                const history = await this._storageManager.getLivecheckHistory();
+                let statusMap: Record<string, string> = {} as any;
+                try { statusMap = (await this._storageManager.getWriteOffStatusMap()) || {}; } catch (_) {}
+                if (Array.isArray(history)) {
+                    for (const entry of history) {
+                        const path = require('path');
+                        const fileName = entry.path ? path.basename(entry.path) : undefined;
+                        for (const issue of entry.issues || []) {
+                            const key1 = issue && issue.id ? String(issue.id) : undefined;
+                            const key2 = issue && issue.uuid ? String(issue.uuid) : undefined;
+                            const localStatus = (key1 && statusMap[key1]) || (key2 && statusMap[key2]) || undefined;
+                            issues.push({
+                                ...issue,
+                                historyId: entry.id,
+                                historyPath: entry.path,
+                                fileName: issue.fileName || fileName,
+                                localWriteOffStatus: localStatus
+                            });
+                        }
+                    }
+                }
+            } catch (e: any) {
+                logger.warn('WriteOffMenuPanel: refreshData getLivecheckHistory failed: ' + (e?.message));
+            }
+
+            const woData: any = { issues };
+            if (this._preselectIssue) {
+                woData.preselect = this._preselectIssue;
+            }
+            WriteOffMenuPanel.currentPanel?._panel.webview.postMessage({ command: 'WOdata', data: JSON.stringify(woData) });
+        } catch (e: any) {
+            logger.error('WriteOffMenuPanel: refreshData failed: ' + (e?.message));
+        }
+    }
     /**
      * Renders the current webview panel if it exists otherwise a new webview panel
      * will be created and displayed.

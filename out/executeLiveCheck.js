@@ -31,6 +31,7 @@ const GetWriteOffReasons_1 = require("../services/GetWriteOffReasons");
 const LiveCheck_1 = require("../services/LiveCheck");
 const UpdateDiagnostics_1 = require("./UpdateDiagnostics");
 const logger_1 = require("./logger");
+const WriteOffMenuPanel_1 = require("./panels/WriteOffMenuPanel");
 // Simple in-memory lock to prevent concurrent runs
 let __qcLiveCheckInProgress = false;
 function executeLiveCheck(context, newWO, storageManager) {
@@ -51,12 +52,23 @@ function executeLiveCheck(context, newWO, storageManager) {
                 title: `Running live check${fileLabel}...`
             }, () => __awaiter(this, void 0, void 0, function* () {
                 const { response, documentPath, qualityGatesPassed } = yield (0, LiveCheck_1.runLivecheck)(context, storageManager);
-                if (documentPath && (!vscode.window.activeTextEditor || vscode.window.activeTextEditor.document.uri.fsPath !== documentPath)) {
-                    yield vscode.window.showTextDocument(vscode.Uri.file(documentPath), { preview: false });
-                }
+                // Do not auto-open the scanned file after Live Check completes
                 if (vscode.window.activeTextEditor) {
                     yield (0, UpdateDiagnostics_1.updateDiagnostics)(vscode.window.activeTextEditor.document, response, context, storageManager);
                     newWO.show();
+                }
+                // If the Write‑off panel is open, refresh with the latest data
+                try {
+                    const panel = WriteOffMenuPanel_1.WriteOffMenuPanel.currentPanel;
+                    if (panel && typeof panel.refreshData === 'function') {
+                        const logger = logger_1.QuickCloudsLogger.getInstance();
+                        logger.info('ExecuteLiveCheck: Refreshing Write-off panel after Live Check');
+                        yield panel.refreshData();
+                    }
+                }
+                catch (e) {
+                    const logger = logger_1.QuickCloudsLogger.getInstance();
+                    logger.warn('ExecuteLiveCheck: Failed to refresh Write-off panel: ' + (e === null || e === void 0 ? void 0 : e.message));
                 }
                 if (response.length > 0) {
                     (0, GetWriteOffReasons_1.default)(storageManager, context);
@@ -85,12 +97,14 @@ function executeLiveCheck(context, newWO, storageManager) {
                 if (counts.low)
                     parts.push(`${counts.low} low`);
                 const summary = parts.join(', ');
+                const summarySuffix = summary ? ` (${summary})` : '';
                 if (hasValidResult && qualityGatesPassed) {
                     if (totalIssues === 0) {
                         vscode.window.showInformationMessage('Live check PASSED');
                     }
                     else if (counts.high === 0) {
-                        const warnMsg = `Live check PASSED with issues (${summary})`;
+                        const plural = totalIssues === 1 ? 'issue' : 'issues';
+                        const warnMsg = `Live check PASSED with ${totalIssues} ${plural} found${summarySuffix}`;
                         vscode.window.showWarningMessage(warnMsg);
                     }
                     else {
