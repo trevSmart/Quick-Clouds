@@ -172,6 +172,20 @@ class LocalStorageService {
             (0, Database_1.saveDatabase)(db, this.dbPath);
         });
     }
+    /**
+     * Removes only the debug/dummy issues from all histories without touching history metadata or write-off data.
+     * Dummy issues are identified by an id that starts with 'debug-issue-'.
+     */
+    removeDummyIssues() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const db = yield this.getDb();
+            // Remove rows where the stored JSON contains an id starting with 'debug-issue-'
+            // Using LIKE as JSON1 extension might not be available in the embedded SQLite.
+            const pattern = '%"id":"debug-issue-%';
+            db.run('DELETE FROM Issues WHERE issue_data LIKE ?', [pattern]);
+            (0, Database_1.saveDatabase)(db, this.dbPath);
+        });
+    }
     getLastScanHistoryId() {
         return __awaiter(this, void 0, void 0, function* () {
             const db = yield this.getDb();

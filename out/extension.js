@@ -81,6 +81,35 @@ async function activate(context) {
             if (e.affectsConfiguration('QuickClouds.debugMode')) {
                 const debugMode = vscode.workspace.getConfiguration('QuickClouds').get('debugMode', false);
                 debugMode ? newWO.show() : newWO.hide();
+                // When disabling debug mode, clear any previously injected dummy issues
+                if (!debugMode) {
+                    (async () => {
+                        try {
+                            const logger = logger_2.QuickCloudsLogger.getInstance();
+                            logger.info('Debug mode disabled: removing dummy issues and refreshing diagnostics');
+                            if (typeof storageManager.removeDummyIssues === 'function') {
+                                await storageManager.removeDummyIssues();
+                            }
+                            // Reset debug dummy injection tracker (if present)
+                            if (global.__qc_debug_dummy_added_for_path) {
+                                try { delete global.__qc_debug_dummy_added_for_path; } catch (_) {}
+                            }
+                            // Refresh diagnostics to reflect updated storage
+                            exports.collection.clear();
+                            try {
+                                await (0, restoreDiagnostics_1.restoreDiagnosticsFromStorage)(context, storageManager);
+                            }
+                            catch (err) {
+                                logger.warn('Diagnostics restore after debug disable failed');
+                            }
+                            logger.info('Dummy issues cleanup complete');
+                        }
+                        catch (err) {
+                            const logger = logger_2.QuickCloudsLogger.getInstance();
+                            logger.error('Failed to clean dummy issues on debug disable', err);
+                        }
+                    })();
+                }
             }
         });
         context.subscriptions.push(cfgListener);

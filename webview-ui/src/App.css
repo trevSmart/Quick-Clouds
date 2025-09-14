@@ -139,6 +139,46 @@
     border: 1px solid var(--vscode-tab-border);
 }
 
+/* Selected issue banner inside the form */
+.selected-issue-banner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    margin: 0 0 14px 0;
+    border: 1px solid var(--vscode-panel-border);
+    border-left-width: 3px;
+    border-radius: 6px;
+    background: var(--vscode-editor-background);
+}
+
+.selected-issue-text {
+    font-size: 13px;
+    color: var(--vscode-editor-foreground);
+    flex: 1;
+}
+
+.clear-selection-btn {
+    padding: 4px 10px;
+    background: var(--vscode-button-secondaryBackground);
+    color: var(--vscode-button-secondaryForeground);
+    border: 1px solid var(--vscode-button-border);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.clear-selection-btn:hover {
+    background: var(--vscode-button-secondaryHoverBackground);
+}
+
+/* Severity accent on the banner's left border */
+.selected-issue-banner.severity-high { border-left-color: #e23445; }
+.selected-issue-banner.severity-medium { border-left-color: #ff8e42; }
+.selected-issue-banner.severity-low { border-left-color: #cdc037; }
+.selected-issue-banner.severity-warning { border-left-color: #17a2b8; }
+.selected-issue-banner.severity-unknown { border-left-color: #6c757d; }
+
 .form-group {
     margin-bottom: 15px;
 }
@@ -247,7 +287,7 @@
 .rule-header h4 {
     margin: 0;
     color: var(--vscode-tab-unfocusedActiveForeground);
-    font-size: 13.3px;
+    font-size: 13.4px;
     font-weight: 500;
     display: flex;
     align-items: center;
@@ -385,19 +425,19 @@
 }
 
 .severity-badge.severity-high {
-    background-color: #c82333;
+    background-color: #e23445;
     color: white;
     border: 1px solid #a71e2a;
 }
 
 .severity-badge.severity-medium {
-    background-color: #ffa366;
+    background-color: #ff8e42;
     color: black;
     border: 1px solid #ffa366;
 }
 
 .severity-badge.severity-low {
-    background-color: #ffe066;
+    background-color: #cdc037;
     color: #212529;
     border: 1px solid #e0a800;
 }

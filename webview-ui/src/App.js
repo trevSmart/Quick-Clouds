@@ -549,6 +549,23 @@ function App() {
                 <h2>Request details</h2>
             </div>
             <div className="writeoff-form">
+                {viewMode === 'single' && selectedIssue && (
+                    <div className={`selected-issue-banner ${getSeverityClass(selectedIssue.severity)}`}>
+                        <span className={`severity-badge ${getSeverityClass(selectedIssue.severity)}`}>
+                            {selectedIssue.severity}
+                        </span>
+                        <span className="selected-issue-text">
+                            {formatIssueLine(selectedIssue, true)}
+                        </span>
+                        <button
+                            className="clear-selection-btn"
+                            onClick={() => setSelectedIssue(null)}
+                            title="Clear selected issue"
+                        >
+                            Change selection
+                        </button>
+                    </div>
+                )}
                 <div className="form-group">
                     <label>Templates:</label>
                     <select
