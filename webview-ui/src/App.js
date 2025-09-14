@@ -71,8 +71,15 @@ function App() {
 
     // Build a consistent subtitle like "<file>, line <n>: <element>" (element optional)
     const formatIssueLine = (issue, includeElement = true) => {
-        const element = includeElement ? getCleanElementName(issue) : '';
-        const base = `${issue.fileName || 'Unknown file'}, line ${issue.lineNumber}`;
+        const baseFile = issue.fileName || 'Unknown file';
+        let element = includeElement ? getCleanElementName(issue) : '';
+
+        // Suppress element if it duplicates the filename
+        if (element && element.trim().toLowerCase() === String(baseFile).trim().toLowerCase()) {
+            element = '';
+        }
+
+        const base = `${baseFile}, line ${issue.lineNumber}`;
         return element ? `${base}: ${element}` : base;
     };
 
@@ -395,7 +402,7 @@ function App() {
                                     <div className="rule-header">
                                         <h4>
                                             <span className="codicon codicon-file-code" aria-hidden="true"></span>
-                                            {fileName} <span className="issues-count">({fileIssues.length} issues)</span>
+                                            {fileName} <span className="issues-count">{fileIssues.length} issues</span>
                                         </h4>
                                         <button
                                             onClick={() => handleSelectAll(fileName)}
@@ -449,7 +456,7 @@ function App() {
                                     <div className="rule-header">
                                         <h4>
                                             <span className="codicon codicon-file-code" aria-hidden="true"></span>
-                                            {fileName} <span className="issues-count">({fileIssues.length} issues)</span>
+                                            {fileName} <span className="issues-count">{fileIssues.length} issues</span>
                                         </h4>
                                     </div>
                                     <div className="issues-grid single-grid">
