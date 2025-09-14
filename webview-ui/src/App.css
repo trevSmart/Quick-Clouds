@@ -166,7 +166,6 @@
     padding: 10px 12px 10px 16px;
     margin: 0 0 14px 0;
     border: 1px solid var(--vscode-panel-border);
-    border-left-width: 3px;
     border-radius: 6px;
     background: var(--vscode-editor-background);
 }
@@ -203,27 +202,6 @@
 .clear-selection-btn .codicon:not([class*="codicon-"]):empty::before {
     content: "\00D7";
     /* multiplication sign as fallback */
-}
-
-/* Severity accent on the banner's left border */
-.selected-issue-banner.severity-high {
-    border-left-color: #e23445;
-}
-
-.selected-issue-banner.severity-medium {
-    border-left-color: #ff8e42;
-}
-
-.selected-issue-banner.severity-low {
-    border-left-color: #cdc037;
-}
-
-.selected-issue-banner.severity-warning {
-    border-left-color: #17a2b8;
-}
-
-.selected-issue-banner.severity-unknown {
-    border-left-color: #6c757d;
 }
 
 .form-group {
@@ -342,6 +320,10 @@
     display: flex;
     align-items: center;
     gap: 8px;
+    /* Make the header title take the available row width so
+       the issues count and last check can align to the right */
+    flex: 1;
+    min-width: 0; /* allow inner content (filename) to shrink if needed */
 }
 
 .rule-header h4 .codicon {
@@ -869,4 +851,8 @@ select {
     min-height: 30px;
     box-sizing: border-box;
     padding: 2px 10px;
+}
+
+select:invalid {
+    color: gray;
 }

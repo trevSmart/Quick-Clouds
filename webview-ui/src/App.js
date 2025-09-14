@@ -860,7 +860,7 @@ function App() {
                         value={selectedTemplate}
                         onChange={(e) => handleTemplateSelect(e.target.value)}
                     >
-                        <option value="">Select a template...</option>
+                        <option value="" disabled selected hidden>Select a template</option>
                         {templates.map(template => (
                             <option key={template.id} value={template.id}>
                                 {template.name}
@@ -875,7 +875,7 @@ function App() {
                         value={reason}
                         onChange={(e) => setReason(e.target.value)}
                     >
-                        <option value="">Select a reason...</option>
+                        <option value="" disabled selected hidden>Select a reason</option>
                         {HARDCODED_REASONS.map(reasonOption => (
                             <option key={reasonOption.id} value={reasonOption.name}>
                                 {reasonOption.name}
