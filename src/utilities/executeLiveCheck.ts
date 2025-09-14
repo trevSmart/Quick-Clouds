@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
+import * as crypto from 'crypto';
 import { handleLicenseInfo } from './handleLicenseInfo';
 import GetWriteOffReasons from '../services/GetWriteOffReasons';
 import { runLivecheck } from '../services/LiveCheck';
@@ -12,7 +13,9 @@ import { env } from '../extension';
 const latestSessionByFile: Map<string, string> = new Map();
 const cancelledSessions: Set<string> = new Set();
 function newSessionId() {
-    return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    // Use cryptographically-secure random bytes for the random portion
+    const randomStr = crypto.randomBytes(4).toString('hex'); // 8 hex characters == 32 bits entropy
+    return `${Date.now()}-${randomStr}`;
 }
 
 export async function executeLiveCheck(context: vscode.ExtensionContext, newWO: vscode.StatusBarItem, storageManager: any): Promise<void> {
