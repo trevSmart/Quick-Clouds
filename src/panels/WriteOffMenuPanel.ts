@@ -246,7 +246,9 @@ class WriteOffMenuPanel {
                             const path = require('path');
                             const fileName = entry.path ? path.basename(entry.path) : undefined;
                             for (const issue of entry.issues || []) {
-                                const localStatus = issue && issue.id ? statusMap[String(issue.id)] : undefined;
+                                const key1 = issue && issue.id ? String(issue.id) : undefined;
+                                const key2 = issue && issue.uuid ? String(issue.uuid) : undefined;
+                                const localStatus = (key1 && statusMap[key1]) || (key2 && statusMap[key2]) || undefined;
                                 issues.push(Object.assign(Object.assign({}, issue), { historyId: entry.id, historyPath: entry.path, fileName: issue.fileName || fileName, localWriteOffStatus: localStatus }));
                             }
                         }
@@ -287,7 +289,7 @@ class WriteOffMenuPanel {
                     const result = yield (0, RequestWriteOff_1.default)(data, env, this._storageManager, this.context);
                     // Notify the webview so it can reset form and unselect the issue
                     const payload = {
-                        id: data === null || data === void 0 ? void 0 : data.id,
+                        id: (data === null || data === void 0 ? void 0 : data.id) || (data === null || data === void 0 ? void 0 : data.uuid),
                         fileName: data === null || data === void 0 ? void 0 : data.fileName,
                         lineNumber: data === null || data === void 0 ? void 0 : data.lineNumber,
                         elementName: data === null || data === void 0 ? void 0 : data.elementName,

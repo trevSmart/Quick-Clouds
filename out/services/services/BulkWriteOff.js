@@ -125,7 +125,10 @@ class BulkWriteOffService {
                         }
                     }
                 };
-                try { await storageManager.setWriteOffStatus(issue.id, 'REQUESTED', { source: 'debug' }); } catch (_) { }
+                try {
+                    const issueKey = (issue && (issue.id || issue.uuid));
+                    if (issueKey) { await storageManager.setWriteOffStatus(issueKey, 'REQUESTED', { source: 'debug' }); }
+                } catch (_) { }
                 return simulatedResponse.data;
             }
         } catch (_) { }
@@ -150,7 +153,10 @@ class BulkWriteOffService {
         };
         try {
             const response = await axios_2.default.patch(url, JSON.stringify(data), { headers });
-            try { await storageManager.setWriteOffStatus(issue.id, 'REQUESTED', { source: 'api' }); } catch (_) { }
+            try {
+                const issueKey = (issue && (issue.id || issue.uuid));
+                if (issueKey) { await storageManager.setWriteOffStatus(issueKey, 'REQUESTED', { source: 'api' }); }
+            } catch (_) { }
             return response.data.data;
         }
         catch (error) {
