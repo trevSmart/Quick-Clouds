@@ -45,12 +45,25 @@ const LiveCheck_1 = require("../services/LiveCheck");
 const UpdateDiagnostics_1 = require("./UpdateDiagnostics");
 const logger_2 = require("./logger");
 const buttonLCSingleton_1 = require("./buttonLCSingleton");
+const IsElementToAnalize_1 = __importDefault(require("./IsElementToAnalize"));
 async function executeLiveCheck(context, newWO, storageManager) {
     var _a, _b;
     try {
+        // Guard: only allow supported file types when command is invoked directly
+        const activeFile = (_b = (_a = vscode.window.activeTextEditor) === null || _a === void 0 ? void 0 : _a.document) === null || _b === void 0 ? void 0 : _b.fileName;
+        try {
+            const supported = activeFile ? (0, IsElementToAnalize_1.default)(activeFile) : false;
+            if (!supported) {
+                const logger = logger_2.QuickCloudsLogger.getInstance();
+                logger.info('ExecuteLiveCheck: Command invoked with unsupported file. Aborting.');
+                vscode.window.showInformationMessage('Live Check is only available for Apex classes, Apex triggers, Aura JS, and LWC JS under force-app. Open a supported file and try again.');
+                return;
+            }
+        }
+        catch (_) { }
         // Set button to spinning state
         (0, buttonLCSingleton_1.setButtonLCSpinning)(true);
-        const activeFile = (_b = (_a = vscode.window.activeTextEditor) === null || _a === void 0 ? void 0 : _a.document) === null || _b === void 0 ? void 0 : _b.fileName;
+        
         const fileLabel = activeFile ? ` for ${path.basename(activeFile)}` : '';
         await vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,

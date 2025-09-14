@@ -347,6 +347,21 @@ function App() {
         return `severity-${severity.toLowerCase()}`;
     };
 
+    // Compute file type badge (APEX, APEX TRIGGER, LWC, AURA)
+    const getFileTypeBadge = (issue) => {
+        try {
+            const raw = String(issue?.historyPath || '').replace(/\\\\/g, '/').toLowerCase();
+            if (!raw) return null;
+            if (raw.endsWith('.cls')) return { key: 'type-apex', label: 'APEX' };
+            if (raw.endsWith('.trigger')) return { key: 'type-apex-trigger', label: 'APEX TRIGGER' };
+            if (raw.includes('/lwc/') && raw.endsWith('.js')) return { key: 'type-lwc', label: 'LWC' };
+            if (raw.includes('/aura/') && raw.endsWith('.js')) return { key: 'type-aura', label: 'AURA' };
+            return null;
+        } catch (_) {
+            return null;
+        }
+    };
+
     const getLocalStatus = (issue) => {
         const s = issue?.localWriteOffStatus || issue?.writeOff?.writeOffStatus;
         return s ? String(s).toUpperCase() : null;
@@ -431,7 +446,11 @@ function App() {
                                     <div className="rule-header">
                                         <h4>
                                             <span className="codicon codicon-file-code" aria-hidden="true"></span>
-                                            {fileName} <span className="issues-count">{fileIssues.length} issues</span>
+                                            {fileName}
+                                            {(() => { const t = getFileTypeBadge(fileIssues && fileIssues[0]); return t ? (
+                                                <span className={`type-badge ${t.key}`}>{t.label}</span>
+                                            ) : null; })()}
+                                            <span className="issues-count">{fileIssues.length} issues</span>
                                         </h4>
                                         <button
                                             onClick={() => handleSelectAll(fileName)}
@@ -490,7 +509,11 @@ function App() {
                                     <div className="rule-header">
                                         <h4>
                                             <span className="codicon codicon-file-code" aria-hidden="true"></span>
-                                            {fileName} <span className="issues-count">{fileIssues.length} issues</span>
+                                            {fileName}
+                                            {(() => { const t = getFileTypeBadge(fileIssues && fileIssues[0]); return t ? (
+                                                <span className={`type-badge ${t.key}`}>{t.label}</span>
+                                            ) : null; })()}
+                                            <span className="issues-count">{fileIssues.length} issues</span>
                                         </h4>
                                     </div>
                                     <div className="issues-grid single-grid">

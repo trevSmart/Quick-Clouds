@@ -43,6 +43,8 @@ const vscode = __importStar(require("vscode"));
 const constants_1 = require("../constants");
 const IsElementToAnalize_1 = __importDefault(require("./IsElementToAnalize"));
 let buttonLCInstance = null;
+// Track if a Live Check is in progress to force-show the button
+let __qc_lc_inProgress = false;
 function getButtonLCInstance() {
     if (!buttonLCInstance) {
         // Higher priority appears more to the left on the Right side
@@ -56,10 +58,14 @@ function getButtonLCInstance() {
 function setButtonLCSpinning(isSpinning, fileName) {
     const buttonLC = getButtonLCInstance();
     if (isSpinning) {
+        __qc_lc_inProgress = true;
         buttonLC.text = '$(loading~spin) Live check';
         buttonLC.tooltip = fileName ? `Checking ${fileName}...` : 'Live check in progress...';
+        // Always show while spinning regardless of active editor or auth state
+        buttonLC.show();
     }
     else {
+        __qc_lc_inProgress = false;
         buttonLC.text = 'Live check';
         buttonLC.tooltip = undefined;
     }
@@ -67,6 +73,11 @@ function setButtonLCSpinning(isSpinning, fileName) {
 async function updateButtonLCVisibility(storageManager) {
     var _a, _b;
     const buttonLC = getButtonLCInstance();
+    // If a run is in progress, keep the button visible
+    if (__qc_lc_inProgress) {
+        buttonLC.show();
+        return;
+    }
     const authType = await storageManager.getUserData('authType');
     const apiKeyStatus = await storageManager.getUserData('apiKeyStatus');
     const isAuthenticated = await storageManager.getUserData('isAuthenticated');

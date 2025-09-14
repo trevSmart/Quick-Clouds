@@ -33,12 +33,35 @@ const UpdateDiagnostics_1 = require("./UpdateDiagnostics");
 const logger_1 = require("./logger");
 // Fix incorrect relative path (was './utilities/utilities/buttonLCSingleton')
 const buttonLCSingleton_1 = require("./utilities/buttonLCSingleton");
+const IsElementToAnalize_1 = require("./IsElementToAnalize");
+// Prevent concurrent Live Check runs
+let __qc_liveCheckInProgress = false;
 function executeLiveCheck(context, newWO, storageManager) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
+            // Concurrency guard: if already running, do nothing
+            if (__qc_liveCheckInProgress) {
+                const logger = logger_1.QuickCloudsLogger.getInstance();
+                logger.info('ExecuteLiveCheck: A run is already in progress. Ignoring new request.');
+                return;
+            }
+            __qc_liveCheckInProgress = true;
             // Get current file name for tooltip
             const activeEditor = vscode.window.activeTextEditor;
             const fileName = activeEditor ? path.basename(activeEditor.document.fileName) : undefined;
+            const activePath = activeEditor ? activeEditor.document.fileName : undefined;
+
+            // Guard: only allow supported file types when command is invoked directly
+            try {
+                const supported = activePath ? (IsElementToAnalize_1 && IsElementToAnalize_1.default ? IsElementToAnalize_1.default(activePath) : false) : false;
+                if (!supported) {
+                    const logger = logger_1.QuickCloudsLogger.getInstance();
+                    logger.info('ExecuteLiveCheck: Command invoked with unsupported file. Aborting.');
+                    vscode.window.showInformationMessage('Live Check is only available for Apex classes, Apex triggers, Aura JS, and LWC JS under force-app. Open a supported file and try again.');
+                    return;
+                }
+            }
+            catch (_) { }
 
             // Set button to spinning state
             (0, buttonLCSingleton_1.setButtonLCSpinning)(true, fileName);
@@ -119,6 +142,7 @@ function executeLiveCheck(context, newWO, storageManager) {
         finally {
             // Always reset button to normal state
             (0, buttonLCSingleton_1.setButtonLCSpinning)(false);
+            __qc_liveCheckInProgress = false;
         }
     });
 }

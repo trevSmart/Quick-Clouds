@@ -3,6 +3,8 @@ import { HTTP_STATUS_OK } from '../constants';
 import isElementToAnalize from './IsElementToAnalize';
 
 let buttonLCInstance: vscode.StatusBarItem | null = null;
+// Track if a Live Check run is currently in progress to control visibility
+let liveCheckInProgressForUI = false;
 
 export function getButtonLCInstance(): vscode.StatusBarItem {
     if (!buttonLCInstance) {
@@ -18,9 +20,13 @@ export function getButtonLCInstance(): vscode.StatusBarItem {
 export function setButtonLCSpinning(isSpinning: boolean, fileName?: string): void {
     const buttonLC = getButtonLCInstance();
     if (isSpinning) {
+        liveCheckInProgressForUI = true;
         buttonLC.text = '$(loading~spin) Live check';
         buttonLC.tooltip = fileName ? `Checking ${fileName}...` : 'Live check in progress...';
+        // Ensure the button is visible while spinning regardless of context
+        buttonLC.show();
     } else {
+        liveCheckInProgressForUI = false;
         buttonLC.text = 'Live check';
         buttonLC.tooltip = undefined;
     }
@@ -28,6 +34,11 @@ export function setButtonLCSpinning(isSpinning: boolean, fileName?: string): voi
 
 export async function updateButtonLCVisibility(storageManager: any): Promise<void> {
     const buttonLC = getButtonLCInstance();
+    // If a Live Check is running, always show the button (spinner state managed elsewhere)
+    if (liveCheckInProgressForUI) {
+        buttonLC.show();
+        return;
+    }
     const authType = await storageManager.getUserData('authType');
     const apiKeyStatus = await storageManager.getUserData('apiKeyStatus');
     const isAuthenticated = await storageManager.getUserData('isAuthenticated');
