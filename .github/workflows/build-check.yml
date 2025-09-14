@@ -33,7 +33,7 @@ jobs:
         npm ci
 
     - name: Run tests
-      run: npm run test:run
+      run: npm run test
 
     - name: Build VSIX package
       run: |
