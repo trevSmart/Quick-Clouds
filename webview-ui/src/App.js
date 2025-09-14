@@ -34,6 +34,7 @@ function App() {
     const [issues, setIssues] = useState([]);
     // Track expand/collapse state per file group (default expanded)
     const [expandedGroups, setExpandedGroups] = useState({});
+    const groupRefs = useRef({});
     const [selectedIssues, setSelectedIssues] = useState([]);
     const [selectedIssue, setSelectedIssue] = useState(null); // For single mode
     const [templates, setTemplates] = useState([]);
@@ -631,7 +632,12 @@ function App() {
                                         tabIndex={0}
                                         aria-expanded={isExpanded(fileName)}
                                         onClick={() => toggleGroup(fileName)}
-                                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleGroup(fileName); } }}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter' || e.key === ' ') {
+                                                e.preventDefault();
+                                                toggleGroup(fileName);
+                                            }
+                                        }}
                                     >
                                         <h4>
                                             <span className="codicon codicon-chevron-right twisty" aria-hidden="true"></span>
@@ -685,13 +691,24 @@ function App() {
                                             </span>
                                         </h4>
                                         <button
-                                            onClick={(e) => { e.stopPropagation(); handleSelectAll(fileName); }}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleSelectAll(fileName);
+                                            }}
                                             className="select-all-btn"
                                         >
                                             {fileIssues.every(issue => selectedIssues.includes(getIssueId(issue))) ? 'Deselect All' : 'Select All'}
                                         </button>
                                     </div>
-                                    <div className="issues-grid">
+                                    <div
+                                        className="issues-grid"
+                                        ref={(el) => {
+                                            if (el) {
+                                                groupRefs.current[fileName] = el;
+                                            }
+                                        }}
+                                        style={{ maxHeight: isExpanded(fileName) ? (groupRefs.current[fileName]?.scrollHeight || 5000) : 0 }}
+                                    >
                                         {fileIssues.map(issue => (
                                             <div key={`bulk-${issue.id || issue.uuid}`} className="issue-item">
                                                 <input
@@ -740,7 +757,12 @@ function App() {
                                         tabIndex={0}
                                         aria-expanded={isExpanded(fileName)}
                                         onClick={() => toggleGroup(fileName)}
-                                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleGroup(fileName); } }}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter' || e.key === ' ') {
+                                                e.preventDefault();
+                                                toggleGroup(fileName);
+                                            }
+                                        }}
                                     >
                                         <h4>
                                             <span className="codicon codicon-chevron-right twisty" aria-hidden="true"></span>
@@ -793,7 +815,15 @@ function App() {
                                             </span>
                                         </h4>
                                     </div>
-                                    <div className="issues-grid single-grid">
+                                    <div
+                                        className="issues-grid single-grid"
+                                        ref={(el) => {
+                                            if (el) {
+                                                groupRefs.current[fileName] = el;
+                                            }
+                                        }}
+                                        style={{ maxHeight: isExpanded(fileName) ? (groupRefs.current[fileName]?.scrollHeight || 5000) : 0 }}
+                                    >
                             {fileIssues.map(issue => {
                                 const issueId = issue.id || issue.uuid;
                                 const selectedId = selectedIssue?.id || selectedIssue?.uuid;

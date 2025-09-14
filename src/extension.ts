@@ -44,7 +44,7 @@ export async function activate(context: vscode.ExtensionContext) {
     let initPromise: Promise<InitResult> | undefined;
 
     async function ensureInitialized(): Promise<InitResult> {
-        if (initPromise) return initPromise;
+        if (initPromise) {return initPromise;}
         initPromise = (async () => {
             const t0 = Date.now();
             const { apiKeyStatus, storageManager, authType, isAuthenticated } = await initializeExtension(context);

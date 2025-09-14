@@ -62,7 +62,7 @@
 
 /* Issues section - unified filters and list */
 .issues-section {
-    border-radius: 8px;
+    border-radius: 10px;
     /* Allow popovers/tooltips to render outside the section */
     overflow: hidden;
     margin-bottom: 20px;
@@ -154,7 +154,7 @@
     margin-bottom: 20px;
     padding: 15px 20px;
     background-color: var(--vscode-panel-background);
-    border-radius: 8px;
+    border-radius: 10px;
     border: 1px solid var(--vscode-tab-border);
 }
 
