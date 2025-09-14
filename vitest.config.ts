@@ -2,6 +2,8 @@ import { defineConfig } from 'vitest/config'
 import { resolve } from 'path'
 
 export default defineConfig({
+  // Use specific tsconfig for Vitest
+  configFile: './tsconfig.vitest.json',
   test: {
     // Test environment
     environment: 'jsdom',
@@ -89,5 +91,10 @@ export default defineConfig({
   // Define global variables for tests
   define: {
     'process.env.NODE_ENV': '"test"'
+  },
+
+  // ESBuild configuration to handle CommonJS modules
+  esbuild: {
+    target: 'node18'
   }
 })
