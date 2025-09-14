@@ -24,10 +24,7 @@ export class QuickCloudsLogger {
         // Also log to console for development
         console.log(`Quick Clouds: ${logMessage}`);
 
-        // Show output channel for errors
-        if (level === 'ERROR') {
-            this.outputChannel.show(true);
-        }
+        // Do not auto-open the output panel on errors
     }
 
     public info(message: string): void {

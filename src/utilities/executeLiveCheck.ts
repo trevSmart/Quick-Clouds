@@ -5,7 +5,6 @@ import GetWriteOffReasons from '../services/GetWriteOffReasons';
 import { runLivecheck } from '../services/LiveCheck';
 import { updateDiagnostics } from './UpdateDiagnostics';
 import { QuickCloudsLogger } from './logger';
-import { setButtonLCSpinning } from './buttonLCSingleton';
 import { WriteOffMenuPanel } from '../panels/WriteOffMenuPanel';
 import { env } from '../extension';
 
@@ -24,49 +23,59 @@ export async function executeLiveCheck(context: vscode.ExtensionContext, newWO: 
         // Get current file name for tooltip
         const activeEditor = vscode.window.activeTextEditor;
         const fileName = activeEditor ? path.basename(activeEditor.document.fileName) : undefined;
+        // Run Live Check inside a progress notification
+        let response: any[] = [];
+        let documentPath: string | undefined;
+        let qualityGatesPassed: boolean | undefined;
+        await vscode.window.withProgress({
+            location: vscode.ProgressLocation.Notification,
+            title: fileName ? `Live check: ${fileName}` : 'Live check',
+            cancellable: false
+        }, async () => {
+            const result = await runLivecheck(context, storageManager);
+            response = result.response || [];
+            documentPath = result.documentPath;
+            qualityGatesPassed = result.qualityGatesPassed;
 
-        // Set button to spinning state
-        setButtonLCSpinning(true, fileName);
+            // Log final results
+            const logger = QuickCloudsLogger.getInstance();
+            logger.info('ExecuteLiveCheck: LiveCheck completed successfully');
+            logger.info('ExecuteLiveCheck: Final issues count: ' + (response ? response.length : 'No response'));
+            logger.info('ExecuteLiveCheck: Document path: ' + documentPath);
 
-        const { response, documentPath, qualityGatesPassed } = await runLivecheck(context, storageManager);
-
-        // Log final results
-        const logger = QuickCloudsLogger.getInstance();
-        logger.info('ExecuteLiveCheck: LiveCheck completed successfully');
-        logger.info('ExecuteLiveCheck: Final issues count: ' + (response ? response.length : 'No response'));
-        logger.info('ExecuteLiveCheck: Document path: ' + documentPath);
-        // Do not auto-open the scanned file after Live Check completes
-        // Intentionally skipping showTextDocument to avoid stealing focus
-        if (vscode.window.activeTextEditor) {
-            await updateDiagnostics(vscode.window.activeTextEditor.document, response, context, storageManager);
-            newWO.show();
-        }
-        // If the Write‑off panel is open, refresh its data so it reflects the latest scan
-        try {
-            const panel: any = (WriteOffMenuPanel as any).currentPanel;
-            if (panel && typeof panel.refreshData === 'function') {
-                logger.info('ExecuteLiveCheck: Refreshing Write-off panel after Live Check');
-                await panel.refreshData();
+            // Update diagnostics for the active editor (no focus stealing)
+            if (vscode.window.activeTextEditor) {
+                await updateDiagnostics(vscode.window.activeTextEditor.document, response, context, storageManager);
+                newWO.show();
             }
-        } catch (e: any) {
-            logger.warn('ExecuteLiveCheck: Failed to refresh Write-off panel: ' + (e?.message));
-            // Fallback: if refresh fails or crashes the webview, rebuild the panel
+
+            // If the Write‑off panel is open, refresh its data so it reflects the latest scan
             try {
-                if ((WriteOffMenuPanel as any).currentPanel) {
-                    (WriteOffMenuPanel as any).closeAll();
-                    WriteOffMenuPanel.render(context.extensionUri, context, env, newWO, storageManager);
-                    logger.info('ExecuteLiveCheck: Write-off panel reloaded as fallback');
+                const panel: any = (WriteOffMenuPanel as any).currentPanel;
+                if (panel && typeof panel.refreshData === 'function') {
+                    logger.info('ExecuteLiveCheck: Refreshing Write-off panel after Live Check');
+                    await panel.refreshData();
                 }
-            } catch (e2: any) {
-                logger.error('ExecuteLiveCheck: Failed to reload Write-off panel: ' + (e2?.message));
+            } catch (e: any) {
+                logger.warn('ExecuteLiveCheck: Failed to refresh Write-off panel: ' + (e?.message));
+                // Fallback: if refresh fails or crashes the webview, rebuild the panel
+                try {
+                    if ((WriteOffMenuPanel as any).currentPanel) {
+                        (WriteOffMenuPanel as any).closeAll();
+                        WriteOffMenuPanel.render(context.extensionUri, context, env, newWO, storageManager);
+                        logger.info('ExecuteLiveCheck: Write-off panel reloaded as fallback');
+                    }
+                } catch (e2: any) {
+                    logger.error('ExecuteLiveCheck: Failed to reload Write-off panel: ' + (e2?.message));
+                }
             }
-        }
-        if (response.length > 0) {
-            GetWriteOffReasons(storageManager, context);
-            await handleLicenseInfo(storageManager, context);
-        } else {
-            logger.info('ExecuteLiveCheck: No issues found, no write-off panel will be shown');
-        }
+            if (response.length > 0) {
+                GetWriteOffReasons(storageManager, context);
+                await handleLicenseInfo(storageManager, context);
+            } else {
+                logger.info('ExecuteLiveCheck: No issues found, no write-off panel will be shown');
+            }
+        });
 
         // Only count real, active issues (exclude informational and APPROVED write-offs)
         const realIssues = response.filter((i: any) => {
@@ -129,8 +138,6 @@ export async function executeLiveCheck(context: vscode.ExtensionContext, newWO: 
             name: error.name
         });
     } finally {
-        // Always reset button to normal state
-        setButtonLCSpinning(false);
         liveCheckInProgress = false;
     }
 }

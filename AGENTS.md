@@ -178,7 +178,7 @@ npm run package
 - **Output Channel**: Dedicated "Quick Clouds" channel in VSCode
 - **Log Levels**: INFO, WARN, ERROR
 - **Timestamps**: Automatic ISO timestamps
-- **Auto-display**: Shows channel on errors
+- **No Auto-display**: Errors are logged but do not auto-open the panel; use `quick-clouds.showLogs` or `logger.show()` to view
 - **Console Fallback**: Also logs to console for development
 
 ### Usage Examples

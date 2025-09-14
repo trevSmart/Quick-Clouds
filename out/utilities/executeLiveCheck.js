@@ -33,8 +33,6 @@ const UpdateDiagnostics_1 = require("./UpdateDiagnostics");
 const logger_1 = require("./logger");
 const WriteOffMenuPanel_1 = require("../panels/WriteOffMenuPanel");
 const extension_1 = require("../extension");
-// Fix incorrect relative path (was './utilities/utilities/buttonLCSingleton')
-const buttonLCSingleton_1 = require("./utilities/buttonLCSingleton");
 const IsElementToAnalize_1 = require("./IsElementToAnalize");
 // Prevent concurrent Live Check runs
 let __qc_liveCheckInProgress = false;
@@ -65,48 +63,61 @@ function executeLiveCheck(context, newWO, storageManager) {
             }
             catch (_) { }
 
-            // Set button to spinning state
-            (0, buttonLCSingleton_1.setButtonLCSpinning)(true, fileName);
+            // Run the core work inside a progress notification
+            let response = [];
+            let documentPath;
+            let qualityGatesPassed;
+            yield vscode.window.withProgress({
+                location: vscode.ProgressLocation.Notification,
+                title: fileName ? `Live check: ${fileName}` : 'Live check',
+                cancellable: false
+            }, () => __awaiter(this, void 0, void 0, function* () {
+                const result = yield (0, LiveCheck_1.runLivecheck)(context, storageManager);
+                response = result.response || [];
+                documentPath = result.documentPath;
+                qualityGatesPassed = result.qualityGatesPassed;
 
-            const { response, documentPath, qualityGatesPassed } = yield (0, LiveCheck_1.runLivecheck)(context, storageManager);
+                // Log final results
+                const logger = logger_1.QuickCloudsLogger.getInstance();
+                logger.info('ExecuteLiveCheck: LiveCheck completed successfully');
+                logger.info('ExecuteLiveCheck: Final issues count: ' + (response ? response.length : 'No response'));
+                logger.info('ExecuteLiveCheck: Document path: ' + documentPath);
 
-            // Log final results
-            const logger = logger_1.QuickCloudsLogger.getInstance();
-            logger.info('ExecuteLiveCheck: LiveCheck completed successfully');
-            logger.info('ExecuteLiveCheck: Final issues count: ' + (response ? response.length : 'No response'));
-            logger.info('ExecuteLiveCheck: Document path: ' + documentPath);
-            // Do not auto-open the scanned file after Live Check completes
-            if (vscode.window.activeTextEditor) {
-                yield (0, UpdateDiagnostics_1.updateDiagnostics)(vscode.window.activeTextEditor.document, response, context, storageManager);
-                newWO.show();
-            }
-            // If the Write‑off panel is open, refresh with the latest data
-            try {
-                const panel = WriteOffMenuPanel_1.WriteOffMenuPanel.currentPanel;
-                if (panel && typeof panel.refreshData === 'function') {
-                    logger.info('ExecuteLiveCheck: Refreshing Write-off panel after Live Check');
-                    yield panel.refreshData();
+                // Update diagnostics for the active editor
+                if (vscode.window.activeTextEditor) {
+                    yield (0, UpdateDiagnostics_1.updateDiagnostics)(vscode.window.activeTextEditor.document, response, context, storageManager);
+                    newWO.show();
                 }
-            }
-            catch (e) {
-                logger.warn('ExecuteLiveCheck: Failed to refresh Write-off panel: ' + (e === null || e === void 0 ? void 0 : e.message));
+
+                // If the Write‑off panel is open, refresh with the latest data
                 try {
-                    if (WriteOffMenuPanel_1.WriteOffMenuPanel.currentPanel) {
-                        WriteOffMenuPanel_1.WriteOffMenuPanel.closeAll();
-                        WriteOffMenuPanel_1.WriteOffMenuPanel.render(context.extensionUri, context, extension_1.env, newWO, storageManager);
-                        logger.info('ExecuteLiveCheck: Write-off panel reloaded as fallback');
+                    const panel = WriteOffMenuPanel_1.WriteOffMenuPanel.currentPanel;
+                    if (panel && typeof panel.refreshData === 'function') {
+                        logger.info('ExecuteLiveCheck: Refreshing Write-off panel after Live Check');
+                        yield panel.refreshData();
                     }
                 }
-                catch (e2) {
-                    logger.error('ExecuteLiveCheck: Failed to reload Write-off panel: ' + (e2 === null || e2 === void 0 ? void 0 : e2.message));
+                catch (e) {
+                    logger.warn('ExecuteLiveCheck: Failed to refresh Write-off panel: ' + (e === null || e === void 0 ? void 0 : e.message));
+                    try {
+                        if (WriteOffMenuPanel_1.WriteOffMenuPanel.currentPanel) {
+                            WriteOffMenuPanel_1.WriteOffMenuPanel.closeAll();
+                            WriteOffMenuPanel_1.WriteOffMenuPanel.render(context.extensionUri, context, extension_1.env, newWO, storageManager);
+                            logger.info('ExecuteLiveCheck: Write-off panel reloaded as fallback');
+                        }
+                    }
+                    catch (e2) {
+                        logger.error('ExecuteLiveCheck: Failed to reload Write-off panel: ' + (e2 === null || e2 === void 0 ? void 0 : e2.message));
+                    }
                 }
-            }
-            if (response.length > 0) {
-                (0, GetWriteOffReasons_1.default)(storageManager, context);
-                yield (0, handleLicenseInfo_1.handleLicenseInfo)(storageManager, context);
-            } else {
-                logger.info('ExecuteLiveCheck: No issues found, no write-off panel will be shown');
-            }
+                if (response.length > 0) {
+                    (0, GetWriteOffReasons_1.default)(storageManager, context);
+                    yield (0, handleLicenseInfo_1.handleLicenseInfo)(storageManager, context);
+                }
+                else {
+                    logger.info('ExecuteLiveCheck: No issues found, no write-off panel will be shown');
+                }
+            }));
 
             const realIssues = response.filter((i) => {
                 const sev = (i?.severity || '').toLowerCase();
@@ -168,8 +179,6 @@ function executeLiveCheck(context, newWO, storageManager) {
             });
         }
         finally {
-            // Always reset button to normal state
-            (0, buttonLCSingleton_1.setButtonLCSpinning)(false);
             __qc_liveCheckInProgress = false;
         }
     });
