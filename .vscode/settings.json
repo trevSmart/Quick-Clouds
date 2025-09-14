@@ -13,7 +13,7 @@
       {
 				"name": ".",
 				"useVsCodeApi": true,
-				// "command": "sf.retrieve.current.source.file",
+				"command": "",
 				"color": "#00000000" // slightly darker and more blueish green
 			},
 			{

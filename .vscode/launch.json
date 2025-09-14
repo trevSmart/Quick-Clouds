@@ -23,7 +23,6 @@
       "outFiles": [
         "${workspaceFolder}/src/**/*.js"
       ],
-      "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen"
     },
     {
