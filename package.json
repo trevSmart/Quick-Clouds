@@ -2,11 +2,11 @@
 	"name": "quick-clouds-for-salesforce",
 	"displayName": "Quick Clouds for Salesforce",
 	"description": "Checks for adherence to coding best practices for Salesforce.",
-	"version": "0.1.77",
+	"version": "0.1.80",
 	"license": "MIT",
 	"icon": "resources/logo.webp",
 	"engines": {
-		"vscode": "^1.64.0"
+		"vscode": "^1.104.0"
 	},
 	"categories": [
 		"Linters",
