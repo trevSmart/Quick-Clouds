@@ -19,7 +19,7 @@ export function setButtonLCSpinning(isSpinning: boolean, fileName?: string): voi
     const buttonLC = getButtonLCInstance();
     if (isSpinning) {
         buttonLC.text = '$(loading~spin) Live check';
-        buttonLC.tooltip = fileName ? `Checking ${fileName}` : 'Live check in progress...';
+        buttonLC.tooltip = fileName ? `Checking ${fileName}...` : 'Live check in progress...';
     } else {
         buttonLC.text = 'Live check';
         buttonLC.tooltip = undefined;

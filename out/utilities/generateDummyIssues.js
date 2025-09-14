@@ -48,6 +48,7 @@ function generateDummyIssues(fileName, cePath) {
 }
 /**
  * Adds dummy issues to the existing issues array when in debug mode
+ * Ensures no duplication across repeated live checks per file/path.
  * @param existingIssues - Array of existing issues from the API
  * @param isDebugMode - Whether we are in debug mode
  * @returns Combined array of existing issues + dummy issues
@@ -56,12 +57,28 @@ function addDummyIssuesIfDebugMode(existingIssues, isDebugMode, fileName, cePath
     if (!isDebugMode) {
         return existingIssues;
     }
-    const dummyIssues = generateDummyIssues(fileName, cePath);
-    // Avoid duplicating dummy issues if added already
-    const hasDummy = (issue) => typeof issue?.id === 'string' && issue.id.startsWith('debug-issue-');
+
+    // Track per-path addition to avoid re-adding on subsequent live checks
+    if (!global.__qc_debug_dummy_added_for_path) {
+        global.__qc_debug_dummy_added_for_path = new Set();
+    }
+    const addedForPath = global.__qc_debug_dummy_added_for_path;
+    const key = (cePath && cePath.trim()) || (fileName && fileName.trim()) || 'unknown';
+
+    // Remove any existing dummy issues from the incoming list just in case
+    const hasDummy = (issue) => typeof (issue === null || issue === void 0 ? void 0 : issue.id) === 'string' && issue.id.startsWith('debug-issue-');
     const filteredExisting = Array.isArray(existingIssues) ? existingIssues.filter(i => !hasDummy(i)) : [];
+
+    if (addedForPath.has(key)) {
+        console.log(`[DEBUG] Dummy issues already injected for '${key}'. Skipping to avoid duplication on repeat live check.`);
+        return filteredExisting;
+    }
+
+    const dummyIssues = generateDummyIssues(fileName, cePath);
     const combinedIssues = [...filteredExisting, ...dummyIssues];
-    console.log(`[DEBUG] Added ${dummyIssues.length} dummy issues to ${existingIssues.length} real issues`);
+
+    addedForPath.add(key);
+    console.log(`[DEBUG] Added ${dummyIssues.length} dummy issues to ${existingIssues.length} real issues (key='${key}')`);
     console.log('[DEBUG] Dummy issues:', dummyIssues);
     return combinedIssues;
 }

@@ -62,16 +62,16 @@
 
 /* Issues section - unified filters and list */
 .issues-section {
-    background-color: var(--vscode-panel-background);
-    border-radius: 6px;
+    border-radius: 8px;
     overflow: hidden;
     margin-bottom: 20px;
+    border: 1px solid var(--vscode-tab-border);
 }
 
 .section-title {
     margin-bottom: 10px;
-    padding-top: 20px;
-    padding-left: 9px;
+    padding-top: 17px;
+    padding-left: 7px;
 }
 
 /* Reduced top padding specifically for the "Issues" section title */
@@ -82,7 +82,7 @@
 .section-title h2 {
     margin: 0;
     color: var(--vscode-descriptionForeground);
-    font-size: 19px;
+    font-size: 18px;
     font-weight: 600;
 }
 
@@ -92,6 +92,7 @@
     padding: 15px 20px;
     background-color: var(--vscode-panel-background);
     border-bottom: 1px solid var(--vscode-panel-border);
+    box-shadow: 0 1px 7px 10px #0003;
 }
 
 .filter-group:last-child {
@@ -132,21 +133,18 @@
 
 .writeoff-form {
     margin-bottom: 20px;
-    padding: 15px;
+    padding: 15px 20px;
     background-color: var(--vscode-panel-background);
-    border-radius: 6px;
+    border-radius: 8px;
+    border: 1px solid var(--vscode-tab-border);
 }
 
 .form-group {
     margin-bottom: 15px;
 }
 
-.form-group:nth-of-type(2) {
-    margin-top: 28px;
-}
-
 .form-group:first-of-type {
-    padding-bottom: 25px;
+    padding-bottom: 22px;
     border-bottom: 1px solid var(--vscode-panel-border);
 }
 
@@ -222,7 +220,7 @@
 }
 
 .issues-list {
-    max-height: 330px;
+    /* max-height: 330px; */
     overflow-y: auto;
     /* Ensure the scrollbar track shows this background */
     background-color: var(--vscode-panel-background);
@@ -240,15 +238,29 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 20px;
-    background-color: var(--vscode-list-hoverBackground);
+    padding: 15px 20px;
+    background-color: var(--vscode-chat-requestBackground);
     border-bottom: 1px solid var(--vscode-panel-border);
+    box-shadow: 0 1px 1px 1px rgba(0, 0, 0, 0.15);
 }
 
 .rule-header h4 {
     margin: 0;
-    color: var(--vscode-editor-foreground);
+    color: var(--vscode-tab-unfocusedActiveForeground);
+    font-size: 13.1px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.rule-header h4 .codicon {
     font-size: 16px;
+}
+
+.issues-count {
+    color: color-mix(in srgb, var(--vscode-tab-unfocusedActiveForeground) 70%, transparent);
+    font-weight: 300;
 }
 
 .select-all-btn {
@@ -267,10 +279,8 @@
 }
 
 .issues-grid {
-    padding: 10px 20px;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 300px));
-    gap: 10px;
+    /* grid-template-columns: repeat(auto-fill, minmax(250px, 300px)); */
 }
 
 .issue-item {
@@ -299,7 +309,7 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 6px;
 }
 
 .issue-line {
@@ -355,14 +365,14 @@
 
 /* Severity badges */
 .severity-badge {
-    font-size: 10px;
+    font-size: 9px;
     padding: 1px 4px;
     border-radius: 10px;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     display: inline-block;
-    min-width: 45px;
+    min-width: 43px;
     text-align: center;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
@@ -445,7 +455,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 13px 20px;
+    padding: 14px 20px 14px 38px;
     border-bottom: 1px solid var(--vscode-panel-border);
     transition: all 0.2s;
     cursor: pointer;
@@ -470,13 +480,13 @@
 
 .issue-header {
     display: flex;
-    gap: 10px;
+    gap: 12px;
     align-items: center;
 }
 
 .issue-rule {
     font-weight: normal;
-    color: var(--vscode-editor-foreground);
+    color: var(--vscode-editorGutter-foldingControlForeground);
     margin-top: -1px;
 }
 
@@ -543,19 +553,22 @@
     text-align: center;
     border-top: 1px solid var(--vscode-panel-border);
     background-color: var(--vscode-panel-background);
+    box-shadow: 0 -1px 13px 2px rgba(0, 0, 0, 0.2);
 }
 
 .issues-counter p {
     margin: 0;
     color: color-mix(in srgb, var(--vscode-foreground) 68%, #0000);
-    font-size: 12.7px;
-    letter-spacing: 0.3px;
+    font-size: 12.2px;
+    letter-spacing: 0.4px;
     font-weight: 200;
 }
 
 .severity-breakdown {
     color: color-mix(in srgb, var(--vscode-foreground) 50%, #0000);
     margin-left: 4px;
+    font-weight: 100;
+    opacity: 0.85;
 }
 
 .severity-item.severity-high {

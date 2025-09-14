@@ -46,25 +46,32 @@ function App() {
     // Reference to the reason select element
     const reasonSelectRef = useRef(null);
 
-    // Extract the element name without duplicated file information
+    // Extract the element name without duplicated file/line information
     const getCleanElementName = (issue) => {
-        if (!issue?.elementName) {
-            return '';
-        }
+        const raw = (issue && issue.elementName) ? String(issue.elementName) : '';
+        if (!raw) return '';
 
-        const file = issue.fileName;
+        // Remove trailing repetitions like ", line 27" possibly repeated
+        // and any leading "Line 27:" prefixes accidentally embedded
+        let cleaned = raw
+            .replace(/^\s*line\s+\d+\s*:\s*/i, '')
+            .replace(/(?:,?\s*line\s+\d+)+\s*$/ig, '')
+            .trim();
+
+        // Also remove duplicated filename suffix (" - <file>") if present
+        const file = issue?.fileName;
         if (file) {
             const suffix = ` - ${file}`;
-            if (issue.elementName.endsWith(suffix)) {
-                return issue.elementName.slice(0, -suffix.length);
+            if (cleaned.endsWith(suffix)) {
+                cleaned = cleaned.slice(0, -suffix.length);
             }
         }
-        return issue.elementName;
+        return cleaned;
     };
 
-    // Format line information for single issue view
-    const formatIssueLine = (issue) => {
-        const element = getCleanElementName(issue);
+    // Build a consistent subtitle like "<file>, line <n>: <element>" (element optional)
+    const formatIssueLine = (issue, includeElement = true) => {
+        const element = includeElement ? getCleanElementName(issue) : '';
         const base = `${issue.fileName || 'Unknown file'}, line ${issue.lineNumber}`;
         return element ? `${base}: ${element}` : base;
     };
@@ -135,11 +142,11 @@ function App() {
     });
 
     const groupedIssues = filteredIssues.reduce((groups, issue) => {
-        const ruleType = issue.issueType || 'Unknown';
-        if (!groups[ruleType]) {
-            groups[ruleType] = [];
+        const fileKey = issue.fileName || 'Unknown file';
+        if (!groups[fileKey]) {
+            groups[fileKey] = [];
         }
-        groups[ruleType].push(issue);
+        groups[fileKey].push(issue);
         return groups;
     }, {});
 
@@ -210,18 +217,18 @@ function App() {
         return issue.id || issue.uuid;
     };
 
-    const handleSelectAll = (ruleType) => {
-        const ruleIssues = groupedIssues[ruleType] || [];
-        const allSelected = ruleIssues.every(issue => selectedIssues.includes(getIssueId(issue)));
+    const handleSelectAll = (groupKey) => {
+        const groupIssues = groupedIssues[groupKey] || [];
+        const allSelected = groupIssues.every(issue => selectedIssues.includes(getIssueId(issue)));
 
         if (allSelected) {
             // Deselect all issues in this rule
             setSelectedIssues(prev => prev.filter(id =>
-                !ruleIssues.some(issue => getIssueId(issue) === id)
+                !groupIssues.some(issue => getIssueId(issue) === id)
             ));
         } else {
             // Select all issues in this rule
-            const newSelected = ruleIssues
+            const newSelected = groupIssues
                 .filter(issue => !selectedIssues.includes(getIssueId(issue)))
                 .map(issue => getIssueId(issue));
             setSelectedIssues(prev => [...prev, ...newSelected]);
@@ -383,19 +390,22 @@ function App() {
                         </div>
 
                         <div className="issues-list">
-                            {Object.entries(groupedIssues).map(([ruleType, ruleIssues]) => (
-                                <div key={ruleType} className="rule-group">
+                            {Object.entries(groupedIssues).map(([fileName, fileIssues]) => (
+                                <div key={fileName} className="rule-group">
                                     <div className="rule-header">
-                                        <h4>{ruleType} ({ruleIssues.length} issues)</h4>
+                                        <h4>
+                                            <span className="codicon codicon-file-code" aria-hidden="true"></span>
+                                            {fileName} <span className="issues-count">({fileIssues.length} issues)</span>
+                                        </h4>
                                         <button
-                                            onClick={() => handleSelectAll(ruleType)}
+                                            onClick={() => handleSelectAll(fileName)}
                                             className="select-all-btn"
                                         >
-                                            {ruleIssues.every(issue => selectedIssues.includes(getIssueId(issue))) ? 'Deselect All' : 'Select All'}
+                                            {fileIssues.every(issue => selectedIssues.includes(getIssueId(issue))) ? 'Deselect All' : 'Select All'}
                                         </button>
                                     </div>
                                     <div className="issues-grid">
-                                        {ruleIssues.map(issue => (
+                                        {fileIssues.map(issue => (
                                             <div key={`bulk-${issue.id || issue.uuid}`} className="issue-item">
                                                 <input
                                                     type="checkbox"
@@ -409,7 +419,7 @@ function App() {
                                                             title="Open file at this line"
                                                             onClick={(e) => handleOpenInEditor(issue, e)}
                                                         >
-                                                            {issue.fileName || 'Unknown file'}, line {issue.lineNumber}
+                                                            {formatIssueLine(issue, false)}
                                                         </button>
                                                         <button
                                                             className="go-to-file-btn"
@@ -434,7 +444,16 @@ function App() {
                 ) : (
                     <div className="single-mode">
                         <div className="issues-list">
-                            {filteredIssues.map(issue => {
+                            {Object.entries(groupedIssues).map(([fileName, fileIssues]) => (
+                                <div key={`single-group-${fileName}`} className="rule-group">
+                                    <div className="rule-header">
+                                        <h4>
+                                            <span className="codicon codicon-file-code" aria-hidden="true"></span>
+                                            {fileName} <span className="issues-count">({fileIssues.length} issues)</span>
+                                        </h4>
+                                    </div>
+                                    <div className="issues-grid single-grid">
+                            {fileIssues.map(issue => {
                                 const issueId = issue.id || issue.uuid;
                                 const selectedId = selectedIssue?.id || selectedIssue?.uuid;
                                 const isSelected = selectedIssue && issueId === selectedId;
@@ -460,7 +479,7 @@ function App() {
                                                     title="Open file at this line"
                                                     onClick={(e) => handleOpenInEditor(issue, e)}
                                                 >
-                                                    {formatIssueLine(issue)}
+                                                    {formatIssueLine(issue, true)}
                                                 </button>
                                                 <button
                                                     className="go-to-file-btn"
@@ -474,6 +493,9 @@ function App() {
                                     </div>
                                 );
                             })}
+                                    </div>
+                                </div>
+                            ))}
                         </div>
                     </div>
                 )}

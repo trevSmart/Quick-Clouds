@@ -70,13 +70,31 @@ export function addDummyIssuesIfDebugMode(existingIssues: any[], isDebugMode: bo
         return existingIssues;
     }
 
-    const dummyIssues = generateDummyIssues(fileName, cePath);
-    // Avoid duplicating dummy issues if added already
+    // Track per-path addition to avoid re-adding on subsequent live checks
+    // Module-level cache survives within extension session
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const globalAny: any = global as any;
+    if (!globalAny.__qc_debug_dummy_added_for_path) {
+        globalAny.__qc_debug_dummy_added_for_path = new Set<string>();
+    }
+    const addedForPath: Set<string> = globalAny.__qc_debug_dummy_added_for_path;
+
+    const key = (cePath && cePath.trim()) || (fileName && fileName.trim()) || 'unknown';
+
+    // Remove any existing dummy issues from the incoming list just in case
     const hasDummy = (issue: any) => typeof issue?.id === 'string' && issue.id.startsWith('debug-issue-');
     const filteredExisting = Array.isArray(existingIssues) ? existingIssues.filter(i => !hasDummy(i)) : [];
+
+    if (addedForPath.has(key)) {
+        console.log(`[DEBUG] Dummy issues already injected for '${key}'. Skipping to avoid duplication on repeat live check.`);
+        return filteredExisting;
+    }
+
+    const dummyIssues = generateDummyIssues(fileName, cePath);
     const combinedIssues = [...filteredExisting, ...dummyIssues];
 
-    console.log(`[DEBUG] Added ${dummyIssues.length} dummy issues to ${existingIssues.length} real issues`);
+    addedForPath.add(key);
+    console.log(`[DEBUG] Added ${dummyIssues.length} dummy issues to ${existingIssues.length} real issues (key='${key}')`);
     console.log('[DEBUG] Dummy issues:', dummyIssues);
 
     return combinedIssues;

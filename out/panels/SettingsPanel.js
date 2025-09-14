@@ -143,10 +143,33 @@ class SettingsPanel {
         }
     }
     _getHtmlForWebview() {
-        // Point to your React build output (adjust as needed)
-        const scriptUri = this._panel.webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'webview-ui', 'build', 'static', 'js', 'main.js'));
-        const styleUri = this._panel.webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'webview-ui', 'build', 'static', 'css', 'main.css'));
-        const indexHtmlUri = this._panel.webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'webview-ui', 'build', 'index.html'));
+        // Resolve hashed asset filenames using asset-manifest.json
+        const fs = require('fs');
+        const path = require('path');
+        const manifestPath = vscode.Uri.joinPath(this._extensionUri, 'webview-ui', 'build', 'asset-manifest.json').fsPath;
+        let scriptRel = ['webview-ui', 'build', 'static', 'js', 'main.js'];
+        let styleRel = ['webview-ui', 'build', 'static', 'css', 'main.css'];
+        try {
+            const manifestRaw = fs.readFileSync(manifestPath, 'utf8');
+            const manifest = JSON.parse(manifestRaw);
+            if (manifest && manifest.files) {
+                const jsPath = manifest.files['main.js'];
+                const cssPath = manifest.files['main.css'];
+                if (jsPath && jsPath.startsWith('./')) {
+                    const parts = jsPath.replace(/^\.\//, '').split('/');
+                    scriptRel = ['webview-ui', 'build', ...parts];
+                }
+                if (cssPath && cssPath.startsWith('./')) {
+                    const parts = cssPath.replace(/^\.\//, '').split('/');
+                    styleRel = ['webview-ui', 'build', ...parts];
+                }
+            }
+        }
+        catch (e) {
+            // Fallback to non-hashed paths if manifest missing
+        }
+        const scriptUri = this._panel.webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, ...scriptRel));
+        const styleUri = this._panel.webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, ...styleRel));
         // Basic HTML template for React
         return `
             <!DOCTYPE html>

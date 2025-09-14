@@ -31,9 +31,18 @@ const GetWriteOffReasons_1 = require("../services/GetWriteOffReasons");
 const LiveCheck_1 = require("../services/LiveCheck");
 const UpdateDiagnostics_1 = require("./UpdateDiagnostics");
 const logger_1 = require("./logger");
+// Simple in-memory lock to prevent concurrent runs
+let __qcLiveCheckInProgress = false;
 function executeLiveCheck(context, newWO, storageManager) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
+            // Concurrency guard: if a run is already active, do nothing
+            if (__qcLiveCheckInProgress) {
+                const logger = logger_1.QuickCloudsLogger.getInstance();
+                logger.info('ExecuteLiveCheck: A run is already in progress. Ignoring new request.');
+                return;
+            }
+            __qcLiveCheckInProgress = true;
             const activeFile = vscode.window.activeTextEditor?.document?.fileName;
             const fileLabel = activeFile ? ` for ${path.basename(activeFile)}` : '';
             yield vscode.window.withProgress({
@@ -112,6 +121,9 @@ function executeLiveCheck(context, newWO, storageManager) {
                 stack: error.stack,
                 name: error.name
             });
+        }
+        finally {
+            __qcLiveCheckInProgress = false;
         }
     });
 }

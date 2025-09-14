@@ -66,34 +66,43 @@
 			if (!root) {
 				return;
 			}
-			root.querySelectorAll('.issue-item, .issue-item-single').forEach(it => {
-				const lineEl = it.querySelector('.issue-line');
-				if (!lineEl) {
-					return;
-				}
-				let fileFromSibling = '';
-				const elemEl = it.querySelector('.issue-element');
-				if (elemEl) {
-					fileFromSibling = elemEl.textContent || '';
-				}
+            root.querySelectorAll('.issue-item, .issue-item-single').forEach(it => {
+                const lineEl = it.querySelector('.issue-line');
+                if (!lineEl) {
+                    return;
+                }
+                let fileFromSibling = '';
+                const elemEl = it.querySelector('.issue-element');
+                if (elemEl) {
+                    fileFromSibling = elemEl.textContent || '';
+                }
 
-				// Try parse from current line text: "Line 12: something"
-				const txt = lineEl.textContent || '';
-				let lineNo = '';
-				const m = txt.match(/Line\s+(\d+)/i);
-				if (m) {
-					lineNo = m[1];
-				}
+                // Try parse from current line text: "Line 12: something"
+                const txt = lineEl.textContent || '';
+                // If the new React UI already formatted the subtitle, don't rewrite
+                // Examples considered formatted:
+                //  - "SomeFile.js, line 27: element"
+                //  - "SomeFile.js, line 27"
+                //  - "line 27: element"
+                const alreadyFormatted = /,\s*line\s+\d+/i.test(txt) || /line\s+\d+\s*:\s*/i.test(txt);
+                if (alreadyFormatted) {
+                    return;
+                }
+                let lineNo = '';
+                const m = txt.match(/Line\s+(\d+)/i);
+                if (m) {
+                    lineNo = m[1];
+                }
 
-				const file = deriveFile(fileFromSibling || txt);
-				if (file && lineNo) {
-					lineEl.textContent = `${file}, line ${lineNo}`;
-				}
-				// Hide the redundant element label in bulk view
-				if (elemEl && elemEl.parentElement) {
-					elemEl.style.display = 'none';
-				}
-			});
+                const file = deriveFile(fileFromSibling || txt);
+                if (file && lineNo) {
+                    lineEl.textContent = `${file}, line ${lineNo}`;
+                }
+                // Hide the redundant element label in bulk view
+                if (elemEl && elemEl.parentElement) {
+                    elemEl.style.display = 'none';
+                }
+            });
 		};
 		// Run after load
 		const run = () => {

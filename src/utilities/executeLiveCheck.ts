@@ -7,8 +7,18 @@ import { updateDiagnostics } from './UpdateDiagnostics';
 import { QuickCloudsLogger } from './logger';
 import { setButtonLCSpinning } from './buttonLCSingleton';
 
+// Prevent concurrent Live Check runs
+let liveCheckInProgress = false;
+
 export async function executeLiveCheck(context: vscode.ExtensionContext, newWO: vscode.StatusBarItem, storageManager: any): Promise<void> {
     try {
+        // Concurrency guard: if already running, do nothing
+        if (liveCheckInProgress) {
+            const logger = QuickCloudsLogger.getInstance();
+            logger.info('ExecuteLiveCheck: A run is already in progress. Ignoring new request.');
+            return;
+        }
+        liveCheckInProgress = true;
         // Get current file name for tooltip
         const activeEditor = vscode.window.activeTextEditor;
         const fileName = activeEditor ? path.basename(activeEditor.document.fileName) : undefined;
@@ -92,5 +102,6 @@ export async function executeLiveCheck(context: vscode.ExtensionContext, newWO: 
     } finally {
         // Always reset button to normal state
         setButtonLCSpinning(false);
+        liveCheckInProgress = false;
     }
 }

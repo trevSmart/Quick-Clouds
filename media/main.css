@@ -49,7 +49,8 @@
 .issues-section {
     border-radius: 6px;
     overflow: hidden;
-    margin-bottom: 20px
+    margin-bottom: 20px;
+    border: 1px solid var(--vscode-panel-background);
 }
 
 .filters,
@@ -104,7 +105,8 @@
     margin-bottom: 20px;
     padding: 15px;
     background-color: var(--vscode-panel-background);
-    border-radius: 6px
+    border-radius: 6px;
+    border: 1px solid var(--vscode-panel-background)
 }
 
 .form-group {
@@ -192,15 +194,16 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 20px;
-    background-color: var(--vscode-list-hoverBackground);
-    border-bottom: 1px solid var(--vscode-panel-border)
+    padding: 8px 20px;
+    background-color: var(--vscode-chat-requestBackground);
+    border-bottom: 1px solid var(--vscode-panel-border);
 }
 
 .rule-header h4 {
     margin: 0;
     color: var(--vscode-editor-foreground);
-    font-size: 16px
+    font-size: 13px;
+    font-weight: 400;
 }
 
 .select-all-btn {

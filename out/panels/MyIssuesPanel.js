@@ -87,6 +87,10 @@ class MyIssuesPanel {
             {
                 // Enable JavaScript in the webview
                 enableScripts: true,
+                localResourceRoots: [
+                    vscode_1.Uri.joinPath(extensionUri, 'webview-ui', 'build'),
+                    vscode_1.Uri.joinPath(extensionUri, 'media')
+                ]
             });
             MyIssuesPanel.currentPanel = new MyIssuesPanel(panel, extensionUri, context, env, button, storageManager);
             logger.info('New MyIssuesPanel created successfully');
@@ -120,28 +124,51 @@ class MyIssuesPanel {
      * rendered within the webview panel
      */
     _getWebviewContent(webview, extensionUri) {
-        // The CSS file from the React build output
-        const stylesUri = (0, getUri_1.getUri)(webview, extensionUri, [
-            "webview-ui",
-            "build",
-            "static",
-            "css",
-            "main.css",
-        ]);
-        // The JS file from the React build output
-        const scriptUri = (0, getUri_1.getUri)(webview, extensionUri, [
+        // Resolve hashed asset filenames using asset-manifest.json
+        const fs = require('fs');
+        let scriptRel = [
             "webview-ui",
             "build",
             "static",
             "js",
             "main.js",
-        ]);
+        ];
+        let styleRel = [
+            "webview-ui",
+            "build",
+            "static",
+            "css",
+            "main.css",
+        ];
+        try {
+            const manifestPath = vscode_1.Uri.joinPath(extensionUri, 'webview-ui', 'build', 'asset-manifest.json').fsPath;
+            const manifestRaw = fs.readFileSync(manifestPath, 'utf8');
+            const manifest = JSON.parse(manifestRaw);
+            if (manifest && manifest.files) {
+                const jsPath = manifest.files['main.js'];
+                const cssPath = manifest.files['main.css'];
+                if (jsPath && jsPath.startsWith('./')) {
+                    const parts = jsPath.replace(/^\.\//, '').split('/');
+                    scriptRel = ['webview-ui', 'build', ...parts];
+                }
+                if (cssPath && cssPath.startsWith('./')) {
+                    const parts = cssPath.replace(/^\.\//, '').split('/');
+                    styleRel = ['webview-ui', 'build', ...parts];
+                }
+            }
+        }
+        catch (e) {
+            // Fallback to non-hashed paths if manifest missing
+        }
+        const stylesUri = (0, getUri_1.getUri)(webview, extensionUri, styleRel);
+        const scriptUri = (0, getUri_1.getUri)(webview, extensionUri, scriptRel);
         return /*html*/ `
       <!DOCTYPE html>
       <html lang="en">
         <head>
           <meta charset="utf-8">
           <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
+          <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; script-src ${webview.cspSource}; img-src ${webview.cspSource} data:; connect-src *;">
           <meta name="theme-color" content="#000000">
           <link rel="stylesheet" type="text/css" href="${stylesUri}">
           <title>Quality Center</title>
