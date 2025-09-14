@@ -152,10 +152,13 @@
 
 .writeoff-form {
     margin-bottom: 20px;
-    padding: 15px 20px;
     background-color: var(--vscode-panel-background);
     border-radius: 10px;
     border: 1px solid var(--vscode-tab-border);
+}
+
+.writeoff-form-content {
+    padding: 15px 20px;
 }
 
 /* Selected issue banner inside the form */
@@ -165,8 +168,8 @@
     gap: 10px;
     padding: 10px 12px 10px 16px;
     margin: 0 0 14px 0;
-    border: 1px solid var(--vscode-panel-border);
-    border-radius: 6px;
+    /* border: 1px solid var(--vscode-panel-border); */
+    border-radius: 6px 6px 0 0;
     background: var(--vscode-editor-background);
 }
 

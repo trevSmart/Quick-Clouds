@@ -1,7 +1,9 @@
-# Quick Clouds - README
+# Quick Clouds
 
 The Quick Clouds for Salesforce extension for Visual Studio Code connects to our centralized, curated set of best practices and rules and checks your code against it in real time.
 Our ruleset includes best practices for Salesforce, Quick Clouds' own recommendations, and other industry standards.
+
+> **Note**: This extension is a fork of the original [Live Check Quality for Salesforce](https://marketplace.cursorapi.com/items/?itemName=qualityclouds.livecheckqualityforsalesforce) extension, customized and enhanced for Quick Clouds' specific requirements.
 
 Quick Clouds for Salesforce makes SaaS platforms such as Salesforce easier to govern and grow.
 Designed by experts to deliver rich insights for both business and IT, it offers unrivalled transparency over the entire software development lifecycle.

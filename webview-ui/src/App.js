@@ -951,62 +951,63 @@ function App() {
                         </button>
                     </div>
                 )}
-                <div className="form-group">
-                    <label>Templates:</label>
-                    <select
-                        value={selectedTemplate}
-                        onChange={(e) => handleTemplateSelect(e.target.value)}
-                    >
-                        <option value="" disabled selected hidden>Select a template</option>
-                        {templates.map(template => (
-                            <option key={template.id} value={template.id}>
-                                {template.name}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-                <div className="form-group">
-                    <label>Reason:</label>
-                    <select
-                        ref={reasonSelectRef}
-                        value={reason}
-                        onChange={(e) => setReason(e.target.value)}
-                    >
-                        <option value="" disabled selected hidden>Select a reason</option>
-                        {HARDCODED_REASONS.map(reasonOption => (
-                            <option key={reasonOption.id} value={reasonOption.name}>
-                                {reasonOption.name}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-                <div className="form-group">
-                    <label>Description:</label>
-                    <textarea
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                        placeholder="Explain why this issue should be written off"
-                        rows="3"
-                    />
-                </div>
-                {viewMode === 'single' && (
-                    <div className="form-group form-group-button">
-                        <button
-                            onClick={handleSingleWriteOff}
-                            disabled={
-                                loading ||
-                                !selectedIssue ||
-                                !reason.trim() ||
-                                !description.trim()
-                            }
-                            className="single-submit-btn"
+                <div className="writeoff-form-content">
+                    <div className="form-group">
+                        <label>Templates:</label>
+                        <select
+                            value={selectedTemplate}
+                            onChange={(e) => handleTemplateSelect(e.target.value)}
                         >
-                            {loading ? 'Processing...' : 'Send request'}
-                        </button>
+                            <option value="" disabled selected hidden>Select a template</option>
+                            {templates.map(template => (
+                                <option key={template.id} value={template.id}>
+                                    {template.name}
+                                </option>
+                            ))}
+                        </select>
                     </div>
-                )}
+                    <div className="form-group">
+                        <label>Reason:</label>
+                        <select
+                            ref={reasonSelectRef}
+                            value={reason}
+                            onChange={(e) => setReason(e.target.value)}
+                        >
+                            <option value="" disabled selected hidden>Select a reason</option>
+                            {HARDCODED_REASONS.map(reasonOption => (
+                                <option key={reasonOption.id} value={reasonOption.name}>
+                                    {reasonOption.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="form-group">
+                        <label>Description:</label>
+                        <textarea
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                            placeholder="Explain why this issue should be written off"
+                            rows="3"
+                        />
+                    </div>
+                    {viewMode === 'single' && (
+                        <div className="form-group form-group-button">
+                            <button
+                                onClick={handleSingleWriteOff}
+                                disabled={
+                                    loading ||
+                                    !selectedIssue ||
+                                    !reason.trim() ||
+                                    !description.trim()
+                                }
+                                className="single-submit-btn"
+                            >
+                                {loading ? 'Processing...' : 'Send request'}
+                            </button>
+                        </div>
+                    )}
+                </div>
             </div>
-
         </div>
     );
 }

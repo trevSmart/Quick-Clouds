@@ -20,7 +20,6 @@ tmp/**
 *.apex
 
 # Documentation
-README.md
 AGENTS.md
 app_versions/**
 
