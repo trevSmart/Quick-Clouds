@@ -120,7 +120,7 @@
 		"package": "./scripts/package.sh",
 		"lint": "eslint .",
 		"lint:fix": "eslint . --fix",
-		"test": "npm run build:vsix",
+		"test": "npm run build:vsix && vsce package --out tmp/quick-clouds-v$VERSION.vsix",
 		"test:run": "vitest run",
 		"test:ui": "vitest --ui",
 		"test:coverage": "vitest run --reporter=verbose",
