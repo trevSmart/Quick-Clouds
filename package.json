@@ -2,7 +2,7 @@
 	"name": "quick-clouds-for-salesforce",
 	"displayName": "Quick Clouds for Salesforce",
 	"description": "Checks for adherence to coding best practices for Salesforce.",
-	"version": "0.1.168",
+	"version": "0.2.3",
 	"license": "MIT",
 	"icon": "resources/logo.webp",
 	"engines": {
@@ -24,15 +24,6 @@
 		"Code quality"
 	],
 	"activationEvents": [
-		"onCommand:quick-clouds.check",
-		"onCommand:quick-clouds.deleteLCHistory",
-		"onCommand:quick-clouds.writeoff",
-		"onCommand:quick-clouds.myIssues",
-		"onCommand:quick-clouds.validateAPIKey",
-		"onCommand:quick-clouds.applyChanges",
-		"onCommand:quick-clouds.discardChanges",
-		"onCommand:quick-clouds.settings",
-		"onCommand:quick-clouds.showLogs",
 		"onUri"
 	],
 	"main": "./out/extension.js",
