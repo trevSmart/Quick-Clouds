@@ -26,7 +26,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.SettingsPanel = void 0;
 const vscode = require("vscode");
 const handleAuthenticationMethod_1 = require("../utilities/handleAuthenticationMethod");
-const buttonLCSingleton_1 = require("../utilities/utilities/buttonLCSingleton");
+const buttonLCSingleton_1 = require("../utilities/buttonLCSingleton");
 const buttonQualityCenterSingleton_1 = require("../utilities/buttonQualityCenterSingleton");
 class SettingsPanel {
     static show(extensionUri, storageManager, context) {

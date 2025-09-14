@@ -98,7 +98,6 @@ class WriteOffMenuPanel {
                     vscode_1.Uri.joinPath(extensionUri, 'webview-ui', 'build'),
                     vscode_1.Uri.joinPath(extensionUri, 'media'),
                     vscode_1.Uri.joinPath(extensionUri, 'resources'),
-                    vscode_1.Uri.joinPath(extensionUri, 'node_modules', '@vscode', 'codicons', 'dist')
                 ],
             });
             logger.info('WriteOffMenuPanel: Panel created, initializing WriteOffMenuPanel');

@@ -37,14 +37,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getButtonLCInstance = getButtonLCInstance;
-exports.setButtonLCSpinning = setButtonLCSpinning;
 exports.updateButtonLCVisibility = updateButtonLCVisibility;
 const vscode = __importStar(require("vscode"));
 const constants_1 = require("../constants");
 const IsElementToAnalize_1 = __importDefault(require("./IsElementToAnalize"));
 let buttonLCInstance = null;
-// Track if a scan is in progress to force-show the button
-let __qc_lc_inProgress = false;
 function getButtonLCInstance() {
     if (!buttonLCInstance) {
         // Higher priority appears more to the left on the Right side
@@ -55,29 +52,9 @@ function getButtonLCInstance() {
     }
     return buttonLCInstance;
 }
-function setButtonLCSpinning(isSpinning, fileName) {
-    const buttonLC = getButtonLCInstance();
-    if (isSpinning) {
-        __qc_lc_inProgress = true;
-        buttonLC.text = '$(loading~spin) Scan';
-        buttonLC.tooltip = fileName ? `Scanning ${fileName}...` : 'Scan in progress...';
-        // Always show while spinning regardless of active editor or auth state
-        buttonLC.show();
-    }
-    else {
-        __qc_lc_inProgress = false;
-        buttonLC.text = 'Scan';
-        buttonLC.tooltip = undefined;
-    }
-}
 async function updateButtonLCVisibility(storageManager) {
     var _a, _b;
     const buttonLC = getButtonLCInstance();
-    // If a run is in progress, keep the button visible
-    if (__qc_lc_inProgress) {
-        buttonLC.show();
-        return;
-    }
     const authType = await storageManager.getUserData('authType');
     const apiKeyStatus = await storageManager.getUserData('apiKeyStatus');
     const isAuthenticated = await storageManager.getUserData('isAuthenticated');
