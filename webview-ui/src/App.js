@@ -49,7 +49,9 @@ function App() {
     // Extract the element name without duplicated file/line information
     const getCleanElementName = (issue) => {
         const raw = (issue && issue.elementName) ? String(issue.elementName) : '';
-        if (!raw) return '';
+        if (!raw) {
+            return '';
+        }
 
         // Remove trailing repetitions like ", line 27" possibly repeated
         // and any leading "Line 27:" prefixes accidentally embedded
@@ -180,6 +182,39 @@ function App() {
         groups[fileKey].push(issue);
         return groups;
     }, {});
+
+    // Sort files alphabetically and issues by severity and line number
+    const sortedGroupedIssues = Object.keys(groupedIssues)
+        .sort((a, b) => a.localeCompare(b)) // Sort files alphabetically
+        .reduce((sorted, fileName) => {
+            // Sort issues within each file by severity (high to low) then by line number (descending)
+            const sortedIssues = groupedIssues[fileName].sort((a, b) => {
+                // Define severity priority (higher number = higher priority)
+                const severityPriority = {
+                    'High': 4,
+                    'Medium': 3,
+                    'Low': 2,
+                    'Warning': 1,
+                    'Unknown': 0
+                };
+
+                const aSeverity = severityPriority[a.severity] || 0;
+                const bSeverity = severityPriority[b.severity] || 0;
+
+                // First sort by severity (descending)
+                if (aSeverity !== bSeverity) {
+                    return bSeverity - aSeverity;
+                }
+
+                // Then sort by line number (descending)
+                const aLine = parseInt(a.lineNumber) || 0;
+                const bLine = parseInt(b.lineNumber) || 0;
+                return bLine - aLine;
+            });
+
+            sorted[fileName] = sortedIssues;
+            return sorted;
+        }, {});
 
     // Calculate severity statistics
     const getSeverityStats = (issuesList) => {
@@ -351,11 +386,21 @@ function App() {
     const getFileTypeBadge = (issue) => {
         try {
             const raw = String(issue?.historyPath || '').replace(/\\\\/g, '/').toLowerCase();
-            if (!raw) return null;
-            if (raw.endsWith('.cls')) return { key: 'type-apex', label: 'APEX' };
-            if (raw.endsWith('.trigger')) return { key: 'type-apex-trigger', label: 'APEX TRIGGER' };
-            if (raw.includes('/lwc/') && raw.endsWith('.js')) return { key: 'type-lwc', label: 'LWC' };
-            if (raw.includes('/aura/') && raw.endsWith('.js')) return { key: 'type-aura', label: 'AURA' };
+            if (!raw) {
+                return null;
+            }
+            if (raw.endsWith('.cls')) {
+                return { key: 'type-apex', label: 'APEX' };
+            }
+            if (raw.endsWith('.trigger')) {
+                return { key: 'type-apex-trigger', label: 'APEX TRIGGER' };
+            }
+            if (raw.includes('/lwc/') && raw.endsWith('.js')) {
+                return { key: 'type-lwc', label: 'LWC' };
+            }
+            if (raw.includes('/aura/') && raw.endsWith('.js')) {
+                return { key: 'type-aura', label: 'AURA' };
+            }
             return null;
         } catch (_) {
             return null;
@@ -441,15 +486,18 @@ function App() {
                         </div>
 
                         <div className="issues-list">
-                            {Object.entries(groupedIssues).map(([fileName, fileIssues]) => (
+                            {Object.entries(sortedGroupedIssues).map(([fileName, fileIssues]) => (
                                 <div key={fileName} className="rule-group">
                                     <div className="rule-header">
                                         <h4>
                                             <span className="codicon codicon-file-code" aria-hidden="true"></span>
                                             {fileName}
-                                            {(() => { const t = getFileTypeBadge(fileIssues && fileIssues[0]); return t ? (
-                                                <span className={`type-badge ${t.key}`}>{t.label}</span>
-                                            ) : null; })()}
+                                            {(() => {
+                                                const t = getFileTypeBadge(fileIssues && fileIssues[0]);
+                                                return t ? (
+                                                    <span className={`type-badge ${t.key}`}>{t.label}</span>
+                                                ) : null;
+                                            })()}
                                             <span className="issues-count">{fileIssues.length} issues</span>
                                         </h4>
                                         <button
@@ -487,11 +535,14 @@ function App() {
                                                     <div className={`severity-badge ${getSeverityClass(issue.severity)}`}>
                                                         {issue.severity}
                                                     </div>
-                                                    {(() => { const status = getLocalStatus(issue); return status === 'REQUESTED' ? (
-                                                        <span className={`status-badge status-${status.toLowerCase()}`} title={`Write-off status: ${status}`}>
-                                                            {status}
-                                                        </span>
-                                                    ) : null; })()}
+                                                    {(() => {
+                                                        const status = getLocalStatus(issue);
+                                                        return status === 'REQUESTED' ? (
+                                                            <span className={`status-badge status-${status.toLowerCase()}`} title={`Write-off status: ${status}`}>
+                                                                {status}
+                                                            </span>
+                                                        ) : null;
+                                                    })()}
                                                     <div className="issue-element">{getCleanElementName(issue)}</div>
                                                 </div>
                                             </div>
@@ -504,15 +555,18 @@ function App() {
                 ) : (
                     <div className="single-mode">
                         <div className="issues-list">
-                            {Object.entries(groupedIssues).map(([fileName, fileIssues]) => (
+                            {Object.entries(sortedGroupedIssues).map(([fileName, fileIssues]) => (
                                 <div key={`single-group-${fileName}`} className="rule-group">
                                     <div className="rule-header">
                                         <h4>
                                             <span className="codicon codicon-file-code" aria-hidden="true"></span>
                                             {fileName}
-                                            {(() => { const t = getFileTypeBadge(fileIssues && fileIssues[0]); return t ? (
-                                                <span className={`type-badge ${t.key}`}>{t.label}</span>
-                                            ) : null; })()}
+                                            {(() => {
+                                                const t = getFileTypeBadge(fileIssues && fileIssues[0]);
+                                                return t ? (
+                                                    <span className={`type-badge ${t.key}`}>{t.label}</span>
+                                                ) : null;
+                                            })()}
                                             <span className="issues-count">{fileIssues.length} issues</span>
                                         </h4>
                                     </div>
@@ -536,7 +590,9 @@ function App() {
                                                     {issue.severity}
                                                 </span>
                                                 <span className="issue-rule">{issue.issueType}</span>
-                                                {(() => { const status = getLocalStatus(issue); return status === 'REQUESTED' ? (
+                                                {(() => {
+                                                    const status = getLocalStatus(issue);
+                                                    return status === 'REQUESTED' ? (
                                                     <span className={`status-badge status-${status.toLowerCase()}`} title={`Write-off status: ${status}`}>
                                                         {status}
                                                     </span>

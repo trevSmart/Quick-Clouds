@@ -72,7 +72,6 @@ export function addDummyIssuesIfDebugMode(existingIssues: any[], isDebugMode: bo
 
     // Track per-path addition to avoid re-adding on subsequent live checks
     // Module-level cache survives within extension session
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const globalAny: any = global as any;
     if (!globalAny.__qc_debug_dummy_added_for_path) {
         globalAny.__qc_debug_dummy_added_for_path = new Set<string>();
