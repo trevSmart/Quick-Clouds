@@ -310,6 +310,8 @@
     background-color: var(--vscode-chat-requestBackground);
     border-bottom: 1px solid var(--vscode-panel-border);
     box-shadow: 0 1px 1px 1px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    user-select: none;
 }
 
 .rule-header h4 {
@@ -406,6 +408,33 @@
 .issues-grid {
     display: grid;
     /* grid-template-columns: repeat(auto-fill, minmax(250px, 300px)); */
+    overflow: hidden;
+    transition: max-height 0.25s ease;
+}
+
+/* Collapsible behavior for issues grid */
+.rule-group.collapsed .issues-grid {
+    max-height: 0;
+}
+
+.rule-group.expanded .issues-grid {
+    /* Large enough to reveal content; animated via max-height */
+    max-height: 5000px;
+}
+
+/* Rotating chevron on expand/collapse */
+.rule-header .twisty {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    margin-right: 4px;
+    color: color-mix(in srgb, var(--vscode-descriptionForeground) 80%, transparent);
+    transition: transform 0.2s ease;
+}
+
+.rule-group.expanded .rule-header .twisty {
+    transform: rotate(90deg);
 }
 
 .issue-item {
@@ -686,7 +715,7 @@
 .qc-tooltip {
     position: absolute;
     z-index: 50;
-    top: calc(100% + 6px);
+    top: calc(100% + 8px);
     left: 50%;
     transform: translateX(-50%);
     /* Wider popover but shrink-to-fit when content is short */

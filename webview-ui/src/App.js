@@ -32,6 +32,8 @@ const HARDCODED_REASONS = [
 
 function App() {
     const [issues, setIssues] = useState([]);
+    // Track expand/collapse state per file group (default expanded)
+    const [expandedGroups, setExpandedGroups] = useState({});
     const [selectedIssues, setSelectedIssues] = useState([]);
     const [selectedIssue, setSelectedIssue] = useState(null); // For single mode
     const [templates, setTemplates] = useState([]);
@@ -233,6 +235,14 @@ function App() {
             sorted[fileName] = sortedIssues;
             return sorted;
         }, {});
+
+    const toggleGroup = (fileName) => {
+        setExpandedGroups(prev => ({
+            ...prev,
+            [fileName]: !(prev[fileName] ?? true)
+        }));
+    };
+    const isExpanded = (fileName) => (expandedGroups[fileName] ?? true);
 
     // Calculate severity statistics
     const getSeverityStats = (issuesList) => {
@@ -614,9 +624,17 @@ function App() {
 
                         <div className="issues-list">
                             {Object.entries(sortedGroupedIssues).map(([fileName, fileIssues]) => (
-                                <div key={fileName} className="rule-group">
-                                    <div className="rule-header">
+                                <div key={fileName} className={`rule-group ${isExpanded(fileName) ? 'expanded' : 'collapsed'}`}>
+                                    <div
+                                        className="rule-header"
+                                        role="button"
+                                        tabIndex={0}
+                                        aria-expanded={isExpanded(fileName)}
+                                        onClick={() => toggleGroup(fileName)}
+                                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleGroup(fileName); } }}
+                                    >
                                         <h4>
+                                            <span className="codicon codicon-chevron-right twisty" aria-hidden="true"></span>
                                             {(() => {
                                                 const icon = getFileIconSrc(fileIssues && fileIssues[0], fileName);
                                                 return icon ? (
@@ -667,7 +685,7 @@ function App() {
                                             </span>
                                         </h4>
                                         <button
-                                            onClick={() => handleSelectAll(fileName)}
+                                            onClick={(e) => { e.stopPropagation(); handleSelectAll(fileName); }}
                                             className="select-all-btn"
                                         >
                                             {fileIssues.every(issue => selectedIssues.includes(getIssueId(issue))) ? 'Deselect All' : 'Select All'}
@@ -715,9 +733,17 @@ function App() {
                     <div className="single-mode">
                         <div className="issues-list">
                             {Object.entries(sortedGroupedIssues).map(([fileName, fileIssues]) => (
-                                <div key={`single-group-${fileName}`} className="rule-group">
-                                    <div className="rule-header">
+                                <div key={`single-group-${fileName}`} className={`rule-group ${isExpanded(fileName) ? 'expanded' : 'collapsed'}`}>
+                                    <div
+                                        className="rule-header"
+                                        role="button"
+                                        tabIndex={0}
+                                        aria-expanded={isExpanded(fileName)}
+                                        onClick={() => toggleGroup(fileName)}
+                                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleGroup(fileName); } }}
+                                    >
                                         <h4>
+                                            <span className="codicon codicon-chevron-right twisty" aria-hidden="true"></span>
                                             {(() => {
                                                 const icon = getFileIconSrc(fileIssues && fileIssues[0], fileName);
                                                 return icon ? (
