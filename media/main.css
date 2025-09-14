@@ -425,3 +425,12 @@
 }
 
 /*# sourceMappingURL=main.56449973.chunk.css.map */
+
+/* Combobox height normalization */
+select,
+.filter-group select,
+.form-group select {
+    height: 29px;
+    min-height: 29px;
+    box-sizing: border-box;
+}

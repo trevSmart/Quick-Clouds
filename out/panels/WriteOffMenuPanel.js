@@ -84,11 +84,11 @@ class WriteOffMenuPanel {
             // If a webview panel does not already exist create and show a new one
             const panel = vscode_1.window.createWebviewPanel(
             // Panel view type
-            "showWriteOffMenu", 
+            "showWriteOffMenu",
             // Panel title
             "Request write-off",
             // The editor column the panel should be displayed in
-            vscode_1.ViewColumn.One, 
+            vscode_1.ViewColumn.One,
             // Extra panel configurations
             {
                 // Enable JavaScript in the webview
@@ -181,9 +181,12 @@ class WriteOffMenuPanel {
         // Inject CSP and a bridge script to route window.alert to VS Code notifications.
         // Also include Codicons stylesheet from packaged resources.
         const bridgeUri = (0, getUri_1.getUri)(webview, extensionUri, ['media', 'webview-bridge.js']);
-        const cspMeta = `<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src ${webview.cspSource} data:; script-src ${webview.cspSource} 'unsafe-eval'; style-src ${webview.cspSource} 'unsafe-inline'; font-src ${webview.cspSource}; connect-src ${webview.cspSource}; frame-ancestors 'none'; base-uri 'self';">`;
+        const cspMeta = `<meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; img-src ${webview.cspSource} data:; script-src ${webview.cspSource} 'unsafe-eval' 'unsafe-inline'; style-src ${webview.cspSource} 'unsafe-inline'; font-src ${webview.cspSource}; connect-src ${webview.cspSource}; frame-ancestors 'none'; base-uri 'self';\">`;
         const codiconCssUri = (0, getUri_1.getUri)(webview, extensionUri, ['resources', 'codicon.css']);
-        indexHtml = indexHtml.replace('<head>', `<head>${cspMeta}<link rel="stylesheet" href="${codiconCssUri}"><script src="${bridgeUri}"></script>`);
+        const apexIconUri = (0, getUri_1.getUri)(webview, extensionUri, ['resources', 'apex-icon.webp']);
+        const jsIconUri = (0, getUri_1.getUri)(webview, extensionUri, ['resources', 'javascript-icon.webp']);
+        const assetsBoot = `<script>window.qcAssets = { apexIcon: '${apexIconUri}', jsIcon: '${jsIconUri}' };</script>`;
+        indexHtml = indexHtml.replace('<head>', `<head>${cspMeta}<link rel=\"stylesheet\" href=\"${codiconCssUri}\">${assetsBoot}<script src=\"${bridgeUri}\"></script>`);
         // Log the resolved asset URIs for diagnostics
         try {
             // Use safer regex patterns to avoid ReDoS vulnerabilities
@@ -235,6 +238,22 @@ class WriteOffMenuPanel {
                 let issues = [];
                 try {
                     const history = yield this._storageManager.getLivecheckHistory();
+                    // Build a map of latest timestamp per file path
+                    const latestByPath = {};
+                    try {
+                        if (Array.isArray(history)) {
+                            for (const entry of history) {
+                                const p = entry && entry.path ? String(entry.path) : undefined;
+                                const ts = entry && entry.timestamp ? String(entry.timestamp) : undefined;
+                                if (p && ts) {
+                                    if (!latestByPath[p] || String(latestByPath[p]) < ts) {
+                                        latestByPath[p] = ts;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    catch (_) { }
                     let statusMap = {};
                     try {
                         statusMap = (yield this._storageManager.getWriteOffStatusMap()) || {};
@@ -248,7 +267,8 @@ class WriteOffMenuPanel {
                                 const key1 = issue && issue.id ? String(issue.id) : undefined;
                                 const key2 = issue && issue.uuid ? String(issue.uuid) : undefined;
                                 const localStatus = (key1 && statusMap[key1]) || (key2 && statusMap[key2]) || undefined;
-                                issues.push(Object.assign(Object.assign({}, issue), { historyId: entry.id, historyPath: entry.path, fileName: issue.fileName || fileName, localWriteOffStatus: localStatus }));
+                                const lastTs = entry && entry.path ? latestByPath[entry.path] : undefined;
+                                issues.push(Object.assign(Object.assign({}, issue), { historyId: entry.id, historyPath: entry.path, fileName: issue.fileName || fileName, localWriteOffStatus: localStatus, lastLiveCheckDate: lastTs }));
                             }
                         }
                     }
@@ -414,6 +434,22 @@ WriteOffMenuPanel.prototype.refreshData = function () {
             let issues = [];
             try {
                 const history = yield this._storageManager.getLivecheckHistory();
+                // Build a map of latest timestamp per file path
+                const latestByPath = {};
+                try {
+                    if (Array.isArray(history)) {
+                        for (const entry of history) {
+                            const p = entry && entry.path ? String(entry.path) : undefined;
+                            const ts = entry && entry.timestamp ? String(entry.timestamp) : undefined;
+                            if (p && ts) {
+                                if (!latestByPath[p] || String(latestByPath[p]) < ts) {
+                                    latestByPath[p] = ts;
+                                }
+                            }
+                        }
+                    }
+                }
+                catch (_) { }
                 let statusMap = {};
                 try {
                     statusMap = (yield this._storageManager.getWriteOffStatusMap()) || {};
@@ -427,7 +463,8 @@ WriteOffMenuPanel.prototype.refreshData = function () {
                             const key1 = issue && issue.id ? String(issue.id) : undefined;
                             const key2 = issue && issue.uuid ? String(issue.uuid) : undefined;
                             const localStatus = (key1 && statusMap[key1]) || (key2 && statusMap[key2]) || undefined;
-                            issues.push(Object.assign(Object.assign({}, issue), { historyId: entry.id, historyPath: entry.path, fileName: issue.fileName || fileName, localWriteOffStatus: localStatus }));
+                            const lastTs = entry && entry.path ? latestByPath[entry.path] : undefined;
+                            issues.push(Object.assign(Object.assign({}, issue), { historyId: entry.id, historyPath: entry.path, fileName: issue.fileName || fileName, localWriteOffStatus: localStatus, lastLiveCheckDate: lastTs }));
                         }
                     }
                 }

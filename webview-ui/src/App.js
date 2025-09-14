@@ -426,9 +426,88 @@ function App() {
         }
     };
 
+    // Determine which icon image to show for the file header
+    const getFileIconSrc = (issue, fileName) => {
+        try {
+            const assets = (typeof window !== 'undefined' && window.qcAssets) ? window.qcAssets : {};
+            const pathLower = String(issue?.historyPath || '').replace(/\\\\/g, '/').toLowerCase();
+            const nameLower = String(issue?.fileName || fileName || '').toLowerCase();
+            const ends = (s, suf) => s.endsWith(suf);
+            const isApex = ends(pathLower, '.cls') || ends(pathLower, '.trigger') || ends(nameLower, '.cls') || ends(nameLower, '.trigger');
+            const isJs = ends(pathLower, '.js') || ends(nameLower, '.js');
+            if (isApex && assets.apexIcon) {
+                return { src: assets.apexIcon, kind: 'apex' };
+            }
+            if (isJs && assets.jsIcon) {
+                return { src: assets.jsIcon, kind: 'js' };
+            }
+            return null;
+        } catch (_) { return null; }
+    };
+
     const getLocalStatus = (issue) => {
-        const s = issue?.localWriteOffStatus || issue?.writeOff?.writeOffStatus;
+        // Prefer server status if present (e.g., APPROVED after re-scan) over local cached status
+        const remote = issue?.writeOff?.writeOffStatus;
+        const local = issue?.localWriteOffStatus;
+        const s = remote || local;
         return s ? String(s).toUpperCase() : null;
+    };
+
+    // Format a date/time like "14/10 12:23" (DD/MM HH:mm)
+    const formatShortDateTime = (iso) => {
+        try {
+            const d = new Date(iso);
+            const dd = String(d.getDate()).padStart(2, '0');
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            const hh = String(d.getHours()).padStart(2, '0');
+            const mi = String(d.getMinutes()).padStart(2, '0');
+            return `${dd}/${mm} ${hh}:${mi}`;
+        } catch (_) {
+            return String(iso || '');
+        }
+    };
+
+    // Render status badge with a custom tooltip for APPROVED
+    const renderStatusBadge = (issue) => {
+        const status = getLocalStatus(issue);
+        if (!(status === 'REQUESTED' || status === 'APPROVED')) return null;
+
+        const w = issue?.writeOff || {};
+        const validator = w?.validator;
+        const validationReason = w?.validationReason;
+        const expirationDate = w?.expirationDate;
+        let expirationText = '';
+        if (expirationDate) {
+            try { expirationText = formatShortDateTime(expirationDate); } catch (_) { expirationText = String(expirationDate); }
+        }
+
+        // New: always show these two lines, with fallbacks
+        const requestedBy = issue?.issueCreatedBy || w?.requester || 'N/A';
+        const description = issue?.issueDescription || w?.requestDescription || 'N/A';
+
+        const title = status === 'APPROVED' ? 'Approved write-off' : 'Write-off request';
+
+        return (
+            <span className="status-badge-wrap">
+                <span className={`status-badge status-${status.toLowerCase()}`}>{status}</span>
+                <div className="qc-tooltip" role="tooltip" aria-label={`${title} details`}>
+                    <div className="arrow"></div>
+                    <div className="title">{title}</div>
+                    <div className="row"><span className="code">Status:</span> {status}</div>
+                    {status === 'APPROVED' && validator ? (
+                        <div className="row"><span className="code">Approved by:</span> {validator}</div>
+                    ) : null}
+                    {status === 'APPROVED' && validationReason ? (
+                        <div className="row"><span className="code">Reason:</span> {validationReason}</div>
+                    ) : null}
+                    {status === 'APPROVED' && expirationDate ? (
+                        <div className="row"><span className="code">Expires:</span> {expirationText}</div>
+                    ) : null}
+                    <div className="row"><span className="code">Requested by:</span> {requestedBy || 'N/A'}</div>
+                    <div className="row"><span className="code">Description:</span> {description || 'N/A'}</div>
+                </div>
+            </span>
+        );
     };
 
     return (
@@ -517,7 +596,13 @@ function App() {
                                 <div key={fileName} className="rule-group">
                                     <div className="rule-header">
                                         <h4>
-                                            <span className="codicon codicon-file-code" aria-hidden="true"></span>
+                                            {(() => {
+                                                const icon = getFileIconSrc(fileIssues && fileIssues[0], fileName);
+                                                return icon ? (
+                                                <img src={icon.src} className={`file-icon ${icon.kind}`} alt="" />
+                                            ) : (
+                                                <span className="codicon codicon-file-code" aria-hidden="true"></span>
+                                            ); })()}
                                             {fileName}
                                             {(() => {
                                                 const t = getFileTypeBadge(fileIssues && fileIssues[0]);
@@ -525,7 +610,21 @@ function App() {
                                                     <span className={`type-badge ${t.key}`}>{t.label}</span>
                                                 ) : null;
                                             })()}
-                                            <span className="issues-count">{fileIssues.length} issues</span>
+                                            <span className="issues-count">{fileIssues.length} {fileIssues.length === 1 ? 'issue' : 'issues'}</span>
+                                            {(() => {
+                                                // Determine latest check timestamp among issues in this group
+                                                const isoList = (fileIssues || []).map(it => it.lastLiveCheckDate).filter(Boolean);
+                                                if (isoList.length === 0) return null;
+                                                let latestIso = isoList[0];
+                                                for (const iso of isoList) {
+                                                    if (String(iso) > String(latestIso)) latestIso = iso;
+                                                }
+                                                let local = '';
+                                                try { local = formatShortDateTime(latestIso); } catch(_) {}
+                                                return local ? (
+                                                    <span className="last-check" title="Last Live Check">{local}</span>
+                                                ) : null;
+                                            })()}
                                         </h4>
                                         <button
                                             onClick={() => handleSelectAll(fileName)}
@@ -562,14 +661,7 @@ function App() {
                                                     <div className={`severity-badge ${getSeverityClass(issue.severity)}`}>
                                                         {issue.severity}
                                                     </div>
-                                                    {(() => {
-                                                        const status = getLocalStatus(issue);
-                                                        return status === 'REQUESTED' ? (
-                                                            <span className={`status-badge status-${status.toLowerCase()}`} title={`Write-off status: ${status}`}>
-                                                                {status}
-                                                            </span>
-                                                        ) : null;
-                                                    })()}
+                                                    {renderStatusBadge(issue)}
                                                     <div className="issue-element">{getCleanElementName(issue)}</div>
                                                 </div>
                                             </div>
@@ -586,7 +678,13 @@ function App() {
                                 <div key={`single-group-${fileName}`} className="rule-group">
                                     <div className="rule-header">
                                         <h4>
-                                            <span className="codicon codicon-file-code" aria-hidden="true"></span>
+                                            {(() => {
+                                                const icon = getFileIconSrc(fileIssues && fileIssues[0], fileName);
+                                                return icon ? (
+                                                <img src={icon.src} className={`file-icon ${icon.kind}`} alt="" />
+                                            ) : (
+                                                <span className="codicon codicon-file-code" aria-hidden="true"></span>
+                                            ); })()}
                                             {fileName}
                                             {(() => {
                                                 const t = getFileTypeBadge(fileIssues && fileIssues[0]);
@@ -594,7 +692,20 @@ function App() {
                                                     <span className={`type-badge ${t.key}`}>{t.label}</span>
                                                 ) : null;
                                             })()}
-                                            <span className="issues-count">{fileIssues.length} issues</span>
+                                            <span className="issues-count">{fileIssues.length} {fileIssues.length === 1 ? 'issue' : 'issues'}</span>
+                                            {(() => {
+                                                const isoList = (fileIssues || []).map(it => it.lastLiveCheckDate).filter(Boolean);
+                                                if (isoList.length === 0) return null;
+                                                let latestIso = isoList[0];
+                                                for (const iso of isoList) {
+                                                    if (String(iso) > String(latestIso)) latestIso = iso;
+                                                }
+                                                let local = '';
+                                                try { local = formatShortDateTime(latestIso); } catch(_) {}
+                                                return local ? (
+                                                    <span className="last-check" title="Last Live Check">{local}</span>
+                                                ) : null;
+                                            })()}
                                         </h4>
                                     </div>
                                     <div className="issues-grid single-grid">
@@ -617,13 +728,7 @@ function App() {
                                                     {issue.severity}
                                                 </span>
                                                 <span className="issue-rule">{issue.issueType}</span>
-                                                {(() => {
-                                                    const status = getLocalStatus(issue);
-                                                    return status === 'REQUESTED' ? (
-                                                    <span className={`status-badge status-${status.toLowerCase()}`} title={`Write-off status: ${status}`}>
-                                                        {status}
-                                                    </span>
-                                                ) : null; })()}
+                                                {renderStatusBadge(issue)}
                                             </div>
                                             <div className="issue-line">
                                                 <button
@@ -696,12 +801,31 @@ function App() {
             <div className="writeoff-form">
                 {viewMode === 'single' && selectedIssue && (
                     <div className={`selected-issue-banner ${getSeverityClass(selectedIssue.severity)}`}>
-                        <span className={`severity-badge ${getSeverityClass(selectedIssue.severity)}`}>
-                            {selectedIssue.severity}
-                        </span>
-                        <span className="selected-issue-text">
-                            {formatIssueLine(selectedIssue, true)}
-                        </span>
+                        <div className="issue-details">
+                            <div className="issue-header">
+                                <span className={`severity-badge ${getSeverityClass(selectedIssue.severity)}`}>
+                                    {selectedIssue.severity}
+                                </span>
+                                <span className="issue-rule">{selectedIssue.issueType}</span>
+                                {renderStatusBadge(selectedIssue)}
+                            </div>
+                            <div className="issue-line">
+                                <button
+                                    className="issue-link"
+                                    title="Open file at this line"
+                                    onClick={(e) => handleOpenInEditor(selectedIssue, e)}
+                                >
+                                    {formatIssueLine(selectedIssue, true)}
+                                </button>
+                                <button
+                                    className="go-to-file-btn"
+                                    title="Open file at this line"
+                                    onClick={(e) => handleOpenInEditor(selectedIssue, e)}
+                                >
+                                    <span className="codicon codicon-go-to-file" aria-hidden="true"></span>
+                                </button>
+                            </div>
+                        </div>
                         <button
                             className="clear-selection-btn"
                             onClick={() => setSelectedIssue(null)}

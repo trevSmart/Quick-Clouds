@@ -233,9 +233,13 @@ class WriteOffMenuPanel {
         const bridgeUri = (0, getUri_1.getUri)(webview, extensionUri, ['media', 'webview-bridge.js']);
         // Load Codicons CSS from packaged resources directory
         const codiconCssUri = (0, getUri_1.getUri)(webview, extensionUri, ['resources', 'codicon.css']);
+        // Resolve asset URIs for icons we want to use in the webview
+        const apexIconUri = (0, getUri_1.getUri)(webview, extensionUri, ['resources', 'apex-icon.webp']);
+        const jsIconUri = (0, getUri_1.getUri)(webview, extensionUri, ['resources', 'javascript-icon.webp']);
         // Note: do not set a <base> tag; it violates base-uri 'self' and breaks resource loading
-        const cspMeta = `<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src ${webview.cspSource} data:; script-src ${webview.cspSource} 'unsafe-eval'; style-src ${webview.cspSource} 'unsafe-inline'; font-src ${webview.cspSource}; connect-src ${webview.cspSource}; frame-ancestors 'none'; base-uri 'self';">`;
-        indexHtml = indexHtml.replace('<head>', `<head>${cspMeta}<link rel="stylesheet" href="${codiconCssUri}"><script src="${bridgeUri}"></script>`);
+        const cspMeta = `<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src ${webview.cspSource} data:; script-src ${webview.cspSource} 'unsafe-eval' 'unsafe-inline'; style-src ${webview.cspSource} 'unsafe-inline'; font-src ${webview.cspSource}; connect-src ${webview.cspSource}; frame-ancestors 'none'; base-uri 'self';">`;
+        const assetsBoot = `<script>window.qcAssets = { apexIcon: '${apexIconUri}', jsIcon: '${jsIconUri}' };</script>`;
+        indexHtml = indexHtml.replace('<head>', `<head>${cspMeta}<link rel="stylesheet" href="${codiconCssUri}">${assetsBoot}<script src="${bridgeUri}"></script>`);
 
         // Log the resolved asset URIs for diagnostics
         try {

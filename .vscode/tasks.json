@@ -4,7 +4,7 @@
 		{
 			"label": "Lint",
 			"type": "npm",
-			"script": "lint",
+			"script": "lint:fix",
 			"group": "build",
 			"presentation": {
 				"panel": "shared",
