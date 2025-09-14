@@ -467,6 +467,21 @@ function App() {
         }
     };
 
+    // Format for file headers: "Last checked 14 sept 15:47"
+    const formatLastChecked = (iso) => {
+        try {
+            const d = new Date(iso);
+            const dd = String(d.getDate()).padStart(2, '0');
+            const months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sept', 'oct', 'nov', 'dec'];
+            const mon = months[d.getMonth()] || '';
+            const hh = String(d.getHours()).padStart(2, '0');
+            const mi = String(d.getMinutes()).padStart(2, '0');
+            return `Last check: ${dd} ${mon} ${hh}:${mi}`;
+        } catch (_) {
+            return String(iso || '');
+        }
+    };
+
     // Render status badge with a custom tooltip for APPROVED
     const renderStatusBadge = (issue) => {
         const status = getLocalStatus(issue);
@@ -616,27 +631,40 @@ function App() {
                                                     <span className={`type-badge ${t.key}`}>{t.label}</span>
                                                 ) : null;
                                             })()}
-                                            <span className="issues-count">{fileIssues.length} {fileIssues.length === 1 ? 'issue' : 'issues'}</span>
-                                            {(() => {
-                                                // Determine latest check timestamp among issues in this group
-                                                const isoList = (fileIssues || []).map(it => it.lastLiveCheckDate).filter(Boolean);
-                                                if (isoList.length === 0) {
-                                                    return null;
-                                                }
-                                                let latestIso = isoList[0];
-                                                for (const iso of isoList) {
-                                                    if (String(iso) > String(latestIso)) {
-                                                        latestIso = iso;
+                                            <span className="file-meta">
+                                                {(() => {
+                                                    const approvedCount = (fileIssues || []).filter(it => (getLocalStatus(it) === 'APPROVED')).length;
+                                                    const activeCount = (fileIssues || []).length - approvedCount;
+                                                    return (
+                                                        <span className="issues-count">
+                                                            <span className="issues-count-main">
+                                                                {activeCount} {activeCount === 1 ? 'issue' : 'issues'}
+                                                            </span>
+                                                            {approvedCount > 0 ? ` (+${approvedCount} approved)` : ''}
+                                                        </span>
+                                                    );
+                                                })()}
+                                                {(() => {
+                                                    // Determine latest check timestamp among issues in this group
+                                                    const isoList = (fileIssues || []).map(it => it.lastLiveCheckDate).filter(Boolean);
+                                                    if (isoList.length === 0) {
+                                                        return null;
                                                     }
-                                                }
-                                                let local = '';
-                                                try {
-                                                    local = formatShortDateTime(latestIso);
-                                                } catch(_) {}
-                                                return local ? (
-                                                    <span className="last-check" title="Last Live Check">{local}</span>
-                                                ) : null;
-                                            })()}
+                                                    let latestIso = isoList[0];
+                                                    for (const iso of isoList) {
+                                                        if (String(iso) > String(latestIso)) {
+                                                            latestIso = iso;
+                                                        }
+                                                    }
+                                                    let local = '';
+                                                    try {
+                                                        local = formatLastChecked(latestIso);
+                                                    } catch(_) {}
+                                                    return local ? (
+                                                        <span className="last-check" title="Last Live Check">{local}</span>
+                                                    ) : null;
+                                                })()}
+                                            </span>
                                         </h4>
                                         <button
                                             onClick={() => handleSelectAll(fileName)}
@@ -704,26 +732,39 @@ function App() {
                                                     <span className={`type-badge ${t.key}`}>{t.label}</span>
                                                 ) : null;
                                             })()}
-                                            <span className="issues-count">{fileIssues.length} {fileIssues.length === 1 ? 'issue' : 'issues'}</span>
-                                            {(() => {
-                                                const isoList = (fileIssues || []).map(it => it.lastLiveCheckDate).filter(Boolean);
-                                                if (isoList.length === 0) {
-                                                    return null;
-                                                }
-                                                let latestIso = isoList[0];
-                                                for (const iso of isoList) {
-                                                    if (String(iso) > String(latestIso)) {
-                                                        latestIso = iso;
+                                            <span className="file-meta">
+                                                {(() => {
+                                                    const approvedCount = (fileIssues || []).filter(it => (getLocalStatus(it) === 'APPROVED')).length;
+                                                    const activeCount = (fileIssues || []).length - approvedCount;
+                                                    return (
+                                                        <span className="issues-count">
+                                                            <span className="issues-count-main">
+                                                                {activeCount} {activeCount === 1 ? 'issue' : 'issues'}
+                                                            </span>
+                                                            {approvedCount > 0 ? ` (+${approvedCount} approved)` : ''}
+                                                        </span>
+                                                    );
+                                                })()}
+                                                {(() => {
+                                                    const isoList = (fileIssues || []).map(it => it.lastLiveCheckDate).filter(Boolean);
+                                                    if (isoList.length === 0) {
+                                                        return null;
                                                     }
-                                                }
-                                                let local = '';
-                                                try {
-                                                    local = formatShortDateTime(latestIso);
-                                                } catch(_) {}
-                                                return local ? (
-                                                    <span className="last-check" title="Last Live Check">{local}</span>
-                                                ) : null;
-                                            })()}
+                                                    let latestIso = isoList[0];
+                                                    for (const iso of isoList) {
+                                                        if (String(iso) > String(latestIso)) {
+                                                            latestIso = iso;
+                                                        }
+                                                    }
+                                                    let local = '';
+                                                    try {
+                                                        local = formatLastChecked(latestIso);
+                                                    } catch(_) {}
+                                                    return local ? (
+                                                        <span className="last-check" title="Last Live Check">{local}</span>
+                                                    ) : null;
+                                                })()}
+                                            </span>
                                         </h4>
                                     </div>
                                     <div className="issues-grid single-grid">

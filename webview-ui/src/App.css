@@ -64,7 +64,7 @@
 .issues-section {
     border-radius: 8px;
     /* Allow popovers/tooltips to render outside the section */
-    overflow: visible;
+    overflow: hidden;
     margin-bottom: 20px;
     border: 1px solid var(--vscode-tab-border);
 }
@@ -306,7 +306,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 20px;
+    padding: 12px 20px;
     background-color: var(--vscode-chat-requestBackground);
     border-bottom: 1px solid var(--vscode-panel-border);
     box-shadow: 0 1px 1px 1px rgba(0, 0, 0, 0.15);
@@ -315,7 +315,7 @@
 .rule-header h4 {
     margin: 0;
     color: var(--vscode-tab-inactiveForeground);
-    font-size: 13.7px;
+    font-size: 14px;
     font-weight: 500;
     display: flex;
     align-items: center;
@@ -328,6 +328,15 @@
 
 .rule-header h4 .codicon {
     font-size: 16px;
+}
+
+/* Right-side meta container for count + last-checked */
+.file-meta {
+    margin-left: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 3px;
 }
 
 /* Image icon shown before filename in group headers */
@@ -359,17 +368,24 @@
 }
 
 .issues-count {
-    color: color-mix(in srgb, var(--vscode-tab-unfocusedActiveForeground) 70%, transparent);
+    color: color-mix(in srgb, var(--vscode-tab-unfocusedActiveForeground) 65%, transparent);
     font-weight: 300;
-    margin-left: auto;
-    /* push count to the right within the header */
+    /* moved to .file-meta; keep default 0 here */
+    margin-left: 0;
     font-size: 12.5px;
 }
 
+.issues-count-main {
+    color: color-mix(in srgb, var(--vscode-tab-unfocusedActiveForeground) 80%, transparent);
+    font-weight: 600;
+}
+
 .last-check {
-    margin-left: 12px;
-    font-size: 12px;
+    /* stacked under the count at the right */
+    margin-left: 0;
+    font-size: 10.6px;
     color: color-mix(in srgb, var(--vscode-descriptionForeground) 80%, transparent);
+    font-weight: 200;
 }
 
 .select-all-btn {
@@ -596,7 +612,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 14px 20px 14px 45px;
+    padding: 14px 20px 14px 52px;
     border-bottom: 1px solid var(--vscode-panel-border);
     transition: all 0.2s;
     cursor: pointer;
@@ -649,15 +665,15 @@
 
 /* Custom badge theming */
 .status-approved {
-    background-color: #1ea97c; /* green */
+    background-color: #008157; /* green */
     color: #ffffff;
-    border: 1px solid #168365;
+    border: 1px solid #008157;
 }
 
 .status-requested {
-    background-color: #c084fc; /* purple-pink */
+    background-color: #8523ac; /* purple-pink */
     color: #ffffff;
-    border: 1px solid #a855f7;
+    border: 1px solid #8523ac;
 }
 
 /* Wrap to host a custom hover tooltip */
@@ -715,28 +731,28 @@
 /* Tooltip arrow */
 .qc-tooltip .arrow {
     position: absolute;
-    top: -10px;
+    top: -14px;
     left: 50%;
     transform: translateX(-50%);
     width: 0;
     height: 0;
     /* Bigger nubbin */
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
-    border-bottom: 10px solid var(--vscode-editorHoverWidget-border);
+    border-left: 14px solid transparent;
+    border-right: 14px solid transparent;
+    border-bottom: 14px solid var(--vscode-editorHoverWidget-border);
 }
 
 .qc-tooltip .arrow::after {
     content: '';
     position: absolute;
     top: 1px;
-    left: -9px;
+    left: -13px;
     width: 0;
     height: 0;
     /* Inner fill to match background */
-    border-left: 9px solid transparent;
-    border-right: 9px solid transparent;
-    border-bottom: 9px solid var(--vscode-editorHoverWidget-background);
+    border-left: 13px solid transparent;
+    border-right: 13px solid transparent;
+    border-bottom: 13px solid var(--vscode-editorHoverWidget-background);
 }
 
 .issue-rule {

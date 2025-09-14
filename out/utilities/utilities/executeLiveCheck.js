@@ -113,7 +113,9 @@ async function executeLiveCheck(context, newWO, storageManager) {
             }
             const realIssues = response.filter((i) => {
                 const sev = (i?.severity || '').toLowerCase();
-                return sev === 'high' || sev === 'medium' || sev === 'low';
+                const status = ((i?.writeOff?.writeOffStatus) || (i?.writeOffStatus) || '').toString().toUpperCase();
+                const isApproved = status === 'APPROVED';
+                return !isApproved && (sev === 'high' || sev === 'medium' || sev === 'low');
             });
             const totalIssues = realIssues.length;
             const hasValidResult = typeof qualityGatesPassed === 'boolean';
