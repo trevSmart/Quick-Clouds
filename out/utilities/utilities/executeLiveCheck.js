@@ -57,8 +57,8 @@ async function executeLiveCheck(context, newWO, storageManager) {
             const supported = activeFile ? (0, IsElementToAnalize_1.default)(activeFile) : false;
             if (!supported) {
                 const logger = logger_2.QuickCloudsLogger.getInstance();
-                logger.info('ExecuteLiveCheck: Command invoked with unsupported file. Aborting.');
-                vscode.window.showInformationMessage('Live Check is only available for Apex classes, Apex triggers, Aura JS, and LWC JS under force-app. Open a supported file and try again.');
+                logger.info('Scan: Command invoked with unsupported file. Aborting.');
+                vscode.window.showInformationMessage('Scan is only available for Apex classes, Apex triggers, Aura JS, and LWC JS under force-app. Open a supported file and try again.');
                 return;
             }
         }
@@ -69,15 +69,21 @@ async function executeLiveCheck(context, newWO, storageManager) {
         const fileLabel = activeFile ? ` for ${path.basename(activeFile)}` : '';
         await vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
-            cancellable: false,
-            title: `Running live check${fileLabel}...`
-        }, async () => {
+            cancellable: true,
+            title: `Scanning${fileLabel}...`
+        }, async (_progress, token) => {
+            // Provide cancel message
+            token && token.onCancellationRequested && token.onCancellationRequested(() => {
+                const fn = activeFile ? path.basename(activeFile) : undefined;
+                if (fn) vscode.window.showInformationMessage(`Scanning of ${fn} was canceled`);
+                else vscode.window.showInformationMessage('Scanning was canceled');
+            });
             const { response, documentPath, qualityGatesPassed } = await (0, LiveCheck_1.runLivecheck)(context, storageManager);
             // Log final results
             const logger = logger_2.QuickCloudsLogger.getInstance();
-            logger.info('ExecuteLiveCheck: LiveCheck completed successfully');
-            logger.info('ExecuteLiveCheck: Final issues count: ' + (response ? response.length : 'No response'));
-            logger.info('ExecuteLiveCheck: Document path: ' + documentPath);
+            logger.info('Scan: Completed successfully');
+            logger.info('Scan: Final issues count: ' + (response ? response.length : 'No response'));
+            logger.info('Scan: Document path: ' + documentPath);
             // Do not auto-open the scanned file after Live Check completes
             if (vscode.window.activeTextEditor) {
                 await (0, UpdateDiagnostics_1.updateDiagnostics)(vscode.window.activeTextEditor.document, response, context, storageManager);
@@ -88,7 +94,7 @@ async function executeLiveCheck(context, newWO, storageManager) {
                 const panel = WriteOffMenuPanel_1.WriteOffMenuPanel.currentPanel;
                 if (panel && typeof panel.refreshData === 'function') {
                     const logger = logger_2.QuickCloudsLogger.getInstance();
-                    logger.info('ExecuteLiveCheck: Refreshing Write-off panel after Live Check');
+                    logger.info('Scan: Refreshing Write-off panel after scan');
                     await panel.refreshData();
                 }
             } catch (e) {
@@ -109,7 +115,7 @@ async function executeLiveCheck(context, newWO, storageManager) {
                 await (0, handleLicenseInfo_1.handleLicenseInfo)(storageManager, context);
             }
             else {
-                logger.info('ExecuteLiveCheck: No issues found, no write-off panel will be shown');
+                logger.info('Scan: No issues found, no write-off panel will be shown');
             }
             const realIssues = response.filter((i) => {
                 const sev = (i?.severity || '').toLowerCase();
@@ -146,20 +152,20 @@ async function executeLiveCheck(context, newWO, storageManager) {
             const summarySuffix = summary ? ` (${summary})` : '';
             if (hasValidResult && qualityGatesPassed) {
                 if (totalIssues === 0) {
-                    vscode.window.showInformationMessage('Live check PASSED');
+                    vscode.window.showInformationMessage('Scan PASSED');
                 }
                 else if (counts.high === 0) {
                     const plural = totalIssues === 1 ? 'issue' : 'issues';
-                    const warnMsg = `Live check PASSED with ${totalIssues} ${plural} ${summarySuffix}`;
+                    const warnMsg = `Scan PASSED with ${totalIssues} ${plural} ${summarySuffix}`;
                     vscode.window.showWarningMessage(warnMsg);
                 }
                 else {
-                    const message = `Live check FAILED with ${totalIssues} ${totalIssues === 1 ? 'issue' : 'issues'} (${summary})`;
+                    const message = `Scan FAILED with ${totalIssues} ${totalIssues === 1 ? 'issue' : 'issues'} (${summary})`;
                     vscode.window.showErrorMessage(message);
                 }
             }
             else if (hasValidResult) {
-                const message = `Live check FAILED with ${totalIssues} ${totalIssues === 1 ? 'issue' : 'issues'} (${summary})`;
+                const message = `Scan FAILED with ${totalIssues} ${totalIssues === 1 ? 'issue' : 'issues'} (${summary})`;
                 if (counts.high > 0) {
                     vscode.window.showErrorMessage(message);
                 }

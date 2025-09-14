@@ -1,6 +1,6 @@
 # Quick Clouds
 
-The Quick Clouds for Salesforce extension for Visual Studio Code connects to our centralized, curated set of best practices and rules and checks your code against it in real time.
+The Quick Clouds for Salesforce extension for Visual Studio Code connects to our centralized, curated set of best practices and rules and checks your Salesforce code for adherence to best practices.
 Our ruleset includes best practices for Salesforce, Quick Clouds' own recommendations, and other industry standards.
 
 > **Note**: This extension is a fork of the original [Live Check Quality for Salesforce](https://marketplace.cursorapi.com/items/?itemName=qualityclouds.livecheckqualityforsalesforce) extension, customized and enhanced for Quick Clouds' specific requirements.
@@ -14,12 +14,12 @@ Once installed and configured, your Quick Clouds extension lets you check and im
 ## Features
 
 ### Checking on demand
-Every time you wish, you can run a check on the file you are working on.
+You can run a check on any file you're working on at any time.
 
 
 ## Extension Settings
 
-You need to provide a valid API key to connect the Quality Clouds ruleset against which your code will be checked.
+You need to provide a valid API key to connect to the Quality Clouds ruleset for code checking.
 To obtain an API key, contact your Quality Clouds admin.
 If you're an admin, check out our [Administering API keys](https://docs.qualityclouds.com/display/QCD/Administering+API+keys) article.
 

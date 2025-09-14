@@ -38,7 +38,7 @@ function runLivecheck(context, storageManager) {
         }
         const { documentText, fullDocumentPath, documentPath, fileName } = documentDetails;
         if (!(0, IsElementToAnalize_1.default)(fullDocumentPath)) {
-            vscode.window.showWarningMessage("This file is not supported by Quality Clouds scan");
+            vscode.window.showWarningMessage("This file type or its parent directory is not supported by Quick Clouds");
             return { response: [], documentPath: fullDocumentPath };
         }
         const { authType } = yield (0, handleAuthenticationMethod_1.getAuthenticationStatus)(storageManager);
@@ -56,7 +56,7 @@ function runLivecheck(context, storageManager) {
                 return { response: [], documentPath: fullDocumentPath };
             }
             if (!selectedProject.attributes || !selectedProject.attributes['main-instance-id']) {
-                vscode.window.showInformationMessage("The selected project does not have a main instance ID. Please select another project or inform your admin.");
+                vscode.window.showInformationMessage("The selected project doesn't have a main instance ID. Please choose another project or contact your administrator.");
                 return { response: [], documentPath: fullDocumentPath };
             }
             headers["Instance-id"] = String(selectedProject.attributes['main-instance-id']);
@@ -68,19 +68,19 @@ function runLivecheck(context, storageManager) {
             if (!activeEditor || activeEditor.document.uri.fsPath !== fullDocumentPath) {
                 yield vscode.window.showTextDocument(vscode.Uri.file(fullDocumentPath), { preview: false });
             }
-            const res = yield axios_1.default.post(url, body, { headers });
+            const res = yield axios_1.default.post(url, body, { headers, timeout: 300000 });
 
             // Log the issues returned by the API
             const logger = logger_1.QuickCloudsLogger.getInstance();
-            logger.info('LiveCheck API Response: Issues count = ' + (res.data.issues ? res.data.issues.length : 'No issues'));
+            logger.info('Scan API Response: Issues count = ' + (res.data.issues ? res.data.issues.length : 'No issues'));
             if (res.data.issues && res.data.issues.length > 0) {
-                logger.info('LiveCheck API Response: First issue sample: ' + JSON.stringify(res.data.issues[0], null, 2));
-                logger.info('LiveCheck API Response: All issues summary:');
+                logger.info('Scan API Response: First issue sample: ' + JSON.stringify(res.data.issues[0], null, 2));
+                logger.info('Scan API Response: All issues summary:');
                 res.data.issues.forEach((issue, index) => {
                     logger.info(`  Issue ${index + 1}: ${issue.ruleName || 'Unknown rule'} - ${issue.message || 'No message'} (Line ${issue.line || 'Unknown'})`);
                 });
             } else {
-                logger.info('LiveCheck API Response: No issues found in response');
+                logger.info('Scan API Response: No issues found in response');
             }
 
             // Dummy issue injection removed: debug mode must not alter API issues
@@ -88,7 +88,7 @@ function runLivecheck(context, storageManager) {
             storageManager.setUserData("qualityGatesActive", (0, EvaluateQualityGates_1.default)(res.data.qualityGates));
             const qualityGatesPassed = res.data.qualityGates.length === 0 || res.data.qualityGates[0].passed;
             let historyId = yield (0, GenerateIssuesHistory_1.default)(res.data.issues, fullDocumentPath, storageManager);
-            logger.info('LiveCheck: Issues saved to history with ID: ' + historyId);
+            logger.info('Scan: Issues saved to history with ID: ' + historyId);
             (0, GenerateWOdata_1.default)(context, res.data.issues, documentText, extension_1.env, historyId, storageManager);
             const allowCompletionOnFail = (_d = (_c = res.data.qualityGates[0]) === null || _c === void 0 ? void 0 : _c.allowCompletionOnFail) !== null && _d !== void 0 ? _d : true;
             storageManager.setUserData("allowCompletionOnFail", allowCompletionOnFail);
@@ -103,9 +103,15 @@ function runLivecheck(context, storageManager) {
 
             if (axios_1.default.isAxiosError(error)) {
                 const authType = yield storageManager.getUserData('authType');
-
+                // Handle request timeout explicitly (5 minutes)
+                if ((error === null || error === void 0 ? void 0 : error.code) === 'ECONNABORTED' || (error === null || error === void 0 ? void 0 : error.message)?.toLowerCase().includes('timeout')) {
+                    const timeoutMsg = 'Scan timed out after 5 minutes. The server did not respond in time.';
+                    logger.warn('Scan timeout:', { code: error === null || error === void 0 ? void 0 : error.code, message: error === null || error === void 0 ? void 0 : error.message });
+                    vscode.window.showInformationMessage(timeoutMsg);
+                    return { response: [], documentPath: fullDocumentPath };
+                }
                 // Log detailed error information
-                logger.error('LiveCheck API Error Details:', {
+                logger.error('Scan API Error Details:', {
                     status: error.response?.status,
                     statusText: error.response?.statusText,
                     data: error.response?.data,
@@ -128,14 +134,14 @@ function runLivecheck(context, storageManager) {
                         data: error.response?.data ? JSON.stringify(error.response.data).substring(0, 200) + '...' : 'No response data'
                     };
 
-                    const errorMessage = `Error in runLivecheck: ${errorDetails.status} ${errorDetails.statusText}. Data: ${errorDetails.data}`;
+                    const errorMessage = `Scan error: ${errorDetails.status} ${errorDetails.statusText}. Data: ${errorDetails.data}`;
                     vscode.window.showInformationMessage(errorMessage);
-                    logger.error('LiveCheck failed with detailed error:', errorMessage);
+                    logger.error('Scan failed with detailed error:', errorMessage);
                 }
             }
             else {
-                logger.error('LiveCheck non-Axios error:', error);
-                vscode.window.showInformationMessage('Error in runLivecheck: ' + error.message);
+                logger.error('Scan non-Axios error:', error);
+                vscode.window.showInformationMessage('Scan error: ' + error.message);
             }
             return { response: [], documentPath: fullDocumentPath };
         }

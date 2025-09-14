@@ -6,7 +6,7 @@ export const QC_CLIENT_HEADER = 'Client-Name';
 
 // Command IDs
 export const CMD_MY_ISSUES = 'quick-clouds.myIssues';
-export const CMD_LIVECHECK = 'quick-clouds.check';
+export const CMD_SCAN = 'quick-clouds.scan';
 export const CMD_WRITE_OFF = 'quick-clouds.writeoff';
 export const CMD_VALIDATE_APIKEY = 'quick-clouds.validateAPIKey';
 export const CMD_SETTINGS = 'quick-clouds.settings';

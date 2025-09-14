@@ -13,7 +13,7 @@ import { createStatusBarItems } from './utilities/createStatusBarItems';
 import { uriHandler } from './utilities/uriHandler';
 import { getButtonLCInstance, updateButtonLCVisibility } from './utilities/buttonLCSingleton';
 import { updateQualityCenterVisibility } from './utilities/buttonQualityCenterSingleton';
-import { CMD_VALIDATE_APIKEY, CMD_LIVECHECK, CMD_WRITE_OFF, CMD_MY_ISSUES, CMD_SETTINGS, CMD_APPLY_CHANGES, CMD_DISCARD_CHANGES } from './constants';
+import { CMD_VALIDATE_APIKEY, CMD_SCAN, CMD_WRITE_OFF, CMD_MY_ISSUES, CMD_SETTINGS, CMD_APPLY_CHANGES, CMD_DISCARD_CHANGES } from './constants';
 import { QuickCloudsLogger } from './utilities/logger';
 import { installGlobalErrorHandlers } from './utilities/globalErrorHandlers';
 
@@ -102,7 +102,7 @@ export async function activate(context: vscode.ExtensionContext) {
         await validateApiKey(storageManager, buttonLC, context, apiKeyFromWebview);
     });
 
-    const liveCheckCommand = vscode.commands.registerCommand(CMD_LIVECHECK, async () => {
+    const liveCheckCommand = vscode.commands.registerCommand(CMD_SCAN, async () => {
         const { storageManager, newWO } = await ensureInitialized();
         await executeLiveCheck(context, newWO, storageManager);
     });

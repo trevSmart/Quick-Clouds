@@ -173,6 +173,45 @@ class LocalStorageService {
         });
     }
     /**
+     * Delete scan issues older than the given number of days.
+     * Removes corresponding entries from Issues, WriteOffData and LivecheckHistory.
+     * Keeps WriteOffStatus intact.
+     */
+    deleteIssuesOlderThan(days) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const db = yield this.getDb();
+            const cutoffDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
+            // Collect history IDs older than cutoff
+            const idsStmt = db.prepare(`SELECT id FROM LivecheckHistory WHERE timestamp < ?`);
+            idsStmt.bind([cutoffDate]);
+            const oldIds = [];
+            while (idsStmt.step()) {
+                const row = idsStmt.getAsObject();
+                oldIds.push(row.id);
+            }
+            idsStmt.free();
+            if (oldIds.length === 0) {
+                return { deletedHistories: 0, deletedIssues: 0 };
+            }
+            // Build a parameterized IN clause
+            const placeholders = oldIds.map(() => '?').join(',');
+            db.run('BEGIN TRANSACTION');
+            try {
+                // Delete dependent rows first
+                db.run(`DELETE FROM Issues WHERE history_id IN (${placeholders})`, oldIds);
+                db.run(`DELETE FROM WriteOffData WHERE history_id IN (${placeholders})`, oldIds);
+                db.run(`DELETE FROM LivecheckHistory WHERE id IN (${placeholders})`, oldIds);
+                db.run('COMMIT');
+                (0, Database_1.saveDatabase)(db, this.dbPath);
+            }
+            catch (e) {
+                db.run('ROLLBACK');
+                throw e;
+            }
+            return { deletedHistories: oldIds.length, deletedIssues: undefined };
+        });
+    }
+    /**
      * Persistent per-issue write-off status APIs
      */
     getWriteOffStatus(issueId) {
@@ -209,20 +248,6 @@ class LocalStorageService {
             }
             stmt.free();
             return map;
-        });
-    }
-    /**
-     * Removes only the debug/dummy issues from all histories without touching history metadata or write-off data.
-     * Dummy issues are identified by an id that starts with 'debug-issue-'.
-     */
-    removeDummyIssues() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const db = yield this.getDb();
-            // Remove rows where the stored JSON contains an id starting with 'debug-issue-'
-            // Using LIKE as JSON1 extension might not be available in the embedded SQLite.
-            const pattern = '%"id":"debug-issue-%';
-            db.run('DELETE FROM Issues WHERE issue_data LIKE ?', [pattern]);
-            (0, Database_1.saveDatabase)(db, this.dbPath);
         });
     }
     getLastScanHistoryId() {

@@ -7,7 +7,7 @@ exports.QC_CLIENT_NAME = 'SalesforceVSCPlugin';
 exports.QC_CLIENT_HEADER = 'Client-Name';
 // Command IDs
 exports.CMD_MY_ISSUES = 'quick-clouds.myIssues';
-exports.CMD_LIVECHECK = 'quick-clouds.check';
+exports.CMD_LIVECHECK = 'quick-clouds.scan';
 exports.CMD_WRITE_OFF = 'quick-clouds.writeoff';
 exports.CMD_VALIDATE_APIKEY = 'quick-clouds.validateAPIKey';
 exports.CMD_SETTINGS = 'quick-clouds.settings';

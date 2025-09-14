@@ -158,7 +158,7 @@ class MyIssuesPanel {
           </div>
 
           <div class="section">
-            <div class="row"><strong>Livecheck history</strong> <span id="histCount" class="muted"></span></div>
+            <div class="row"><strong>Scan history</strong> <span id="histCount" class="muted"></span></div>
             <div class="list" id="historyList"></div>
           </div>
 
@@ -353,7 +353,7 @@ class MyIssuesPanel {
                             vscode.commands.executeCommand('qc2.getAISuggestion', yield vscode.workspace.openTextDocument(documentUri), diagnostic);
                         }
                         else {
-                            vscode.window.showWarningMessage('Issue was not found in current element.');
+                            vscode.window.showWarningMessage('Issue was not found in the current element.');
                         }
                     }), 500);
                 }

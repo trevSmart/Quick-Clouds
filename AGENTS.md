@@ -52,13 +52,13 @@ Quick Clouds for Salesforce is a customized version of the Live Check Quality fo
 
 3. **Services**
    - `GetDocumentsInfo.ts` - Analyzes project files (potential bottleneck)
-   - `LiveCheck.ts` - Performs quality analysis
+   - `LiveCheck.ts` - Performs scan analysis (API client)
    - `LocalStorageService.ts` - Data persistence
    - Various API services for QualityClouds integration
 
 4. **Utilities**
    - `logger.ts` - **NEW** Comprehensive logging system
-   - `buttonLCSingleton.ts` - Live Check button management
+   - `buttonLCSingleton.ts` - Scan button management
    - `buttonQualityCenterSingleton.ts` - Quality Center button management
    - Various other utility functions
 
@@ -92,10 +92,10 @@ Quick Clouds for Salesforce is a customized version of the Live Check Quality fo
 - `quick-clouds.showLogs` - Opens Quick Clouds output channel
 - `qc2.myIssues` - Triggers Quality Center (with logging)
 
-### Secondary Issue: Live Check API Errors
+### Secondary Issue: Scan API Errors
 
 **Symptoms:**
-- Live Check command fails with "Internal Server Error"
+- Scan command fails with "Internal Server Error"
 - Generic error messages like "Error in runLivecheck: undefined"
 - No detailed information about server response
 - **Key Finding**: Original extension works perfectly, indicating configuration issue
@@ -119,7 +119,7 @@ Quick Clouds for Salesforce is a customized version of the Live Check Quality fo
 
 **Files Modified:**
 - `out/services/LiveCheck.js` - Enhanced API error handling
-- `out/utilities/executeLiveCheck.js` - Enhanced execution error handling
+- `out/utilities/executeLiveCheck.js` - Enhanced execution error handling (scan)
 - `out/constants.js` - Maintained original QC_CLIENT_NAME
 - `src/constants.ts` - Maintained original QC_CLIENT_NAME
 - `src/env.ts` - Maintained original CallbackUri
@@ -203,10 +203,10 @@ logger.show(); // Manually show output channel
    - Ensure TypeScript validation is disabled in VSCode
    - Use pre-compiled JavaScript files in `out/` directory
 
-2. **Live Check Error Debugging**:
-   - Execute Live Check command
+2. **Scan Error Debugging**:
+- Execute scan command
    - Check Quick Clouds output channel for detailed error logs
-   - Look for "LiveCheck API Error Details" entries
+- Look for "Scan API Error Details" entries
    - Analyze server response data, status codes, and headers
 
 3. **Quality Center Loading Issues**:
@@ -263,7 +263,7 @@ Then reload the window or close/reopen the Write‑off panel.
 
 | Command | Description | Category |
 |---------|-------------|----------|
-| `quick-clouds.check` | Run Live Check analysis | Quick Clouds |
+| `quick-clouds.scan` | Run scan | Quick Clouds |
 | `quick-clouds.myIssues` | Open Quality Center | Quick Clouds |
 | `quick-clouds.writeoff` | Request issue write-off | Quick Clouds |
 | `quick-clouds.settings` | Open settings panel | Quick Clouds |
@@ -282,7 +282,7 @@ Quick Clouds/
 │   │   └── WriteOffMenuPanel.ts
 │   ├── services/             # Business logic
 │   │   ├── GetDocumentsInfo.ts # File analysis (bottleneck)
-│   │   ├── LiveCheck.ts      # Quality analysis
+│   │   ├── LiveCheck.ts      # Scan analysis (API client)
 │   │   └── ...
 │   ├── utilities/            # Helper functions
 │   │   ├── logger.ts         # NEW: Logging system

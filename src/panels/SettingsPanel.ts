@@ -173,7 +173,7 @@ class SettingsPanel {
           <h1>Quick Clouds Settings</h1>
 
           <div class="section" id="authSection">
-            <div class="row"><label>Auth method</label>
+            <div class="row"><label>Authentication method</label>
               <select id="authMethod">
                 <option value="oauth">OAuth</option>
                 <option value="apiKey">API Key</option>
@@ -189,7 +189,7 @@ class SettingsPanel {
             <div class="row">
               <label>Project</label>
               <select id="projectSelect"><option value="">Select a project…</option></select>
-              <button id="btnGather">Gather Projects</button>
+              <button id="btnGather">Load projects</button>
             </div>
           </div>
 
@@ -204,7 +204,7 @@ class SettingsPanel {
 
           <div class="section" id="optionsSection">
             <div class="row">
-              <label for="onlyBlockers">Only blocker issues</label>
+              <label for="onlyBlockers">Show only blocker issues</label>
               <input id="onlyBlockers" type="checkbox" />
             </div>
           </div>

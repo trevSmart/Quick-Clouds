@@ -64,7 +64,7 @@
 .issues-section {
     border-radius: 10px;
     /* Allow popovers/tooltips to render outside the section */
-    overflow: hidden;
+    overflow: visible;
     margin-bottom: 20px;
     border: 1px solid var(--vscode-tab-border);
 }
@@ -339,9 +339,11 @@
 .file-meta {
     margin-left: auto;
     display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 3px;
+    flex-direction: row; /* show count + info icon inline */
+    align-items: center;
+    gap: 11px;
+    top: 1px;
+    position: relative;
 }
 
 /* Image icon shown before filename in group headers */
@@ -363,6 +365,7 @@
     width: 16px;
     height: 16px;
     border-radius: 2px;
+    opacity: 0.75;
 }
 
 /* Apex: 18x18, no rounding */
@@ -411,7 +414,8 @@
 .issues-grid {
     display: grid;
     /* grid-template-columns: repeat(auto-fill, minmax(250px, 300px)); */
-    overflow: hidden;
+    /* Let tooltips inside items overflow the grid container */
+    overflow: visible;
     transition: max-height 0.25s ease;
 }
 
@@ -450,7 +454,8 @@
     border-radius: 4px;
     transition: all 0.2s;
     max-width: 100%;
-    overflow: hidden;
+    /* Do not clip custom tooltips/popovers inside items */
+    overflow: visible;
 }
 
 .issue-item:hover {
@@ -676,6 +681,8 @@
 
 /* Status badges: match severity badge styling exactly */
 .status-badge {
+    position: relative;
+    top: -2px;
     font-size: 9px;
     padding: 1px 4px;
     border-radius: 10px;
@@ -712,6 +719,13 @@
 .status-badge-wrap {
     position: relative;
     display: inline-block;
+    top: 2px;
+}
+
+/* Generic wrapper for any element that owns a qc-tooltip */
+.qc-tooltip-wrap {
+    position: relative;
+    display: inline-block;
 }
 
 /* Quick Clouds tooltip styling using VS Code theme colors */
@@ -737,9 +751,16 @@
     white-space: normal;
 }
 
-.status-badge-wrap:hover .qc-tooltip {
+.status-badge-wrap:hover .qc-tooltip,
+.qc-tooltip-wrap:hover .qc-tooltip {
     opacity: 1;
     pointer-events: auto;
+}
+
+/* Small info icon next to counts */
+.info-icon {
+    font: 14px/1 codicon, monospace;
+    color: var(--vscode-descriptionForeground);
 }
 
 .qc-tooltip .title {

@@ -24,7 +24,7 @@ class TreeDataProvider {
     runScan(item) {
         vscode.workspace.openTextDocument(item.resourceUri).then(doc => {
             vscode.window.showTextDocument(doc).then(editor => {
-                vscode.commands.executeCommand('quick-clouds.check');
+                vscode.commands.executeCommand('quick-clouds.scan');
             });
         });
     }

@@ -133,6 +133,39 @@ class MementoStorageService {
             return rule ? rule.id : null;
         });
     }
+    /**
+     * Delete scan issues older than the given number of days in memento storage.
+     * Removes corresponding entries from the LivecheckHistory array and WriteOffData map.
+     * Keeps WriteOffStatus intact.
+     */
+    deleteIssuesOlderThan(days) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const cutoffDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
+            const history = yield this.getLivecheckHistory();
+            const toKeep = [];
+            const deletedIds = [];
+            for (const h of history) {
+                if (h.timestamp && h.timestamp >= cutoffDate) {
+                    toKeep.push(h);
+                }
+                else {
+                    deletedIds.push(h.id);
+                }
+            }
+            if (deletedIds.length === 0) {
+                return { deletedHistories: 0, deletedIssues: 0 };
+            }
+            yield this.memento.update('LivecheckHistory', toKeep);
+            const writeOffData = this.memento.get('WriteOffData', {});
+            for (const id of deletedIds) {
+                if (Object.prototype.hasOwnProperty.call(writeOffData, id)) {
+                    delete writeOffData[id];
+                }
+            }
+            yield this.memento.update('WriteOffData', writeOffData);
+            return { deletedHistories: deletedIds.length, deletedIssues: undefined };
+        });
+    }
 }
 exports.MementoStorageService = MementoStorageService;
 //# sourceMappingURL=MementoStorageService.js.map

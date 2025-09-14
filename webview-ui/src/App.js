@@ -606,14 +606,14 @@ function App() {
                 {realIssues.length === 0 && issues.some(it => (it?.severity || '').toLowerCase() === 'info') && (
                     <div className="info-banner">
                         <span className="codicon codicon-info" aria-hidden="true"></span>
-                        <span>Online checks completed. No issues detected.</span>
+                        <span>Scan passed</span>
                     </div>
                 )}
 
                 {viewMode === 'bulk' ? (
                     <div className="bulk-mode">
                         <div className="bulk-header">
-                            <h3>Select Issues ({selectedIssues.length} selected)</h3>
+                            <h3>Select issues ({selectedIssues.length} selected)</h3>
                             <button
                                 onClick={handleBulkWriteOff}
                                 disabled={loading || selectedIssues.length === 0}
@@ -664,7 +664,7 @@ function App() {
                                                             <span className="issues-count-main">
                                                                 {activeCount} {activeCount === 1 ? 'issue' : 'issues'}
                                                             </span>
-                                                            {approvedCount > 0 ? ` (+${approvedCount} approved)` : ''}
+                                                            {approvedCount > 0 ? ` (+${approvedCount} write-offs)` : ''}
                                                         </span>
                                                     );
                                                 })()}
@@ -682,10 +682,16 @@ function App() {
                                                     }
                                                     let local = '';
                                                     try {
-                                                        local = formatLastChecked(latestIso);
+                                                        local = formatLastChecked(latestIso).replace('Last check:', 'Last checked:');
                                                     } catch(_) {}
                                                     return local ? (
-                                                        <span className="last-check" title="Last Live Check">{local}</span>
+                                                        <span className="qc-tooltip-wrap" aria-label="Show file scan details">
+                                                            <span className="codicon codicon-info info-icon" aria-hidden="true"></span>
+                                                            <div className="qc-tooltip" role="tooltip" aria-label="File scan details">
+                                                                <div className="arrow"></div>
+                                                                <div className="row">{local}</div>
+                                                            </div>
+                                                        </span>
                                                     ) : null;
                                                 })()}
                                             </span>
@@ -789,7 +795,7 @@ function App() {
                                                             <span className="issues-count-main">
                                                                 {activeCount} {activeCount === 1 ? 'issue' : 'issues'}
                                                             </span>
-                                                            {approvedCount > 0 ? ` (+${approvedCount} approved)` : ''}
+                                                            {approvedCount > 0 ? ` (+${approvedCount} write-offs)` : ''}
                                                         </span>
                                                     );
                                                 })()}
@@ -806,10 +812,16 @@ function App() {
                                                     }
                                                     let local = '';
                                                     try {
-                                                        local = formatLastChecked(latestIso);
+                                                        local = formatLastChecked(latestIso).replace('Last check:', 'Last checked:');
                                                     } catch(_) {}
                                                     return local ? (
-                                                        <span className="last-check" title="Last Live Check">{local}</span>
+                                                        <span className="qc-tooltip-wrap" aria-label="Show file scan details">
+                                                            <span className="codicon codicon-info info-icon" aria-hidden="true"></span>
+                                                            <div className="qc-tooltip" role="tooltip" aria-label="File scan details">
+                                                                <div className="arrow"></div>
+                                                                <div className="row">{local}</div>
+                                                            </div>
+                                                        </span>
                                                     ) : null;
                                                 })()}
                                             </span>

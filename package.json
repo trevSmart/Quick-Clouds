@@ -2,7 +2,7 @@
 	"name": "quick-clouds-for-salesforce",
 	"displayName": "Quick Clouds for Salesforce",
 	"description": "Checks for adherence to coding best practices for Salesforce.",
-	"version": "0.2.27",
+	"version": "0.2.41",
 	"license": "MIT",
 	"icon": "resources/logo.webp",
 	"engines": {
@@ -24,7 +24,8 @@
 		"Code quality"
 	],
 	"activationEvents": [
-		"onUri"
+		"onUri",
+		"onCommand:quick-clouds.scan"
 	],
 	"main": "./out/extension.js",
 	"capabilities": {
@@ -33,9 +34,10 @@
 	"contributes": {
 		"commands": [
 			{
-				"command": "quick-clouds.check",
+				"command": "quick-clouds.scan",
 				"category": "Quick Clouds",
-				"title": "Quick Clouds Live Check"
+				"title": "Run Quick Clouds scan",
+				"icon": "$(code-review)"
 			},
 			{
 				"command": "quick-clouds.deleteLCHistory",
@@ -45,7 +47,7 @@
 			{
 				"command": "quick-clouds.writeoff",
 				"category": "Quick Clouds",
-				"title": "Request an issue write-off"
+				"title": "Request issue write-off"
 			},
 			{
 				"command": "quick-clouds.myIssues",
@@ -55,7 +57,7 @@
 			{
 				"command": "quick-clouds.validateAPIKey",
 				"category": "Quick Clouds",
-				"title": "Validate Quick Clouds API key"
+				"title": "Validate API key"
 			},
 			{
 				"command": "quick-clouds.applyChanges",
@@ -100,6 +102,16 @@
 					"description": "Enable debug mode to simulate write-off requests instead of sending them to the server"
 				}
 			}
+		},
+		"menus": {
+			"editor/title": [
+				{
+					"command": "quick-clouds.scan",
+					"when": "editorTextFocus && (resourceLangId == apex || resourceLangId == javascript || resourceLangId == typescript || resourceLangId == html || resourceLangId == css || resourceLangId == xml)",
+					"group": "navigation@100",
+					"icon": "$(code-review)"
+				}
+			]
 		}
 	},
 	"scripts": {

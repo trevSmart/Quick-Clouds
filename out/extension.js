@@ -89,11 +89,7 @@ async function activate(context) {
                     (async () => {
                         try {
                             const logger = logger_2.QuickCloudsLogger.getInstance();
-                            logger.info('Debug mode disabled: removing dummy issues and refreshing diagnostics');
-                            if (typeof storageManager.removeDummyIssues === 'function') {
-                                await storageManager.removeDummyIssues();
-                            }
-                            // No-op: dummy issue injection has been removed
+                            logger.info('Debug mode disabled: refreshing diagnostics');
                             // Refresh diagnostics to reflect updated storage
                             exports.collection.clear();
                             try {
@@ -102,11 +98,11 @@ async function activate(context) {
                             catch (err) {
                                 logger.warn('Diagnostics restore after debug disable failed');
                             }
-                            logger.info('Dummy issues cleanup complete');
+                            logger.info('Debug mode cleanup complete');
                         }
                         catch (err) {
                             const logger = logger_2.QuickCloudsLogger.getInstance();
-                            logger.error('Failed to clean dummy issues on debug disable', err);
+                            logger.error('Failed to clean debug mode artifacts', err);
                         }
                     })();
                 }

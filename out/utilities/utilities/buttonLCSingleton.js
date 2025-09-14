@@ -43,15 +43,15 @@ const vscode = __importStar(require("vscode"));
 const constants_1 = require("../constants");
 const IsElementToAnalize_1 = __importDefault(require("./IsElementToAnalize"));
 let buttonLCInstance = null;
-// Track if a Live Check is in progress to force-show the button
+// Track if a scan is in progress to force-show the button
 let __qc_lc_inProgress = false;
 function getButtonLCInstance() {
     if (!buttonLCInstance) {
         // Higher priority appears more to the left on the Right side
-        // Set to 30 to keep order: LiveCheck (30) -> Write-off (20) -> Quality Center (10)
+        // Set to 30 to keep order: Scan (30) -> Write-off (20) -> Quality Center (10)
         buttonLCInstance = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 30);
-        buttonLCInstance.text = 'Live check';
-        buttonLCInstance.command = 'quick-clouds.check';
+        buttonLCInstance.text = 'Scan';
+        buttonLCInstance.command = 'quick-clouds.scan';
     }
     return buttonLCInstance;
 }
@@ -59,14 +59,14 @@ function setButtonLCSpinning(isSpinning, fileName) {
     const buttonLC = getButtonLCInstance();
     if (isSpinning) {
         __qc_lc_inProgress = true;
-        buttonLC.text = '$(loading~spin) Live check';
-        buttonLC.tooltip = fileName ? `Checking ${fileName}...` : 'Live check in progress...';
+        buttonLC.text = '$(loading~spin) Scan';
+        buttonLC.tooltip = fileName ? `Scanning ${fileName}...` : 'Scan in progress...';
         // Always show while spinning regardless of active editor or auth state
         buttonLC.show();
     }
     else {
         __qc_lc_inProgress = false;
-        buttonLC.text = 'Live check';
+        buttonLC.text = 'Scan';
         buttonLC.tooltip = undefined;
     }
 }

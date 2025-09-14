@@ -1,18 +1,18 @@
 import * as vscode from 'vscode';
-import { HTTP_STATUS_OK } from '../constants';
+import { HTTP_STATUS_OK, CMD_SCAN } from '../constants';
 import isElementToAnalize from './IsElementToAnalize';
 
 let buttonLCInstance: vscode.StatusBarItem | null = null;
-// Track if a Live Check run is currently in progress to control visibility
+// Track if a scan run is currently in progress to control visibility
 let liveCheckInProgressForUI = false;
 
 export function getButtonLCInstance(): vscode.StatusBarItem {
     if (!buttonLCInstance) {
         // Higher priority appears more to the left on the Right side
-        // Set to 30 to keep order: LiveCheck (30) -> Write-off (20) -> Quality Center (10)
+        // Set to 30 to keep order: Scan (30) -> Write-off (20) -> Quality Center (10)
         buttonLCInstance = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 30);
-        buttonLCInstance.text = 'Live check';
-        buttonLCInstance.command = 'quick-clouds.check';
+        buttonLCInstance.text = 'Scan';
+        buttonLCInstance.command = CMD_SCAN;
     }
     return buttonLCInstance;
 }
@@ -21,13 +21,13 @@ export function setButtonLCSpinning(isSpinning: boolean, fileName?: string): voi
     const buttonLC = getButtonLCInstance();
     if (isSpinning) {
         liveCheckInProgressForUI = true;
-        buttonLC.text = '$(loading~spin) Live check';
-        buttonLC.tooltip = fileName ? `Checking ${fileName}...` : 'Live check in progress...';
+        buttonLC.text = '$(loading~spin) Scan';
+        buttonLC.tooltip = fileName ? `Scanning ${fileName}...` : 'Scan in progress...';
         // Ensure the button is visible while spinning regardless of context
         buttonLC.show();
     } else {
         liveCheckInProgressForUI = false;
-        buttonLC.text = 'Live check';
+        buttonLC.text = 'Scan';
         buttonLC.tooltip = undefined;
     }
 }

@@ -63,22 +63,22 @@ function executeLiveCheck(context, newWO, storageManager) {
                     const panel = WriteOffMenuPanel_1.WriteOffMenuPanel.currentPanel;
                     if (panel && typeof panel.refreshData === 'function') {
                         const logger = logger_1.QuickCloudsLogger.getInstance();
-                        logger.info('ExecuteLiveCheck: Refreshing Write-off panel after Live Check');
+                        logger.info('Scan: Refreshing Write-off panel after scan');
                         yield panel.refreshData();
                     }
                 }
                 catch (e) {
                     const logger = logger_1.QuickCloudsLogger.getInstance();
-                    logger.warn('ExecuteLiveCheck: Failed to refresh Write-off panel: ' + (e === null || e === void 0 ? void 0 : e.message));
+                    logger.warn('Scan: Failed to refresh Write-off panel: ' + (e === null || e === void 0 ? void 0 : e.message));
                     try {
                         if (WriteOffMenuPanel_1.WriteOffMenuPanel.currentPanel) {
                             WriteOffMenuPanel_1.WriteOffMenuPanel.closeAll();
                             WriteOffMenuPanel_1.WriteOffMenuPanel.render(context.extensionUri, context, extension_1.env, newWO, storageManager);
-                            logger.info('ExecuteLiveCheck: Write-off panel reloaded as fallback');
+                            logger.info('Scan: Write-off panel reloaded as fallback');
                         }
                     }
                     catch (e2) {
-                        logger.error('ExecuteLiveCheck: Failed to reload Write-off panel: ' + (e2 === null || e2 === void 0 ? void 0 : e2.message));
+                        logger.error('Scan: Failed to reload Write-off panel: ' + (e2 === null || e2 === void 0 ? void 0 : e2.message));
                     }
                 }
                 if (response.length > 0) {
@@ -117,20 +117,20 @@ function executeLiveCheck(context, newWO, storageManager) {
                 const summarySuffix = summary ? ` (${summary})` : '';
                 if (hasValidResult && qualityGatesPassed) {
                     if (totalIssues === 0) {
-                        vscode.window.showInformationMessage('Live check PASSED');
+                        vscode.window.showInformationMessage('Scan PASSED');
                     }
                     else if (counts.high === 0) {
                         const plural = totalIssues === 1 ? 'issue' : 'issues';
-                        const warnMsg = `Live check PASSED with ${totalIssues} ${plural} ${summarySuffix}`;
+                        const warnMsg = `Scan PASSED with ${totalIssues} ${plural} ${summarySuffix}`;
                         vscode.window.showWarningMessage(warnMsg);
                     }
                     else {
-                        const message = `Live check FAILED with ${totalIssues} ${totalIssues === 1 ? 'issue' : 'issues'} (${summary})`;
+                        const message = `Scan FAILED with ${totalIssues} ${totalIssues === 1 ? 'issue' : 'issues'} (${summary})`;
                         vscode.window.showErrorMessage(message);
                     }
                 }
                 else if (hasValidResult) {
-                    const message = `Live check FAILED with ${totalIssues} ${totalIssues === 1 ? 'issue' : 'issues'} (${summary})`;
+                const message = `Scan FAILED with ${totalIssues} ${totalIssues === 1 ? 'issue' : 'issues'} (${summary})`;
                     if (counts.high > 0) {
                         vscode.window.showErrorMessage(message);
                     }
@@ -142,12 +142,12 @@ function executeLiveCheck(context, newWO, storageManager) {
         }
         catch (error) {
             const logger = logger_1.QuickCloudsLogger.getInstance();
-            logger.error('ExecuteLiveCheck failed:', error);
+            logger.error('Scan failed:', error);
             // Enhanced error message
             const errorMessage = error.message || error.toString();
-            const detailedMessage = `Quick Clouds: LiveCheck execution failed: ${errorMessage}`;
+            const detailedMessage = `Quick Clouds: Scan execution failed: ${errorMessage}`;
             vscode.window.showInformationMessage(detailedMessage);
-            logger.error('LiveCheck execution error details:', {
+            logger.error('Scan execution error details:', {
                 message: error.message,
                 stack: error.stack,
                 name: error.name
