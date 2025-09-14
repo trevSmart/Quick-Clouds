@@ -30,7 +30,7 @@ export default async function requestWriteoff(data: any, env: string, storageMan
 
         vscode.window.showInformationMessage("[DEBUG] Write-off simulation: " + simulatedResponse.data.attributes["write-off"]["write-off-status"]);
         debugMode.log('RequestWriteOff: Simulated response:', simulatedResponse);
-
+        try { await storageManager.setWriteOffStatus(data.id, 'REQUESTED', { source: 'debug' }); } catch (_) {}
         return simulatedResponse.data;
     }
 
@@ -51,6 +51,7 @@ export default async function requestWriteoff(data: any, env: string, storageMan
             vscode.window.showInformationMessage("Write-off is " +
                 res.data.data.attributes["write-off"]["write-off-status"]);
         }
+        try { await storageManager.setWriteOffStatus(data.id, 'REQUESTED', { source: 'api' }); } catch(_) {}
         return res.data.data;
     };
 

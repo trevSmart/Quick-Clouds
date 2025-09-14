@@ -26,6 +26,13 @@ class SchemaManager {
                     data TEXT NOT NULL,
                     FOREIGN KEY (history_id) REFERENCES LivecheckHistory (id) ON DELETE CASCADE
                 );
+                -- Persistent per-issue write-off status, independent of scan history
+                CREATE TABLE IF NOT EXISTS WriteOffStatus (
+                    issue_id TEXT PRIMARY KEY,
+                    status TEXT NOT NULL,
+                    updated_at TEXT,
+                    metadata TEXT
+                );
             `);
         }
         catch (err) {

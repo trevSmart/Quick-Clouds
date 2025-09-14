@@ -45,7 +45,7 @@ class SettingsPanel {
         this.context = context;
         this._panel = vscode.window.createWebviewPanel('qualitycloudsSettings', 'Quick Clouds Settings', column, {
             enableScripts: true,
-            localResourceRoots: [vscode.Uri.joinPath(extensionUri, 'media'), vscode.Uri.joinPath(extensionUri, 'webview-ui', 'build')]
+            localResourceRoots: [vscode.Uri.joinPath(extensionUri, 'media'), vscode.Uri.joinPath(extensionUri, 'resources')]
         });
         this._panel.webview.html = this._getHtmlForWebview();
         this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
@@ -143,50 +143,132 @@ class SettingsPanel {
         }
     }
     _getHtmlForWebview() {
-        // Resolve hashed asset filenames using asset-manifest.json
-        const fs = require('fs');
-        const path = require('path');
-        const manifestPath = vscode.Uri.joinPath(this._extensionUri, 'webview-ui', 'build', 'asset-manifest.json').fsPath;
-        let scriptRel = ['webview-ui', 'build', 'static', 'js', 'main.js'];
-        let styleRel = ['webview-ui', 'build', 'static', 'css', 'main.css'];
-        try {
-            const manifestRaw = fs.readFileSync(manifestPath, 'utf8');
-            const manifest = JSON.parse(manifestRaw);
-            if (manifest && manifest.files) {
-                const jsPath = manifest.files['main.js'];
-                const cssPath = manifest.files['main.css'];
-                if (jsPath && jsPath.startsWith('./')) {
-                    const parts = jsPath.replace(/^\.\//, '').split('/');
-                    scriptRel = ['webview-ui', 'build', ...parts];
-                }
-                if (cssPath && cssPath.startsWith('./')) {
-                    const parts = cssPath.replace(/^\.\//, '').split('/');
-                    styleRel = ['webview-ui', 'build', ...parts];
-                }
+        const codiconCss = this._panel.webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'resources', 'codicon.css'));
+        const resetCss = this._panel.webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'reset.css'));
+        const vscodeCss = this._panel.webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'vscode.css'));
+        const csp = `default-src 'none'; img-src ${this._panel.webview.cspSource} data:; style-src ${this._panel.webview.cspSource} 'unsafe-inline'; script-src ${this._panel.webview.cspSource}; font-src ${this._panel.webview.cspSource};`;
+        return `<!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta http-equiv="Content-Security-Policy" content="${csp}">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+          <link rel="stylesheet" href="${resetCss}">
+          <link rel="stylesheet" href="${vscodeCss}">
+          <link rel="stylesheet" href="${codiconCss}">
+          <title>Quick Clouds Settings</title>
+          <style>
+            body { padding: 16px; color: var(--vscode-editor-foreground); background: var(--vscode-editor-background); }
+            h1 { margin: 0 0 12px; font-size: 20px; }
+            .section { border: 1px solid var(--vscode-panel-border); background: var(--vscode-panel-background); border-radius: 6px; padding: 12px; margin: 12px 0; }
+            .row { display: flex; align-items: center; gap: 8px; margin: 8px 0; }
+            label { color: var(--vscode-descriptionForeground); min-width: 160px; display: inline-block; }
+            input, select { background: var(--vscode-input-background); border: 1px solid var(--vscode-input-border); color: var(--vscode-input-foreground); padding: 6px 8px; border-radius: 4px; }
+            button { background: var(--vscode-button-background); color: var(--vscode-button-foreground); border: 1px solid var(--vscode-button-border); padding: 6px 10px; border-radius: 4px; cursor: pointer; }
+            button:hover { background: var(--vscode-button-hoverBackground); }
+            .muted { color: var(--vscode-descriptionForeground); }
+          </style>
+        </head>
+        <body>
+          <h1>Quick Clouds Settings</h1>
+          <div class="section" id="authSection">
+            <div class="row"><label>Auth method</label>
+              <select id="authMethod">
+                <option value="oauth">OAuth</option>
+                <option value="apiKey">API Key</option>
+                <option value="credentials">Credentials</option>
+              </select>
+              <button id="btnLogin">Login</button>
+              <button id="btnDisconnect">Disconnect</button>
+            </div>
+            <div class="row"><label>Status</label> <span id="authStatus" class="muted">Unknown</span></div>
+          </div>
+          <div class="section" id="projectSection">
+            <div class="row">
+              <label>Project</label>
+              <select id="projectSelect"><option value="">Select a project…</option></select>
+              <button id="btnGather">Gather Projects</button>
+            </div>
+          </div>
+          <div class="section" id="apiSection">
+            <div class="row"><label>API key</label>
+              <input id="apiKey" type="password" placeholder="Enter API key" />
+              <button id="btnSetKey">Set</button>
+              <button id="btnValidateKey">Validate</button>
+            </div>
+            <div class="row"><label>API key status</label> <span id="apiKeyStatus" class="muted">Unknown</span></div>
+          </div>
+          <div class="section" id="optionsSection">
+            <div class="row">
+              <label for="onlyBlockers">Only blocker issues</label>
+              <input id="onlyBlockers" type="checkbox" />
+            </div>
+          </div>
+          <script>
+            const vscode = acquireVsCodeApi();
+            let projectsCache = [];
+            const qs = (id) => document.getElementById(id);
+            function setAuthStatus(data) {
+              try {
+                const authType = (data && data.authType) || 'unknown';
+                const isAuth = !!(data && data.isAuthenticated);
+                qs('authStatus').textContent = authType + ' | ' + (isAuth ? 'Authenticated' : 'Not authenticated');
+                const sel = qs('authMethod');
+                if (sel && authType) { sel.value = authType; }
+              } catch (e) {}
             }
-        }
-        catch (e) {
-            // Fallback to non-hashed paths if manifest missing
-        }
-        const scriptUri = this._panel.webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, ...scriptRel));
-        const styleUri = this._panel.webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, ...styleRel));
-        // Basic HTML template for React
-        return `
-            <!DOCTYPE html>
-            <html lang="en">
-            <head>
-                <meta charset="UTF-8">
-                <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${this._panel.webview.cspSource} 'unsafe-inline'; script-src ${this._panel.webview.cspSource}; img-src ${this._panel.webview.cspSource} data:; connect-src *;">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <link rel="stylesheet" type="text/css" href="${styleUri}">
-                <title>Quick Clouds Settings</title>
-            </head>
-            <body>
-                <div id="root"></div>
-                <script src="${scriptUri}"></script>
-            </body>
-            </html>
-        `;
+            window.addEventListener('message', (event) => {
+              const msg = event.data || {};
+              switch (msg.command) {
+                case 'showSettings':
+                  break;
+                case 'authStatus':
+                  setAuthStatus(msg.data);
+                  break;
+                case 'showProjects':
+                  projectsCache = Array.isArray(msg.data) ? msg.data : [];
+                  const sel = qs('projectSelect');
+                  sel.innerHTML = '<option value="">Select a project…</option>' + projectsCache.map((p, i) => {
+                    const name = (p && p.attributes && (p.attributes['project-name'] || p.attributes['name'])) || ('Project #' + (i+1));
+                    return '<option value="' + i + '">' + name + '</option>';
+                  }).join('');
+                  break;
+                case 'showSelectedProject':
+                  try {
+                    const p = msg.data;
+                    if (!p) { qs('projectSelect').value = ''; break; }
+                    const idx = projectsCache.findIndex(x => String(x && x.id) === String(p && p.id));
+                    if (idx >= 0) { qs('projectSelect').value = String(idx); }
+                  } catch (e) {}
+                  break;
+                case 'apiKeyStatus':
+                  qs('apiKeyStatus').textContent = String(msg.data || 'Unknown');
+                  break;
+                case 'OnlyBlockerIssuesSet':
+                  qs('onlyBlockers').checked = !!msg.data;
+                  break;
+                case 'apiKeySet':
+                  qs('apiKey').value = msg.data || '';
+                  break;
+              }
+            });
+            qs('btnLogin').addEventListener('click', () => vscode.postMessage({ command: 'startLogin' }));
+            qs('btnDisconnect').addEventListener('click', () => vscode.postMessage({ command: 'disconnect' }));
+            qs('btnGather').addEventListener('click', () => vscode.postMessage({ command: 'gatherProjects' }));
+            qs('authMethod').addEventListener('change', (e) => vscode.postMessage({ command: 'setAuthMethod', value: e.target.value }));
+            qs('projectSelect').addEventListener('change', (e) => {
+              const idx = Number(e.target.value);
+              if (!isNaN(idx) && projectsCache[idx]) {
+                vscode.postMessage({ command: 'selectedProject', value: projectsCache[idx] });
+              }
+            });
+            qs('onlyBlockers').addEventListener('change', (e) => vscode.postMessage({ command: 'setOnlyBlockerIssues', value: !!e.target.checked }));
+            qs('btnSetKey').addEventListener('click', () => vscode.postMessage({ command: 'setApiKey', value: qs('apiKey').value || '' }));
+            qs('btnValidateKey').addEventListener('click', () => vscode.postMessage({ command: 'validateApiKey', value: qs('apiKey').value || '' }));
+            vscode.postMessage({ command: 'webviewLoaded' });
+          </script>
+        </body>
+        </html>`;
     }
     // Call this after login to update the webview with the latest state
     static notifyAuthChanged(storageManager) {

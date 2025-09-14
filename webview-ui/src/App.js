@@ -71,11 +71,14 @@ function App() {
 
     // Build a consistent subtitle like "<file>, line <n>: <element>" (element optional)
     const formatIssueLine = (issue, includeElement = true) => {
-        const baseFile = issue.fileName || 'Unknown file';
+        const baseFile = String(issue.fileName || 'Unknown file');
         let element = includeElement ? getCleanElementName(issue) : '';
 
-        // Suppress element if it duplicates the filename
-        if (element && element.trim().toLowerCase() === String(baseFile).trim().toLowerCase()) {
+        // Normalize names for comparison: trim, lower, strip extension
+        const stripExt = (s) => s.replace(/\.[^./\\]+$/, '');
+        const norm = (s) => stripExt(String(s || '').trim().toLowerCase());
+
+        if (element && norm(element) === norm(baseFile)) {
             element = '';
         }
 
@@ -110,6 +113,27 @@ function App() {
                 case 'templatesData':
                     setTemplates(JSON.parse(message.data));
                     break;
+                case 'writeoffSubmitted': {
+                    // Reset form and unselect issue after successful submission
+                    setLoading(false);
+                    try {
+                        const d = message.data || {};
+                        const id = d.id;
+                        if (id) {
+                            setIssues(prev => prev.map(it => {
+                                const itId = it.id || it.uuid;
+                                if (String(itId) === String(id)) {
+                                    return { ...it, localWriteOffStatus: 'REQUESTED' };
+                                }
+                                return it;
+                            }));
+                        }
+                    } catch (_) {}
+                    setSelectedIssue(null);
+                    setReason('');
+                    setDescription('');
+                    break;
+                }
                 default:
                     // Handle unknown commands silently
                     break;
@@ -323,6 +347,11 @@ function App() {
         return `severity-${severity.toLowerCase()}`;
     };
 
+    const getLocalStatus = (issue) => {
+        const s = issue?.localWriteOffStatus || issue?.writeOff?.writeOffStatus;
+        return s ? String(s).toUpperCase() : null;
+    };
+
     return (
         <div className="writeoff-container">
             <div className="header">
@@ -439,6 +468,11 @@ function App() {
                                                     <div className={`severity-badge ${getSeverityClass(issue.severity)}`}>
                                                         {issue.severity}
                                                     </div>
+                                                    {(() => { const status = getLocalStatus(issue); return status === 'REQUESTED' ? (
+                                                        <span className={`status-badge status-${status.toLowerCase()}`} title={`Write-off status: ${status}`}>
+                                                            {status}
+                                                        </span>
+                                                    ) : null; })()}
                                                     <div className="issue-element">{getCleanElementName(issue)}</div>
                                                 </div>
                                             </div>
@@ -479,6 +513,11 @@ function App() {
                                                     {issue.severity}
                                                 </span>
                                                 <span className="issue-rule">{issue.issueType}</span>
+                                                {(() => { const status = getLocalStatus(issue); return status === 'REQUESTED' ? (
+                                                    <span className={`status-badge status-${status.toLowerCase()}`} title={`Write-off status: ${status}`}>
+                                                        {status}
+                                                    </span>
+                                                ) : null; })()}
                                             </div>
                                             <div className="issue-line">
                                                 <button
@@ -561,8 +600,9 @@ function App() {
                             className="clear-selection-btn"
                             onClick={() => setSelectedIssue(null)}
                             title="Clear selected issue"
+                            aria-label="Clear selected issue"
                         >
-                            Change selection
+                            <span className="codicon codicon-close" aria-hidden="true"></span>
                         </button>
                     </div>
                 )}

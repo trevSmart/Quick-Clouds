@@ -88,6 +88,27 @@ class MementoStorageService {
             yield this.memento.update('WriteOffData', writeOffData);
         });
     }
+    // Persistent per-issue write-off status APIs for memento storage
+    getWriteOffStatus(issueId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const map = this.memento.get('WriteOffStatus', {});
+            return map[issueId] || null;
+        });
+    }
+    setWriteOffStatus(issueId, status, metadata) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const map = this.memento.get('WriteOffStatus', {});
+            map[issueId] = status;
+            yield this.memento.update('WriteOffStatus', map);
+            this.changeEmitter.emit('WriteOffStatus', { issueId, status, metadata });
+        });
+    }
+    getWriteOffStatusMap() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const map = this.memento.get('WriteOffStatus', {});
+            return map || {};
+        });
+    }
     getLastScanHistoryId() {
         return __awaiter(this, void 0, void 0, function* () {
             const history = yield this.getLivecheckHistory();

@@ -190,7 +190,7 @@ export class BulkWriteOffService {
             };
 
             debugMode.log('BulkWriteOff: Simulated response:', simulatedResponse);
-
+            try { await storageManager.setWriteOffStatus(issue.id, 'REQUESTED', { source: 'debug' }); } catch (_) {}
             return simulatedResponse.data;
         }
 
@@ -217,6 +217,7 @@ export class BulkWriteOffService {
 
         try {
             const response = await axios.patch(url, JSON.stringify(data), { headers });
+            try { await storageManager.setWriteOffStatus(issue.id, 'REQUESTED', { source: 'api' }); } catch (_) {}
             return response.data.data;
         } catch (error) {
             if (axios.isAxiosError(error)) {

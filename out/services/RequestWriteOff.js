@@ -28,21 +28,22 @@ function requestWriteoff(data, env, storageManager, context) {
                 data: data
             });
 
-            // Simulate a successful response
-            const simulatedResponse = {
-                data: {
-                    attributes: {
-                        "write-off": {
-                            "write-off-status": "requested"
-                        }
+        // Simulate a successful response
+        const simulatedResponse = {
+            data: {
+                attributes: {
+                    "write-off": {
+                        "write-off-status": "requested"
                     }
                 }
-            };
+            }
+        };
 
-            vscode.window.showInformationMessage("[DEBUG] Write-off simulation: " + simulatedResponse.data.attributes["write-off"]["write-off-status"]);
-            debugMode.log('RequestWriteOff: Simulated response:', simulatedResponse);
-
-            return simulatedResponse.data;
+        vscode.window.showInformationMessage("[DEBUG] Write-off simulation: " + simulatedResponse.data.attributes["write-off"]["write-off-status"]);
+        debugMode.log('RequestWriteOff: Simulated response:', simulatedResponse);
+        try { yield storageManager.setWriteOffStatus(data.id, 'REQUESTED', { source: 'debug' }); }
+        catch (_) { }
+        return simulatedResponse.data;
         }
 
         // Original implementation for non-debug mode
@@ -55,6 +56,8 @@ function requestWriteoff(data, env, storageManager, context) {
                 vscode.window.showInformationMessage("Write-off is " +
                     res.data.data.attributes["write-off"]["write-off-status"]);
             }
+            try { yield storageManager.setWriteOffStatus(data.id, 'REQUESTED', { source: 'api' }); }
+            catch (_) { }
             return res.data.data;
         });
         try {

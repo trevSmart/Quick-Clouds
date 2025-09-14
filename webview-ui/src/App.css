@@ -144,7 +144,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 10px 12px;
+    padding: 10px 12px 10px 16px;
     margin: 0 0 14px 0;
     border: 1px solid var(--vscode-panel-border);
     border-left-width: 3px;
@@ -159,17 +159,30 @@
 }
 
 .clear-selection-btn {
-    padding: 4px 10px;
-    background: var(--vscode-button-secondaryBackground);
-    color: var(--vscode-button-secondaryForeground);
-    border: 1px solid var(--vscode-button-border);
-    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: var(--vscode-descriptionForeground);
     cursor: pointer;
-    font-size: 12px;
+    border-radius: 4px;
 }
 
 .clear-selection-btn:hover {
-    background: var(--vscode-button-secondaryHoverBackground);
+    background: var(--vscode-toolbar-hoverBackground, rgba(90, 93, 94, 0.20));
+}
+
+/* Codicon fallback for the clear button */
+.clear-selection-btn .codicon {
+    font: 16px/1 codicon, monospace;
+}
+
+.clear-selection-btn .codicon:not([class*="codicon-"]):empty::before {
+    content: "\00D7"; /* multiplication sign as fallback */
 }
 
 /* Severity accent on the banner's left border */
@@ -522,6 +535,23 @@
     display: flex;
     gap: 12px;
     align-items: center;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    border: 1px solid var(--vscode-panel-border);
+    background: var(--vscode-badge-background);
+    color: var(--vscode-badge-foreground);
+}
+
+.status-requested {
+    /* Reuse default badge colors; keep class for potential theming */
 }
 
 .issue-rule {

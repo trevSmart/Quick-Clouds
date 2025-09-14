@@ -219,6 +219,46 @@ logger.show(); // Manually show output channel
    - Add logger imports when implementing new logging features
    - Test changes by reloading the extension window
 
+## Write-Off UI: Duplicate Filename In Subtitle (Recurring)
+
+### Symptom
+- In the Write‑off panel, the subtitle shows duplicated identifiers, for example:
+  - `csbd_MacRelatedList.js, line 57: csbd_MacRelatedList`
+  - `SomeFile.js, line 25: SomeFile.js`
+
+### Root Cause
+- The React webview formats the subtitle as "<file>, line <n>: <element>". Some issues use an `elementName` equal to the file name (with or without extension). Without normalization, the element gets redundantly appended.
+- The legacy bridge script (`media/webview-bridge.js`) also post‑processes subtitles. If the React UI wasn’t formatting consistently, the bridge filled the gap; this interaction can re‑introduce duplicates when code changes are rebuilt.
+
+### Fix (Source of Truth: React UI)
+We keep the logic in the React UI and make the bridge a no‑op when the text is already formatted.
+
+1) React webview logic
+- File: `webview-ui/src/App.js`
+- Functions involved:
+  - `getCleanElementName(issue)`: strips embedded "line N" fragments and filename suffixes `" - <file>"`.
+  - `formatIssueLine(issue, includeElement)`: builds the subtitle and suppresses the element when it equals the filename ignoring case and extension.
+- Normalization rule: compare `elementName` vs `fileName` case‑insensitively and after stripping extensions and path prefixes. If equal, omit the element so the subtitle is just `"<file>, line <n>"`.
+
+2) Bridge guard
+- File: `media/webview-bridge.js`
+- Behavior: If the text already contains `", line N"`, it doesn’t rewrite it. This avoids double processing.
+
+3) Rebuild the webview
+```bash
+npm run build:webview
+```
+Then reload the window or close/reopen the Write‑off panel.
+
+### Quick Validation Checklist
+- Bulk mode cards: show `"<file>, line <n>"` in the subtitle link.
+- Single mode cards: show `"<file>, line <n>: <element>"` only when `<element>` is not just the filename.
+- No `", line N: <file>"` where `<file>` matches the filename (with or without extension).
+
+### Gotchas
+- Don’t edit `webview-ui/build/*` directly; rebuild instead.
+- If you must hot‑patch behavior while testing, `media/webview-bridge.js` is injected at runtime, but remember to keep it conservative (skip when already formatted) to avoid regressions.
+
 ## Key Commands
 
 | Command | Description | Category |

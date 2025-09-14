@@ -178,6 +178,45 @@ class LocalStorageService {
         });
     }
     /**
+     * Persistent per-issue write-off status APIs
+     */
+    getWriteOffStatus(issueId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const db = yield this.getDb();
+            const stmt = db.prepare(`SELECT status FROM WriteOffStatus WHERE issue_id = ?`);
+            stmt.bind([issueId]);
+            let status = null;
+            if (stmt.step()) {
+                const row = stmt.getAsObject();
+                status = row.status || null;
+            }
+            stmt.free();
+            return status;
+        });
+    }
+    setWriteOffStatus(issueId, status, metadata) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const db = yield this.getDb();
+            const updatedAt = new Date().toISOString();
+            const meta = metadata ? JSON.stringify(metadata) : null;
+            db.run(`INSERT OR REPLACE INTO WriteOffStatus (issue_id, status, updated_at, metadata) VALUES (?, ?, ?, ?)`, [issueId, status, updatedAt, meta]);
+            (0, Database_1.saveDatabase)(db, this.dbPath);
+        });
+    }
+    getWriteOffStatusMap() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const db = yield this.getDb();
+            const stmt = db.prepare(`SELECT issue_id, status FROM WriteOffStatus`);
+            const map = {};
+            while (stmt.step()) {
+                const row = stmt.getAsObject();
+                map[row.issue_id] = row.status;
+            }
+            stmt.free();
+            return map;
+        });
+    }
+    /**
      * Removes only the debug/dummy issues from all histories without touching history metadata or write-off data.
      * Dummy issues are identified by an id that starts with 'debug-issue-'.
      */

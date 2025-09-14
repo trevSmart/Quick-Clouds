@@ -88,8 +88,8 @@ class MyIssuesPanel {
                 // Enable JavaScript in the webview
                 enableScripts: true,
                 localResourceRoots: [
-                    vscode_1.Uri.joinPath(extensionUri, 'webview-ui', 'build'),
-                    vscode_1.Uri.joinPath(extensionUri, 'media')
+                    vscode_1.Uri.joinPath(extensionUri, 'media'),
+                    vscode_1.Uri.joinPath(extensionUri, 'resources')
                 ]
             });
             MyIssuesPanel.currentPanel = new MyIssuesPanel(panel, extensionUri, context, env, button, storageManager);
@@ -124,62 +124,91 @@ class MyIssuesPanel {
      * rendered within the webview panel
      */
     _getWebviewContent(webview, extensionUri) {
-        // Resolve hashed asset filenames using asset-manifest.json
-        const fs = require('fs');
-        let scriptRel = [
-            "webview-ui",
-            "build",
-            "static",
-            "js",
-            "main.js",
-        ];
-        let styleRel = [
-            "webview-ui",
-            "build",
-            "static",
-            "css",
-            "main.css",
-        ];
-        try {
-            const manifestPath = vscode_1.Uri.joinPath(extensionUri, 'webview-ui', 'build', 'asset-manifest.json').fsPath;
-            const manifestRaw = fs.readFileSync(manifestPath, 'utf8');
-            const manifest = JSON.parse(manifestRaw);
-            if (manifest && manifest.files) {
-                const jsPath = manifest.files['main.js'];
-                const cssPath = manifest.files['main.css'];
-                if (jsPath && jsPath.startsWith('./')) {
-                    const parts = jsPath.replace(/^\.\//, '').split('/');
-                    scriptRel = ['webview-ui', 'build', ...parts];
-                }
-                if (cssPath && cssPath.startsWith('./')) {
-                    const parts = cssPath.replace(/^\.\//, '').split('/');
-                    styleRel = ['webview-ui', 'build', ...parts];
-                }
-            }
-        }
-        catch (e) {
-            // Fallback to non-hashed paths if manifest missing
-        }
-        const stylesUri = (0, getUri_1.getUri)(webview, extensionUri, styleRel);
-        const scriptUri = (0, getUri_1.getUri)(webview, extensionUri, scriptRel);
+        const codiconCss = (0, getUri_1.getUri)(webview, extensionUri, ['resources', 'codicon.css']);
+        const resetCss = (0, getUri_1.getUri)(webview, extensionUri, ['media', 'reset.css']);
+        const vscodeCss = (0, getUri_1.getUri)(webview, extensionUri, ['media', 'vscode.css']);
+        const csp = `default-src 'none'; img-src ${webview.cspSource} data:; style-src ${webview.cspSource} 'unsafe-inline'; script-src ${webview.cspSource}; font-src ${webview.cspSource};`;
         return /*html*/ `
       <!DOCTYPE html>
       <html lang="en">
         <head>
           <meta charset="utf-8">
+          <meta http-equiv="Content-Security-Policy" content="${csp}">
           <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
-          <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; script-src ${webview.cspSource}; img-src ${webview.cspSource} data:; connect-src *;">
-          <meta name="theme-color" content="#000000">
-          <link rel="stylesheet" type="text/css" href="${stylesUri}">
+          <link rel="stylesheet" href="${resetCss}">
+          <link rel="stylesheet" href="${vscodeCss}">
+          <link rel="stylesheet" href="${codiconCss}">
           <title>Quality Center</title>
+          <style>
+            body { padding: 16px; color: var(--vscode-editor-foreground); background: var(--vscode-editor-background); }
+            h1 { margin: 0 0 12px; font-size: 20px; }
+            .section { border: 1px solid var(--vscode-panel-border); background: var(--vscode-panel-background); border-radius: 6px; padding: 12px; margin: 12px 0; }
+            .row { display: flex; align-items: center; gap: 8px; margin: 8px 0; }
+            .muted { color: var(--vscode-descriptionForeground); }
+            .list { max-height: 360px; overflow: auto; border: 1px solid var(--vscode-panel-border); border-radius: 6px; }
+            .item { display: flex; justify-content: space-between; padding: 8px 10px; border-bottom: 1px solid var(--vscode-sideBarSectionHeader-border); }
+            .item:last-child { border-bottom: none; }
+            button { background: var(--vscode-button-background); color: var(--vscode-button-foreground); border: 1px solid var(--vscode-button-border); padding: 6px 10px; border-radius: 4px; cursor: pointer; }
+            button:hover { background: var(--vscode-button-hoverBackground); }
+          </style>
         </head>
         <body>
-          <noscript>You need to enable JavaScript to run this app.</noscript>
-          <div id="root"></div>
-          <script src="${scriptUri}"></script>
+          <h1>Quality Center</h1>
+          <div class="section">
+            <div class="row"><span class="muted">Selected folder:</span> <strong id="selFolder">Loading…</strong></div>
+            <div class="row"><span class="muted">Date filter:</span> <span id="dateFilter" class="muted">None</span></div>
+            <div class="row">
+              <button id="btnPick">Select folder…</button>
+            </div>
+          </div>
+          <div class="section">
+            <div class="row"><strong>Livecheck history</strong> <span id="histCount" class="muted"></span></div>
+            <div class="list" id="historyList"></div>
+          </div>
+          <div class="section">
+            <div class="row"><strong>Detected Components</strong> <span id="ceCount" class="muted"></span></div>
+            <div class="list" id="ceList"></div>
+          </div>
+          <script>
+            const vscode = acquireVsCodeApi();
+            const qs = (id) => document.getElementById(id);
+            const elHist = qs('historyList');
+            const elCE = qs('ceList');
+            function renderHistory(hist) {
+              const arr = Array.isArray(hist) ? hist : [];
+              qs('histCount').textContent = '(' + arr.length + ')';
+              elHist.innerHTML = arr.map((h) => {
+                const path = h && h.path ? String(h.path) : '';
+                const issues = (h && Array.isArray(h.issues)) ? h.issues.length : 0;
+                return '<div class="item"><span>' + (path || '—') + '</span><span class="muted">' + issues + ' issues</span></div>';
+              }).join('');
+            }
+            function renderDocs(docs) {
+              const arr = Array.isArray(docs) ? docs : [];
+              qs('ceCount').textContent = '(' + arr.length + ')';
+              elCE.innerHTML = arr.slice(0, 200).map((d) => {
+                const name = d && (d.name || d.file || d.cePath || 'Item');
+                return '<div class="item"><span>' + name + '</span></div>';
+              }).join('');
+            }
+            window.addEventListener('message', (event) => {
+              const msg = event.data || {};
+              if (msg.command === 'myIssues') {
+                try { var data = JSON.parse(msg.data); } catch (_) { var data = {}; }
+                qs('selFolder').textContent = data && data.selectedFolder ? data.selectedFolder : '—';
+                renderHistory(data && data.LivecheckHistory);
+                renderDocs(data && data.AllCEs);
+              }
+              if (msg.command === 'dateFilter') {
+                try { var df = JSON.parse(msg.data); } catch (_) { var df = msg.data; }
+                qs('dateFilter').textContent = df ? String(df) : 'None';
+              }
+            });
+            qs('btnPick').addEventListener('click', () => vscode.postMessage({ command: 'openDirectoryPicker' }));
+            vscode.postMessage({ command: 'webviewLoaded' });
+          </script>
         </body>
-      </html>
-    `;
+      </html>`;
     }
     /**
      * Sets up an event listener to listen for messages passed from the webview context and

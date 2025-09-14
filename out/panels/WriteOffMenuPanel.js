@@ -86,7 +86,7 @@ class WriteOffMenuPanel {
             // Panel view type
             "showWriteOffMenu", 
             // Panel title
-            "Write-off menu", 
+            "Request write-off",
             // The editor column the panel should be displayed in
             vscode_1.ViewColumn.One, 
             // Extra panel configurations
@@ -227,12 +227,18 @@ class WriteOffMenuPanel {
                 let issues = [];
                 try {
                     const history = yield this._storageManager.getLivecheckHistory();
+                    let statusMap = {};
+                    try {
+                        statusMap = (yield this._storageManager.getWriteOffStatusMap()) || {};
+                    }
+                    catch (_) { }
                     if (Array.isArray(history)) {
                         for (const entry of history) {
                             const path = require('path');
                             const fileName = entry.path ? path.basename(entry.path) : undefined;
                             for (const issue of entry.issues || []) {
-                                issues.push(Object.assign(Object.assign({}, issue), { historyId: entry.id, historyPath: entry.path, fileName: issue.fileName || fileName }));
+                                const localStatus = issue && issue.id ? statusMap[String(issue.id)] : undefined;
+                                issues.push(Object.assign(Object.assign({}, issue), { historyId: entry.id, historyPath: entry.path, fileName: issue.fileName || fileName, localWriteOffStatus: localStatus }));
                             }
                         }
                     }
@@ -268,8 +274,23 @@ class WriteOffMenuPanel {
                     }
                 }
                 catch (_) { }
-                (0, RequestWriteOff_1.default)(data, env, this._storageManager, this.context);
-                setTimeout(() => WriteOffMenuPanel.currentPanel.dispose(), 300);
+                try {
+                    const result = yield (0, RequestWriteOff_1.default)(data, env, this._storageManager, this.context);
+                    const payload = {
+                        id: (data === null || data === void 0 ? void 0 : data.id),
+                        fileName: (data === null || data === void 0 ? void 0 : data.fileName),
+                        lineNumber: (data === null || data === void 0 ? void 0 : data.lineNumber),
+                        elementName: (data === null || data === void 0 ? void 0 : data.elementName),
+                        status: 'REQUESTED',
+                        result
+                    };
+                    WriteOffMenuPanel.currentPanel._panel.webview.postMessage({ command: 'writeoffSubmitted', data: payload });
+                }
+                catch (e) {
+                    logger.error('WriteOffMenuPanel: writeoffRequest failed: ' + (e === null || e === void 0 ? void 0 : e.message));
+                    vscode_1.window.showErrorMessage('Write-off request failed');
+                }
+                // Keep the write-off panel open after sending the request
             }
             if (command === 'openFileAtLine') {
                 try {
