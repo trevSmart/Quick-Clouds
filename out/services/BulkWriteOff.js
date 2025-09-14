@@ -8,7 +8,7 @@ const axios_2 = __importDefault(require("axios"));
 const getAuthHeader_2 = require("../utilities/getAuthHeader");
 const constants_2 = require("../constants");
 const ApiService_2 = require("./ApiService");
-const debugMode_2 = require("../utilities/debugMode");
+const debugMode_1 = require("../utilities/debugMode");
 class BulkWriteOffService {
     constructor() {
         this.templates = [];
@@ -106,30 +106,38 @@ class BulkWriteOffService {
         return grouped;
     }
     async requestWriteOff(issue, reason, description, env, storageManager, context) {
-        // Respect DEBUG mode: simulate instead of sending
-        try {
-            const dbg = debugMode_2.DebugMode?.getInstance?.();
-            if (dbg?.shouldSimulateApiCalls?.()) {
-                dbg.log('BulkWriteOff: Simulating write-off request instead of making real API call', {
-                    issueId: issue.id,
-                    issueType: issue.issueType,
-                    reason,
-                    description,
-                    url: `${env}/api/v2/sf-live-check-issue/${issue.id}`
-                });
-                const simulatedResponse = {
-                    data: {
-                        attributes: {
-                            "write-off": {
-                                "write-off-status": "requested"
-                            }
+        const debugMode = debugMode_1.DebugMode.getInstance();
+        // Check if we're in debug mode
+        if (debugMode.shouldSimulateApiCalls()) {
+            debugMode.log('BulkWriteOff: Simulating write-off request instead of making real API call');
+            debugMode.log('BulkWriteOff: Simulated data:', {
+                issueId: issue.id,
+                issueType: issue.issueType,
+                reason: reason,
+                description: description,
+                url: `${env}/api/v2/sf-live-check-issue/${issue.id}`
+            });
+            // Simulate a successful response
+            const simulatedResponse = {
+                data: {
+                    attributes: {
+                        "write-off": {
+                            "write-off-status": "requested"
                         }
                     }
-                };
-                return simulatedResponse.data;
+                }
+            };
+            debugMode.log('BulkWriteOff: Simulated response:', simulatedResponse);
+            try {
+                const issueKey = (issue && (issue.id || issue.uuid));
+                if (issueKey) {
+                    await storageManager.setWriteOffStatus(issueKey, 'REQUESTED', { source: 'debug' });
+                }
             }
-        } catch (_) { }
-
+            catch (_) { }
+            return simulatedResponse.data;
+        }
+        // Original implementation for non-debug mode
         const headers = {
             ...(await (0, getAuthHeader_2.getAuthHeader)(storageManager, context)),
             'Accept': 'application/vnd.api+json',
@@ -150,6 +158,13 @@ class BulkWriteOffService {
         };
         try {
             const response = await axios_2.default.patch(url, JSON.stringify(data), { headers });
+            try {
+                const issueKey = (issue && (issue.id || issue.uuid));
+                if (issueKey) {
+                    await storageManager.setWriteOffStatus(issueKey, 'REQUESTED', { source: 'api' });
+                }
+            }
+            catch (_) { }
             return response.data.data;
         }
         catch (error) {

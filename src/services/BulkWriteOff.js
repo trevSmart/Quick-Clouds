@@ -143,15 +143,15 @@ export class BulkWriteOffService {
         return results;
     }
 
-    private groupIssuesByRule(issues: Issue[]): Map<string, Issue[]> {
-        const grouped = new Map<string, Issue[]>();
+    groupIssuesByRule(issues) {
+        const grouped = new Map();
 
         for (const issue of issues) {
             const ruleType = issue.issueType || 'Unknown';
             if (!grouped.has(ruleType)) {
                 grouped.set(ruleType, []);
             }
-            grouped.get(ruleType)!.push(issue);
+            grouped.get(ruleType).push(issue);
         }
 
         return grouped;

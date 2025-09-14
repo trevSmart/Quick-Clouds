@@ -154,6 +154,7 @@ class MyIssuesPanel {
         </head>
         <body>
           <h1>Quality Center</h1>
+
           <div class="section">
             <div class="row"><span class="muted">Selected folder:</span> <strong id="selFolder">Loading…</strong></div>
             <div class="row"><span class="muted">Date filter:</span> <span id="dateFilter" class="muted">None</span></div>
@@ -161,19 +162,23 @@ class MyIssuesPanel {
               <button id="btnPick">Select folder…</button>
             </div>
           </div>
+
           <div class="section">
-            <div class="row"><strong>Livecheck history</strong> <span id="histCount" class="muted"></span></div>
+            <div class="row"><strong>Scan history</strong> <span id="histCount" class="muted"></span></div>
             <div class="list" id="historyList"></div>
           </div>
+
           <div class="section">
             <div class="row"><strong>Detected Components</strong> <span id="ceCount" class="muted"></span></div>
             <div class="list" id="ceList"></div>
           </div>
+
           <script>
             const vscode = acquireVsCodeApi();
             const qs = (id) => document.getElementById(id);
             const elHist = qs('historyList');
             const elCE = qs('ceList');
+
             function renderHistory(hist) {
               const arr = Array.isArray(hist) ? hist : [];
               qs('histCount').textContent = '(' + arr.length + ')';
@@ -183,6 +188,7 @@ class MyIssuesPanel {
                 return '<div class="item"><span>' + (path || '—') + '</span><span class="muted">' + issues + ' issues</span></div>';
               }).join('');
             }
+
             function renderDocs(docs) {
               const arr = Array.isArray(docs) ? docs : [];
               qs('ceCount').textContent = '(' + arr.length + ')';
@@ -191,6 +197,7 @@ class MyIssuesPanel {
                 return '<div class="item"><span>' + name + '</span></div>';
               }).join('');
             }
+
             window.addEventListener('message', (event) => {
               const msg = event.data || {};
               if (msg.command === 'myIssues') {
@@ -204,6 +211,7 @@ class MyIssuesPanel {
                 qs('dateFilter').textContent = df ? String(df) : 'None';
               }
             });
+
             qs('btnPick').addEventListener('click', () => vscode.postMessage({ command: 'openDirectoryPicker' }));
             vscode.postMessage({ command: 'webviewLoaded' });
           </script>
@@ -337,7 +345,7 @@ class MyIssuesPanel {
                                 vscode.commands.executeCommand('qc2.getAISuggestion', yield vscode.workspace.openTextDocument(documentUri), diagnostic);
                             }
                             else {
-                                vscode.window.showWarningMessage('Issue was not found in current element.');
+                                vscode.window.showWarningMessage('Issue was not found in the current element.');
                             }
                         }), 500);
                     }

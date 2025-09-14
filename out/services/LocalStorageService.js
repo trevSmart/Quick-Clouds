@@ -139,10 +139,13 @@ class LocalStorageService {
     setLivecheckHistory(path, issues, timestamp) {
         return __awaiter(this, void 0, void 0, function* () {
             const db = yield this.getDb();
+            // Delete existing data for this file path to avoid duplicates
             db.run(`DELETE FROM Issues WHERE history_id IN (SELECT id FROM LivecheckHistory WHERE path = ?)`, [path]);
             db.run(`DELETE FROM WriteOffData WHERE history_id IN (SELECT id FROM LivecheckHistory WHERE path = ?)`, [path]);
             db.run(`DELETE FROM LivecheckHistory WHERE path = ?`, [path]);
+            // Insert new data
             db.run(`INSERT INTO LivecheckHistory (path, timestamp) VALUES (?, ?)`, [path, timestamp]);
+            // Get last inserted id
             const stmt = db.prepare(`SELECT last_insert_rowid() as id`);
             stmt.step();
             const row = stmt.getAsObject();
@@ -186,6 +189,7 @@ class LocalStorageService {
         return __awaiter(this, void 0, void 0, function* () {
             const db = yield this.getDb();
             const cutoffDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
+            // Collect history IDs older than cutoff
             const idsStmt = db.prepare(`SELECT id FROM LivecheckHistory WHERE timestamp < ?`);
             idsStmt.bind([cutoffDate]);
             const oldIds = [];
@@ -197,9 +201,11 @@ class LocalStorageService {
             if (oldIds.length === 0) {
                 return { deletedHistories: 0, deletedIssues: 0 };
             }
+            // Build a parameterized IN clause
             const placeholders = oldIds.map(() => '?').join(',');
             db.run('BEGIN TRANSACTION');
             try {
+                // Delete dependent rows first
                 db.run(`DELETE FROM Issues WHERE history_id IN (${placeholders})`, oldIds);
                 db.run(`DELETE FROM WriteOffData WHERE history_id IN (${placeholders})`, oldIds);
                 db.run(`DELETE FROM LivecheckHistory WHERE id IN (${placeholders})`, oldIds);

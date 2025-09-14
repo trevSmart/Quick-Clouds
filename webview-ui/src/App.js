@@ -266,6 +266,7 @@ function App() {
         });
     }, [issues, expandedGroups, viewMode]);
 
+
     // Calculate severity statistics
     const getSeverityStats = (issuesList) => {
         const stats = {

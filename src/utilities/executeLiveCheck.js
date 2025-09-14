@@ -49,10 +49,10 @@ export async function executeLiveCheck(context: vscode.ExtensionContext, newWO: 
 
             const livePromise = runLivecheck(context, storageManager);
             // If user cancels, stop waiting on the progress UI immediately, but keep the promise running
-            const cancelPromise = new Promise<void>((resolve) => token.onCancellationRequested(() => resolve()));
-            const winner: any = await Promise.race([livePromise, cancelPromise]);
+            const cancelPromise = new Promise((resolve) => token.onCancellationRequested(() => resolve()));
+            const winner = await Promise.race([livePromise, cancelPromise]);
 
-            const handleResult = async (result: any) => {
+            const handleResult = async (result) => {
                 // Purge old issues before any further processing
                 try {
                     const purgeResult = await (storageManager?.deleteIssuesOlderThan

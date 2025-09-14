@@ -1,8 +1,4 @@
 {
-  "typescript.preferences.includePackageJsonAutoImports": "off",
-  "typescript.suggest.autoImports": false,
-  "typescript.validate.enable": false,
-  "javascript.validate.enable": false,
   "vitest.enable": true,
   "vitest.commandLine": "npm run test:run",
   "vitest.rootConfig": "./vitest.config.ts",
@@ -38,5 +34,12 @@
     ],
     "defaultColor": "white",
     "reloadButton": null
-  }
+  },
+  "files.associations": {
+    "src/**/*.ts": "javascript"
+  },
+  "typescript.preferences.includePackageJsonAutoImports": "off",
+  "typescript.suggest.autoImports": false,
+  "typescript.validate.enable": false,
+  "javascript.validate.enable": false
 }

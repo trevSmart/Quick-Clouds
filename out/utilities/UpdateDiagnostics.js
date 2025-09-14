@@ -30,7 +30,7 @@ function updateDiagnostics(document, response, context, storageManager) {
             }
             return;
         }
-        // Remove diagnostics only for this document
+        // Remove diagnostics only for the current document
         extension_1.collection.delete(document.uri);
         const diagnosticsArray = [];
         const displayOnlyBlockerIssues = (yield storageManager.getUserData('OnlyBlockerIssues')) || false;
@@ -56,15 +56,12 @@ function sortDiagnostics(diagnostics) {
             'Information': 2,
             'Hint': 1
         };
-
         const aSeverity = severityPriority[a.severity] || 0;
         const bSeverity = severityPriority[b.severity] || 0;
-
         // First sort by severity (descending)
         if (aSeverity !== bSeverity) {
             return bSeverity - aSeverity;
         }
-
         // Then sort by line number (descending)
         const aLine = a.range.start.line;
         const bLine = b.range.start.line;

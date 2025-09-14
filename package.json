@@ -2,7 +2,7 @@
 	"name": "quick-clouds-for-salesforce",
 	"displayName": "Quick Clouds for Salesforce",
 	"description": "Checks for adherence to coding best practices for Salesforce.",
-	"version": "0.2.52",
+	"version": "0.2.58",
 	"license": "MIT",
 	"icon": "resources/logo.webp",
 	"engines": {
@@ -24,9 +24,24 @@
 		"Code quality"
 	],
 	"activationEvents": [
-		"onUri"
+		"onUri",
+		"onLanguage:apex",
+		"onLanguage:javascript",
+		"onLanguage:typescript",
+		"onLanguage:html",
+		"onLanguage:css",
+		"onLanguage:xml",
+		"workspaceContains:**/*.cls",
+		"workspaceContains:**/*.trigger",
+		"workspaceContains:**/*.component",
+		"workspaceContains:**/*.page",
+		"workspaceContains:**/*.js",
+		"workspaceContains:**/*.ts",
+		"workspaceContains:**/*.html",
+		"workspaceContains:**/*.css",
+		"workspaceContains:**/*.xml"
 	],
-	"main": "./out/extension.js",
+	"main": "./src/extension.js",
 	"capabilities": {
 		"uriHandler": true
 	},
@@ -114,6 +129,7 @@
 		}
 	},
 	"scripts": {
+		"compile": "echo 'No compilation needed - using JavaScript source files'",
 		"build:webview": "NODE_OPTIONS=--openssl-legacy-provider npm --prefix ./webview-ui run build:dev",
 		"build:vsix": "npm run build:webview && NODE_OPTIONS=\"--require ./scripts/vsce-file-polyfill.js\" npx @vscode/vsce package --out quick-clouds-build-check.vsix",
 		"package": "./scripts/package.sh",

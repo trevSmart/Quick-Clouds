@@ -63,8 +63,7 @@
 /* Issues section - unified filters and list */
 .issues-section {
     border-radius: 10px;
-    /* Allow popovers/tooltips to render outside the section */
-    overflow: visible;
+    overflow: hidden;
     margin-bottom: 20px;
     border: 1px solid var(--vscode-tab-border);
 }
@@ -381,6 +380,8 @@
     /* moved to .file-meta; keep default 0 here */
     margin-left: 0;
     font-size: 12.5px;
+    position: relative;
+    top: -1px;
 }
 
 .issues-count-main {
@@ -413,9 +414,7 @@
 
 .issues-grid {
     display: grid;
-    /* grid-template-columns: repeat(auto-fill, minmax(250px, 300px)); */
-    /* Let tooltips inside items overflow the grid container */
-    overflow: visible;
+    overflow: hidden;
     transition: max-height 0.25s ease;
 }
 
@@ -454,8 +453,7 @@
     border-radius: 4px;
     transition: all 0.2s;
     max-width: 100%;
-    /* Do not clip custom tooltips/popovers inside items */
-    overflow: visible;
+    overflow: hidden;
 }
 
 .issue-item:hover {
@@ -730,11 +728,9 @@
 
 /* Quick Clouds tooltip styling using VS Code theme colors */
 .qc-tooltip {
-    position: absolute;
+    position: fixed;
     z-index: 50;
-    top: calc(100% + 8px);
-    left: 50%;
-    transform: translateX(-50%);
+    transform: translateX(-50%) translateY(8px);
     /* Wider popover but shrink-to-fit when content is short */
     width: max-content;
     min-width: 0;
@@ -747,7 +743,7 @@
     padding: 8px 10px;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 120ms ease-in-out;
+    transition: opacity 120ms ease-in-out, transform 120ms ease-in-out;
     white-space: normal;
 }
 
@@ -755,6 +751,7 @@
 .qc-tooltip-wrap:hover .qc-tooltip {
     opacity: 1;
     pointer-events: auto;
+    transform: translateX(-50%) translateY(0);
 }
 
 /* Small info icon next to counts */

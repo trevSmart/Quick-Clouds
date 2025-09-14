@@ -2,22 +2,18 @@
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) {
-            try {
-                step(generator.next(value));
-            }
-            catch (e) {
-                reject(e);
-            }
+        function fulfilled(value) { try {
+            step(generator.next(value));
         }
-        function rejected(value) {
-            try {
-                step(generator["throw"](value));
-            }
-            catch (e) {
-                reject(e);
-            }
+        catch (e) {
+            reject(e);
+        } }
+        function rejected(value) { try {
+            step(generator["throw"](value));
         }
+        catch (e) {
+            reject(e);
+        } }
         function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
@@ -26,7 +22,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.SettingsPanel = void 0;
 const vscode = require("vscode");
 const handleAuthenticationMethod_1 = require("../utilities/handleAuthenticationMethod");
-const buttonLCSingleton_1 = require("../utilities/utilities/buttonLCSingleton");
+const buttonLCSingleton_1 = require("../utilities/buttonLCSingleton");
 const buttonQualityCenterSingleton_1 = require("../utilities/buttonQualityCenterSingleton");
 class SettingsPanel {
     static show(extensionUri, storageManager, context) {
@@ -45,7 +41,10 @@ class SettingsPanel {
         this.context = context;
         this._panel = vscode.window.createWebviewPanel('qualitycloudsSettings', 'Quick Clouds Settings', column, {
             enableScripts: true,
-            localResourceRoots: [vscode.Uri.joinPath(extensionUri, 'media'), vscode.Uri.joinPath(extensionUri, 'resources')]
+            localResourceRoots: [
+                vscode.Uri.joinPath(extensionUri, 'media'),
+                vscode.Uri.joinPath(extensionUri, 'resources')
+            ]
         });
         this._panel.webview.html = this._getHtmlForWebview();
         this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
@@ -56,10 +55,10 @@ class SettingsPanel {
                     const src = message && message.source ? ` (${message.source})` : '';
                     const msg = message && message.message ? String(message.message) : 'Unknown webview error';
                     const stack = message && message.stack ? `\nStack: ${String(message.stack)}` : '';
-                    const logger = require('../utilities/logger');
-                    logger.QuickCloudsLogger.getInstance().error(`Webview error in SettingsPanel${src}: ${msg}${stack}`);
+                    const { QuickCloudsLogger } = require('../utilities/logger');
+                    QuickCloudsLogger.getInstance().error(`Webview error in SettingsPanel${src}: ${msg}${stack}`);
                 }
-                catch (_b) { }
+                catch (_) { }
                 return;
             }
             switch (message.command) {
@@ -182,8 +181,9 @@ class SettingsPanel {
         </head>
         <body>
           <h1>Quick Clouds Settings</h1>
+
           <div class="section" id="authSection">
-            <div class="row"><label>Auth method</label>
+            <div class="row"><label>Authentication method</label>
               <select id="authMethod">
                 <option value="oauth">OAuth</option>
                 <option value="apiKey">API Key</option>
@@ -194,13 +194,15 @@ class SettingsPanel {
             </div>
             <div class="row"><label>Status</label> <span id="authStatus" class="muted">Unknown</span></div>
           </div>
+
           <div class="section" id="projectSection">
             <div class="row">
               <label>Project</label>
               <select id="projectSelect"><option value="">Select a project…</option></select>
-              <button id="btnGather">Gather Projects</button>
+              <button id="btnGather">Load projects</button>
             </div>
           </div>
+
           <div class="section" id="apiSection">
             <div class="row"><label>API key</label>
               <input id="apiKey" type="password" placeholder="Enter API key" />
@@ -209,16 +211,19 @@ class SettingsPanel {
             </div>
             <div class="row"><label>API key status</label> <span id="apiKeyStatus" class="muted">Unknown</span></div>
           </div>
+
           <div class="section" id="optionsSection">
             <div class="row">
-              <label for="onlyBlockers">Only blocker issues</label>
+              <label for="onlyBlockers">Show only blocker issues</label>
               <input id="onlyBlockers" type="checkbox" />
             </div>
           </div>
+
           <script>
             const vscode = acquireVsCodeApi();
             let projectsCache = [];
             const qs = (id) => document.getElementById(id);
+
             function setAuthStatus(data) {
               try {
                 const authType = (data && data.authType) || 'unknown';
@@ -228,10 +233,12 @@ class SettingsPanel {
                 if (sel && authType) { sel.value = authType; }
               } catch (e) {}
             }
+
             window.addEventListener('message', (event) => {
               const msg = event.data || {};
               switch (msg.command) {
                 case 'showSettings':
+                  // no-op; UI is always visible
                   break;
                 case 'authStatus':
                   setAuthStatus(msg.data);
@@ -263,6 +270,8 @@ class SettingsPanel {
                   break;
               }
             });
+
+            // Wire UI actions
             qs('btnLogin').addEventListener('click', () => vscode.postMessage({ command: 'startLogin' }));
             qs('btnDisconnect').addEventListener('click', () => vscode.postMessage({ command: 'disconnect' }));
             qs('btnGather').addEventListener('click', () => vscode.postMessage({ command: 'gatherProjects' }));
@@ -276,6 +285,8 @@ class SettingsPanel {
             qs('onlyBlockers').addEventListener('change', (e) => vscode.postMessage({ command: 'setOnlyBlockerIssues', value: !!e.target.checked }));
             qs('btnSetKey').addEventListener('click', () => vscode.postMessage({ command: 'setApiKey', value: qs('apiKey').value || '' }));
             qs('btnValidateKey').addEventListener('click', () => vscode.postMessage({ command: 'validateApiKey', value: qs('apiKey').value || '' }));
+
+            // Ask extension to populate initial state
             vscode.postMessage({ command: 'webviewLoaded' });
           </script>
         </body>

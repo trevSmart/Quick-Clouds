@@ -17,7 +17,7 @@ export async function restoreDiagnosticsFromStorage(context: vscode.ExtensionCon
         }
 
         // Keep only the latest scan per file path
-        const latestByPath = new Map<string, { path: string; timestamp: number; issues: any[] }>();
+        const latestByPath = new Map();
         for (const h of history) {
             if (!h || !h.path) { continue; }
             const prev = latestByPath.get(h.path);

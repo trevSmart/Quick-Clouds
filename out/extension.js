@@ -1,22 +1,22 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function (o, m, k, k2) {
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     var desc = Object.getOwnPropertyDescriptor(m, k);
     if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-        desc = { enumerable: true, get: function () { return m[k]; } };
+      desc = { enumerable: true, get: function() { return m[k]; } };
     }
     Object.defineProperty(o, k2, desc);
-}) : (function (o, m, k, k2) {
+}) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
 }));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function (o, v) {
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
     Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function (o, v) {
+}) : function(o, v) {
     o["default"] = v;
 });
 var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function (o) {
+    var ownKeys = function(o) {
         ownKeys = Object.getOwnPropertyNames || function (o) {
             var ar = [];
             for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
@@ -46,150 +46,132 @@ const executeLiveCheck_1 = require("./utilities/executeLiveCheck");
 const generateCodeFix_1 = require("./utilities/generateCodeFix");
 const validateApiKey_1 = require("./utilities/validateApiKey");
 const initializeExtension_1 = require("./utilities/initializeExtension");
+const restoreDiagnostics_1 = require("./utilities/restoreDiagnostics");
 const createStatusBarItems_1 = require("./utilities/createStatusBarItems");
 const uriHandler_1 = require("./utilities/uriHandler");
-const buttonLCSingleton_2 = require("./utilities/utilities/buttonLCSingleton");
+const buttonLCSingleton_2 = require("./utilities/buttonLCSingleton");
 const buttonQualityCenterSingleton_2 = require("./utilities/buttonQualityCenterSingleton");
 const constants_2 = require("./constants");
 const logger_2 = require("./utilities/logger");
-const restoreDiagnostics_1 = require("./utilities/restoreDiagnostics");
 const globalErrorHandlers_1 = require("./utilities/globalErrorHandlers");
 exports.env = env_2.Env.PROD;
 exports.collection = vscode.languages.createDiagnosticCollection('Quick Clouds');
 async function activate(context) {
     const logger = logger_2.QuickCloudsLogger.getInstance();
-    logger.info('Quick Clouds Extension activated');
-    try {
-        // Install global error handlers early so any failure gets logged
-        (0, globalErrorHandlers_1.installGlobalErrorHandlers)(context);
-        const { apiKeyStatus, storageManager, authType, isAuthenticated } = await (0, initializeExtension_1.initializeExtension)(context);
-        const buttonLC = (0, buttonLCSingleton_2.getButtonLCInstance)();
-        await (0, buttonLCSingleton_2.updateButtonLCVisibility)(storageManager);
-        await (0, buttonQualityCenterSingleton_2.updateQualityCenterVisibility)(storageManager); // Ensure Quality Center button is updated on activation
-        // Update LiveCheck button visibility when the active editor changes
-        vscode.window.onDidChangeActiveTextEditor(() => {
-            (0, buttonLCSingleton_2.updateButtonLCVisibility)(storageManager);
-        });
-        const { newWO, myIssues, applyChangesButton, discardChangesButton, loginButton } = (0, createStatusBarItems_1.createStatusBarItems)(apiKeyStatus, authType, isAuthenticated, storageManager);
-
-        // React to configuration changes (status bar visibility, debug mode)
-        const cfgListener = vscode.workspace.onDidChangeConfiguration((e) => {
-            if (e.affectsConfiguration('QuickClouds.showSettingsButton')) {
-                const showSettingsButton = vscode.workspace.getConfiguration('QuickClouds').get('showSettingsButton', true);
-                showSettingsButton ? loginButton.show() : loginButton.hide();
-            }
-            if (e.affectsConfiguration('QuickClouds.showQualityCenterButton')) {
-                (0, buttonQualityCenterSingleton_2.updateQualityCenterVisibility)(storageManager);
-            }
-            if (e.affectsConfiguration('QuickClouds.debugMode')) {
-                const debugMode = vscode.workspace.getConfiguration('QuickClouds').get('debugMode', false);
-                debugMode ? newWO.show() : newWO.hide();
-                // When disabling debug mode, ensure any debug-only artifacts are cleared
-                if (!debugMode) {
-                    (async () => {
-                        try {
-                            const logger = logger_2.QuickCloudsLogger.getInstance();
-                            logger.info('Debug mode disabled: refreshing diagnostics');
-                            // Refresh diagnostics to reflect updated storage
-                            exports.collection.clear();
-                            try {
-                                await (0, restoreDiagnostics_1.restoreDiagnosticsFromStorage)(context, storageManager);
-                            }
-                            catch (err) {
-                                logger.warn('Diagnostics restore after debug disable failed');
-                            }
-                            logger.info('Debug mode cleanup complete');
-                        }
-                        catch (err) {
-                            const logger = logger_2.QuickCloudsLogger.getInstance();
-                            logger.error('Failed to clean debug mode artifacts', err);
-                        }
-                    })();
+    const activateStart = Date.now();
+    logger.info('Quick Clouds: activate() called');
+    // Install global error handlers early so any failure gets logged
+    (0, globalErrorHandlers_1.installGlobalErrorHandlers)(context);
+    let initPromise;
+    async function ensureInitialized() {
+        if (initPromise) {
+            return initPromise;
+        }
+        initPromise = (async () => {
+            const t0 = Date.now();
+            const { apiKeyStatus, storageManager, authType, isAuthenticated } = await (0, initializeExtension_1.initializeExtension)(context);
+            const buttonLC = (0, buttonLCSingleton_2.getButtonLCInstance)();
+            await (0, buttonLCSingleton_2.updateButtonLCVisibility)(storageManager);
+            await (0, buttonQualityCenterSingleton_2.updateQualityCenterVisibility)(storageManager);
+            // Update LiveCheck button visibility when the active editor changes
+            vscode.window.onDidChangeActiveTextEditor(() => {
+                (0, buttonLCSingleton_2.updateButtonLCVisibility)(storageManager);
+            });
+            const { newWO, myIssues, applyChangesButton, discardChangesButton, loginButton } = (0, createStatusBarItems_1.createStatusBarItems)(apiKeyStatus, authType, isAuthenticated, storageManager);
+            // React to configuration changes (status bar visibility, debug mode)
+            const cfgListener = vscode.workspace.onDidChangeConfiguration((e) => {
+                if (e.affectsConfiguration('QuickClouds.showSettingsButton')) {
+                    const showSettingsButton = vscode.workspace.getConfiguration('QuickClouds').get('showSettingsButton', true);
+                    showSettingsButton ? loginButton.show() : loginButton.hide();
                 }
-            }
-        });
-        context.subscriptions.push(cfgListener);
-        const validateAPIKeyCommand = vscode.commands.registerCommand(constants_2.CMD_VALIDATE_APIKEY, async (apiKeyFromWebview) => {
-            await (0, validateApiKey_1.validateApiKey)(storageManager, buttonLC, context, apiKeyFromWebview);
-        });
-        const liveCheckCommand = vscode.commands.registerCommand(constants_2.CMD_LIVECHECK, async () => {
-            // Pass the write-off button and correct argument order
-            await (0, executeLiveCheck_1.executeLiveCheck)(context, newWO, storageManager);
-        });
-        const writeOffCommand = vscode.commands.registerCommand(constants_2.CMD_WRITE_OFF, async (document, diagnostic) => {
-            const preselect = document && diagnostic
-                ? {
-                    fileName: path.basename(document.fileName),
-                    lineNumber: diagnostic.range.start.line + 1
+                if (e.affectsConfiguration('QuickClouds.showQualityCenterButton')) {
+                    (0, buttonQualityCenterSingleton_2.updateQualityCenterVisibility)(storageManager);
                 }
-                : undefined;
-            // Open Write-off panel using static render
-            WriteOffMenuPanel_1.WriteOffMenuPanel.render(context.extensionUri, context, exports.env, newWO, storageManager, preselect);
-        });
-        const myIssuesCommand = vscode.commands.registerCommand(constants_2.CMD_MY_ISSUES, async () => {
-            // Open Quality Center using static render
-            MyIssuesPanel_1.MyIssuesPanel.render(context.extensionUri, context, exports.env, myIssues, storageManager);
-        });
-        const settingsCommand = vscode.commands.registerCommand(constants_2.CMD_SETTINGS, async () => {
-            // Open Settings using static show
-            SettingsPanel_2.SettingsPanel.show(context.extensionUri, storageManager, context);
-        });
-        const applyChangesCommand = vscode.commands.registerCommand(constants_2.CMD_APPLY_CHANGES, async () => {
-            await (0, generateCodeFix_1.generateCodeFix)(storageManager, applyChangesButton, discardChangesButton, context);
-        });
-        const discardChangesCommand = vscode.commands.registerCommand(constants_2.CMD_DISCARD_CHANGES, async () => {
-            await (0, generateCodeFix_1.generateCodeFix)(storageManager, applyChangesButton, discardChangesButton, context, true);
-        });
-        const deleteLCHistoryCommand = vscode.commands.registerCommand('quick-clouds.deleteLCHistory', async () => {
-            try {
-                await storageManager.deleteAllData();
-                exports.collection.clear();
+                if (e.affectsConfiguration('QuickClouds.debugMode')) {
+                    const debugMode = vscode.workspace.getConfiguration('QuickClouds').get('debugMode', false);
+                    debugMode ? newWO.show() : newWO.hide();
+                }
+            });
+            context.subscriptions.push(cfgListener);
+            // Restore diagnostics in the background to avoid blocking first command
+            setTimeout(async () => {
                 try {
-                    if (WriteOffMenuPanel_1.WriteOffMenuPanel.currentPanel &&
-                        WriteOffMenuPanel_1.WriteOffMenuPanel.currentPanel._panel &&
-                        WriteOffMenuPanel_1.WriteOffMenuPanel.currentPanel._panel.webview) {
-                        WriteOffMenuPanel_1.WriteOffMenuPanel.currentPanel._panel.webview.postMessage({ command: 'WOdata', data: JSON.stringify({ issues: [] }) });
-                    }
+                    await (0, restoreDiagnostics_1.restoreDiagnosticsFromStorage)(context, storageManager);
                 }
-                catch (_a) { }
-                vscode.window.showInformationMessage('All issues cleared');
+                catch {
+                    logger.warn('Diagnostics restore deferred task failed');
+                }
+            }, 0);
+            logger.info(`Quick Clouds: initialization completed in ${Date.now() - t0} ms`);
+            return { storageManager, apiKeyStatus, authType, isAuthenticated, buttonLC, newWO, myIssues, applyChangesButton, discardChangesButton, loginButton };
+        })();
+        return initPromise;
+    }
+    // Register commands immediately; they will lazy-initialize on first use.
+    const validateAPIKeyCommand = vscode.commands.registerCommand(constants_2.CMD_VALIDATE_APIKEY, async (apiKeyFromWebview) => {
+        const { storageManager, buttonLC } = await ensureInitialized();
+        await (0, validateApiKey_1.validateApiKey)(storageManager, buttonLC, context, apiKeyFromWebview);
+    });
+    const liveCheckCommand = vscode.commands.registerCommand(constants_2.CMD_SCAN, async () => {
+        const { storageManager, newWO } = await ensureInitialized();
+        await (0, executeLiveCheck_1.executeLiveCheck)(context, newWO, storageManager);
+    });
+    const writeOffCommand = vscode.commands.registerCommand(constants_2.CMD_WRITE_OFF, async (document, diagnostic) => {
+        const { storageManager, newWO } = await ensureInitialized();
+        const preselect = document && diagnostic
+            ? {
+                fileName: path.basename(document.fileName),
+                lineNumber: diagnostic.range.start.line + 1
             }
-            catch (error) {
-                logger.error('Failed to delete data', error);
-                vscode.window.showErrorMessage('Failed to delete data');
-            }
-        });
-        const showLogsCommand = vscode.commands.registerCommand('quick-clouds.showLogs', () => {
-            const logger = logger_2.QuickCloudsLogger.getInstance();
-            logger.show();
-        });
-        // Register URI handler for OAuth callback
-        const uriHandlerCommand = vscode.commands.registerCommand('quick-clouds.uriHandler', async (uri) => {
-            await (0, uriHandler_1.uriHandler)(uri, storageManager, context);
-        });
-        // Register commands
-        context.subscriptions.push(validateAPIKeyCommand, liveCheckCommand, writeOffCommand, myIssuesCommand, settingsCommand, applyChangesCommand, discardChangesCommand, deleteLCHistoryCommand, showLogsCommand, uriHandlerCommand);
-        // Register URI handler
-        context.subscriptions.push(vscode.window.registerUriHandler({
-            handleUri: async (uri) => {
-                await (0, uriHandler_1.uriHandler)(uri, storageManager, context);
-            }
-        }));
-        logger.info('Quick Clouds Extension commands registered successfully');
-
-        // Restore diagnostics from stored history so issues are shown on startup
+            : undefined;
+        WriteOffMenuPanel_1.WriteOffMenuPanel.render(context.extensionUri, context, exports.env, newWO, storageManager, preselect);
+    });
+    const myIssuesCommand = vscode.commands.registerCommand(constants_2.CMD_MY_ISSUES, async () => {
+        const { storageManager, myIssues } = await ensureInitialized();
+        MyIssuesPanel_1.MyIssuesPanel.render(context.extensionUri, context, exports.env, myIssues, storageManager);
+    });
+    const settingsCommand = vscode.commands.registerCommand(constants_2.CMD_SETTINGS, async () => {
+        const { storageManager } = await ensureInitialized();
+        SettingsPanel_2.SettingsPanel.show(context.extensionUri, storageManager, context);
+    });
+    const applyChangesCommand = vscode.commands.registerCommand(constants_2.CMD_APPLY_CHANGES, async () => {
+        const { storageManager, applyChangesButton, discardChangesButton } = await ensureInitialized();
+        await (0, generateCodeFix_1.generateCodeFix)(storageManager, applyChangesButton, discardChangesButton, context);
+    });
+    const discardChangesCommand = vscode.commands.registerCommand(constants_2.CMD_DISCARD_CHANGES, async () => {
+        const { storageManager, applyChangesButton, discardChangesButton } = await ensureInitialized();
+        await (0, generateCodeFix_1.generateCodeFix)(storageManager, applyChangesButton, discardChangesButton, context, true);
+    });
+    const deleteLCHistoryCommand = vscode.commands.registerCommand('quick-clouds.deleteLCHistory', async () => {
+        const { storageManager } = await ensureInitialized();
         try {
-            await (0, restoreDiagnostics_1.restoreDiagnosticsFromStorage)(context, storageManager);
+            await storageManager.deleteAllData();
+            exports.collection.clear();
+            try {
+                if (WriteOffMenuPanel_1.WriteOffMenuPanel.currentPanel && typeof WriteOffMenuPanel_1.WriteOffMenuPanel.currentPanel.refreshData === 'function') {
+                    await WriteOffMenuPanel_1.WriteOffMenuPanel.currentPanel.refreshData();
+                }
+            }
+            catch { }
+            vscode.window.showInformationMessage('Quick Clouds: All issues cleared');
         }
-        catch (e) {
-            logger.warn('Diagnostics restore on activation failed');
+        catch (error) {
+            logger.error('Failed to delete data', error);
+            vscode.window.showErrorMessage('Quick Clouds: Failed to delete data');
         }
-    }
-    catch (error) {
-        const logger = logger_2.QuickCloudsLogger.getInstance();
-        logger.error('Error during Quick Clouds Extension activation', error);
-        vscode.window.showErrorMessage('Failed to activate Quick Clouds Extension');
-    }
+    });
+    const showLogsCommand = vscode.commands.registerCommand('quick-clouds.showLogs', () => {
+        logger_2.QuickCloudsLogger.getInstance().show();
+    });
+    // Uri handler: activates on vscode:// callback and lazy-inits before handling
+    const disposableUriHandler = vscode.window.registerUriHandler({
+        handleUri: async (uri) => {
+            const { storageManager } = await ensureInitialized();
+            await (0, uriHandler_1.uriHandler)(uri, storageManager, context);
+        }
+    });
+    context.subscriptions.push(validateAPIKeyCommand, liveCheckCommand, writeOffCommand, myIssuesCommand, settingsCommand, applyChangesCommand, discardChangesCommand, deleteLCHistoryCommand, showLogsCommand, disposableUriHandler);
+    logger.info(`Quick Clouds: activate() completed (commands ready) in ${Date.now() - activateStart} ms`);
 }
 function deactivate() {
     // Clean up resources if needed

@@ -40,41 +40,40 @@ exports.getButtonLCInstance = getButtonLCInstance;
 exports.setButtonLCSpinning = setButtonLCSpinning;
 exports.updateButtonLCVisibility = updateButtonLCVisibility;
 const vscode = __importStar(require("vscode"));
-const constants_1 = require("../constants");
-const IsElementToAnalize_1 = __importDefault(require("./IsElementToAnalize"));
+const constants_2 = require("../constants");
+const IsElementToAnalize_2 = __importDefault(require("./IsElementToAnalize"));
 let buttonLCInstance = null;
-// Track if a scan is in progress to force-show the button
-let __qc_lc_inProgress = false;
+// Track if a scan run is currently in progress to control visibility
+let liveCheckInProgressForUI = false;
 function getButtonLCInstance() {
     if (!buttonLCInstance) {
         // Higher priority appears more to the left on the Right side
         // Set to 30 to keep order: Scan (30) -> Write-off (20) -> Quality Center (10)
         buttonLCInstance = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 30);
         buttonLCInstance.text = 'Scan';
-        buttonLCInstance.command = 'quick-clouds.scan';
+        buttonLCInstance.command = constants_2.CMD_SCAN;
     }
     return buttonLCInstance;
 }
 function setButtonLCSpinning(isSpinning, fileName) {
     const buttonLC = getButtonLCInstance();
     if (isSpinning) {
-        __qc_lc_inProgress = true;
+        liveCheckInProgressForUI = true;
         buttonLC.text = '$(loading~spin) Scan';
         buttonLC.tooltip = fileName ? `Scanning ${fileName}...` : 'Scan in progress...';
-        // Always show while spinning regardless of active editor or auth state
+        // Ensure the button is visible while spinning regardless of context
         buttonLC.show();
     }
     else {
-        __qc_lc_inProgress = false;
+        liveCheckInProgressForUI = false;
         buttonLC.text = 'Scan';
         buttonLC.tooltip = undefined;
     }
 }
 async function updateButtonLCVisibility(storageManager) {
-    var _a, _b;
     const buttonLC = getButtonLCInstance();
-    // If a run is in progress, keep the button visible
-    if (__qc_lc_inProgress) {
+    // If a Live Check is running, always show the button (spinner state managed elsewhere)
+    if (liveCheckInProgressForUI) {
         buttonLC.show();
         return;
     }
@@ -83,9 +82,9 @@ async function updateButtonLCVisibility(storageManager) {
     const isAuthenticated = await storageManager.getUserData('isAuthenticated');
     const activeEditor = vscode.window.activeTextEditor;
     const hasActiveEditor = !!activeEditor;
-    const activePath = ((_b = (_a = activeEditor === null || activeEditor === void 0 ? void 0 : activeEditor.document) === null || _a === void 0 ? void 0 : _a.uri) === null || _b === void 0 ? void 0 : _b.fsPath) || '';
-    const isSupportedFile = hasActiveEditor ? (0, IsElementToAnalize_1.default)(activePath) : false;
-    if (hasActiveEditor && isSupportedFile && ((authType === 'apiKey' && apiKeyStatus && apiKeyStatus.statusCode === constants_1.HTTP_STATUS_OK) ||
+    const activePath = activeEditor?.document?.uri?.fsPath || '';
+    const isSupportedFile = hasActiveEditor ? (0, IsElementToAnalize_2.default)(activePath) : false;
+    if (hasActiveEditor && isSupportedFile && ((authType === 'apiKey' && apiKeyStatus && apiKeyStatus.statusCode === constants_2.HTTP_STATUS_OK) ||
         (authType === 'credentials' && isAuthenticated))) {
         buttonLC.show();
     }
@@ -93,3 +92,4 @@ async function updateButtonLCVisibility(storageManager) {
         buttonLC.hide();
     }
 }
+//# sourceMappingURL=buttonLCSingleton.js.map

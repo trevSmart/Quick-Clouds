@@ -1,22 +1,22 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function (o, m, k, k2) {
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     var desc = Object.getOwnPropertyDescriptor(m, k);
     if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-        desc = { enumerable: true, get: function () { return m[k]; } };
+      desc = { enumerable: true, get: function() { return m[k]; } };
     }
     Object.defineProperty(o, k2, desc);
-}) : (function (o, m, k, k2) {
+}) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
 }));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function (o, v) {
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
     Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function (o, v) {
+}) : function(o, v) {
     o["default"] = v;
 });
 var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function (o) {
+    var ownKeys = function(o) {
         ownKeys = Object.getOwnPropertyNames || function (o) {
             var ar = [];
             for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
@@ -32,17 +32,20 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createStatusBarItems = createStatusBarItems;
 const vscode = __importStar(require("vscode"));
-const buttonLCSingleton_2 = require("./utilities/buttonLCSingleton");
+const buttonLCSingleton_2 = require("./buttonLCSingleton");
+const IsElementToAnalize_2 = __importDefault(require("./IsElementToAnalize"));
 const buttonQualityCenterSingleton_2 = require("./buttonQualityCenterSingleton");
 const constants_2 = require("../constants");
-const IsElementToAnalize_1 = require("./IsElementToAnalize");
 function createStatusBarItems(apiKeyStatus, authType, isAuthenticated = false, storageManager) {
     const buttonLC = (0, buttonLCSingleton_2.getButtonLCInstance)();
     const activePath = vscode.window.activeTextEditor?.document?.uri?.fsPath || '';
-    const isSupportedFile = activePath ? (0, IsElementToAnalize_1.default)(activePath) : false;
+    const isSupportedFile = activePath ? (0, IsElementToAnalize_2.default)(activePath) : false;
     const canShowByAuth = (authType === 'apiKey' && apiKeyStatus && apiKeyStatus.statusCode === constants_2.HTTP_STATUS_OK) ||
         (authType === 'credentials' && isAuthenticated === true);
     canShowByAuth && isSupportedFile ? buttonLC.show() : buttonLC.hide();
@@ -72,11 +75,9 @@ function createStatusBarItems(apiKeyStatus, authType, isAuthenticated = false, s
             : 'API Key not valid. Click to validate or update your API Key.';
     }
     const loginButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
-    // Align label with TS source and branding
     loginButton.text = '$(account) Quick Clouds settings';
     loginButton.command = 'quick-clouds.settings';
     loginButton.tooltip = tooltip;
-    // Respect `QuickClouds.showSettingsButton` setting
     const showSettingsButton = vscode.workspace
         .getConfiguration('QuickClouds')
         .get('showSettingsButton', true);

@@ -66,6 +66,54 @@ class WriteOffMenuPanel {
         logger.info('WriteOffMenuPanel: Message listener set up successfully');
     }
     /**
+     * Rebuilds the issues payload from storage and sends it to the webview.
+     * Useful when external actions (like clearing history) require the UI to refresh.
+     */
+    async refreshData() {
+        const logger = logger_1.QuickCloudsLogger.getInstance();
+        try {
+            logger.info('WriteOffMenuPanel: Refreshing data after external change');
+            let issues = [];
+            try {
+                const history = await this._storageManager.getLivecheckHistory();
+                let statusMap = {};
+                try {
+                    statusMap = (await this._storageManager.getWriteOffStatusMap()) || {};
+                }
+                catch (_) { }
+                if (Array.isArray(history)) {
+                    for (const entry of history) {
+                        const path = require('path');
+                        const fileName = entry.path ? path.basename(entry.path) : undefined;
+                        for (const issue of entry.issues || []) {
+                            const key1 = issue && issue.id ? String(issue.id) : undefined;
+                            const key2 = issue && issue.uuid ? String(issue.uuid) : undefined;
+                            const localStatus = (key1 && statusMap[key1]) || (key2 && statusMap[key2]) || undefined;
+                            issues.push({
+                                ...issue,
+                                historyId: entry.id,
+                                historyPath: entry.path,
+                                fileName: issue.fileName || fileName,
+                                localWriteOffStatus: localStatus
+                            });
+                        }
+                    }
+                }
+            }
+            catch (e) {
+                logger.warn('WriteOffMenuPanel: refreshData getLivecheckHistory failed: ' + (e?.message));
+            }
+            const woData = { issues };
+            if (this._preselectIssue) {
+                woData.preselect = this._preselectIssue;
+            }
+            WriteOffMenuPanel.currentPanel?._panel.webview.postMessage({ command: 'WOdata', data: JSON.stringify(woData) });
+        }
+        catch (e) {
+            logger.error('WriteOffMenuPanel: refreshData failed: ' + (e?.message));
+        }
+    }
+    /**
      * Renders the current webview panel if it exists otherwise a new webview panel
      * will be created and displayed.
      *
@@ -84,16 +132,16 @@ class WriteOffMenuPanel {
             // If a webview panel does not already exist create and show a new one
             const panel = vscode_1.window.createWebviewPanel(
             // Panel view type
-            "showWriteOffMenu",
+            "showWriteOffMenu", 
             // Panel title
-            "Request write-off",
+            "Request write-off", 
             // The editor column the panel should be displayed in
-            vscode_1.ViewColumn.One,
+            vscode_1.ViewColumn.One, 
             // Extra panel configurations
             {
                 // Enable JavaScript in the webview
                 enableScripts: true,
-                // Restrict local resources to the webview build folder and media/resources
+                // Restrict local resources to the webview build folder and media
                 localResourceRoots: [
                     vscode_1.Uri.joinPath(extensionUri, 'webview-ui', 'build'),
                     vscode_1.Uri.joinPath(extensionUri, 'media'),
@@ -154,22 +202,24 @@ class WriteOffMenuPanel {
         }
         // Helper to convert an attribute value that points to a build asset into a webview URI
         const toWebviewUri = (rawPath) => {
+            // Normalize variations like ./static/..., /static/..., or static/...
             const clean = String(rawPath).replace(/^\.?\/?/, '');
             const parts = clean.split('/');
             return String((0, getUri_1.getUri)(webview, extensionUri, ['webview-ui', 'build', ...parts]));
         };
-        // Replace href/src pointing to ./static/... , /static/... or static/... and /favicon.ico
-        indexHtml = indexHtml
-            .replace(/\b(href|src)=["'](?:\.\/|\/)?static\/[^"]+["']/g, (m) => {
-            const valueMatch = m.match(/=["']([^"']+)["']/);
+        // Rewrite all href/src that reference build assets to absolute webview URIs
+        // Matches src|href="(./)?static/..." or "static/..." or "/static/..."
+        indexHtml = indexHtml.replace(/\b(href|src)="(\.\/)?static\/[^"]+"/g, (match) => {
+            const valueMatch = match.match(/="([^"]+)"/);
             if (!valueMatch) {
-                return m;
+                return match;
             }
             const original = valueMatch[1];
             const uri = toWebviewUri(original.replace(/^\//, ''));
-            return m.replace(original, uri);
-        })
-            .replace(/href="\/favicon\.ico"/g, () => {
+            return match.replace(original, uri);
+        });
+        // Rewrite favicon if present
+        indexHtml = indexHtml.replace(/href="\/favicon\.ico"/g, () => {
             const favPath = path.join(buildDirFsPath, 'favicon.ico');
             if (fs.existsSync(favPath)) {
                 const favUri = (0, getUri_1.getUri)(webview, extensionUri, ['webview-ui', 'build', 'favicon.ico']);
@@ -178,15 +228,18 @@ class WriteOffMenuPanel {
             // Drop favicon reference if not packaged
             return 'href=""';
         });
-        // Inject CSP and a bridge script to route window.alert to VS Code notifications.
-        // Also include Codicons stylesheet from packaged resources.
+        // Inject CSP, a base tag to ensure any other relative paths resolve correctly
+        // and a bridge script to route window.alert to VS Code notifications
         const bridgeUri = (0, getUri_1.getUri)(webview, extensionUri, ['media', 'webview-bridge.js']);
-        const cspMeta = `<meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; img-src ${webview.cspSource} data:; script-src ${webview.cspSource} 'unsafe-eval' 'unsafe-inline'; style-src ${webview.cspSource} 'unsafe-inline'; font-src ${webview.cspSource}; connect-src ${webview.cspSource}; frame-ancestors 'none'; base-uri 'self';\">`;
+        // Load Codicons CSS from packaged resources directory
         const codiconCssUri = (0, getUri_1.getUri)(webview, extensionUri, ['resources', 'codicon.css']);
+        // Resolve asset URIs for icons we want to use in the webview
         const apexIconUri = (0, getUri_1.getUri)(webview, extensionUri, ['resources', 'apex-icon.webp']);
         const jsIconUri = (0, getUri_1.getUri)(webview, extensionUri, ['resources', 'javascript-icon.webp']);
+        // Note: do not set a <base> tag; it violates base-uri 'self' and breaks resource loading
+        const cspMeta = `<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src ${webview.cspSource} data:; script-src ${webview.cspSource} 'unsafe-eval' 'unsafe-inline'; style-src ${webview.cspSource} 'unsafe-inline'; font-src ${webview.cspSource}; connect-src ${webview.cspSource}; frame-ancestors 'none'; base-uri 'self';">`;
         const assetsBoot = `<script>window.qcAssets = { apexIcon: '${apexIconUri}', jsIcon: '${jsIconUri}' };</script>`;
-        indexHtml = indexHtml.replace('<head>', `<head>${cspMeta}<link rel=\"stylesheet\" href=\"${codiconCssUri}\">${assetsBoot}<script src=\"${bridgeUri}\"></script>`);
+        indexHtml = indexHtml.replace('<head>', `<head>${cspMeta}<link rel="stylesheet" href="${codiconCssUri}">${assetsBoot}<script src="${bridgeUri}"></script>`);
         // Log the resolved asset URIs for diagnostics
         try {
             // Use safer regex patterns to avoid ReDoS vulnerabilities
@@ -221,7 +274,6 @@ class WriteOffMenuPanel {
             logger.info('WriteOffMenuPanel: Received message: ' + JSON.stringify(message));
             const command = message.command;
             const data = message.data;
-
             if (command === 'webviewError') {
                 const src = message && message.source ? ` (${message.source})` : '';
                 const msg = message && message.message ? String(message.message) : 'Unknown webview error';
@@ -238,22 +290,6 @@ class WriteOffMenuPanel {
                 let issues = [];
                 try {
                     const history = yield this._storageManager.getLivecheckHistory();
-                    // Build a map of latest timestamp per file path
-                    const latestByPath = {};
-                    try {
-                        if (Array.isArray(history)) {
-                            for (const entry of history) {
-                                const p = entry && entry.path ? String(entry.path) : undefined;
-                                const ts = entry && entry.timestamp ? String(entry.timestamp) : undefined;
-                                if (p && ts) {
-                                    if (!latestByPath[p] || String(latestByPath[p]) < ts) {
-                                        latestByPath[p] = ts;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    catch (_) { }
                     let statusMap = {};
                     try {
                         statusMap = (yield this._storageManager.getWriteOffStatusMap()) || {};
@@ -267,8 +303,7 @@ class WriteOffMenuPanel {
                                 const key1 = issue && issue.id ? String(issue.id) : undefined;
                                 const key2 = issue && issue.uuid ? String(issue.uuid) : undefined;
                                 const localStatus = (key1 && statusMap[key1]) || (key2 && statusMap[key2]) || undefined;
-                                const lastTs = entry && entry.path ? latestByPath[entry.path] : undefined;
-                                issues.push(Object.assign(Object.assign({}, issue), { historyId: entry.id, historyPath: entry.path, fileName: issue.fileName || fileName, localWriteOffStatus: localStatus, lastLiveCheckDate: lastTs }));
+                                issues.push(Object.assign(Object.assign({}, issue), { historyId: entry.id, historyPath: entry.path, fileName: issue.fileName || fileName, localWriteOffStatus: localStatus }));
                             }
                         }
                     }
@@ -277,15 +312,7 @@ class WriteOffMenuPanel {
                     logger.warn('WriteOffMenuPanel: getLivecheckHistory failed: ' + (e === null || e === void 0 ? void 0 : e.message));
                 }
                 logger.info('WriteOffMenuPanel: Total issues retrieved: ' + issues.length);
-                // Filter out non-actionable informational entries before sending to webview
-                const realIssues = issues.filter((it) => {
-                    const sev = (it && it.severity ? String(it.severity) : '').toLowerCase();
-                    return sev === 'high' || sev === 'medium' || sev === 'low' || sev === 'warning';
-                });
-                if (realIssues.length !== issues.length) {
-                    logger.info('WriteOffMenuPanel: Filtered informational entries. Real issues: ' + realIssues.length);
-                }
-                const woData = { issues: realIssues };
+                const woData = { issues };
                 if (this._preselectIssue) {
                     woData.preselect = this._preselectIssue;
                 }
@@ -314,11 +341,12 @@ class WriteOffMenuPanel {
                 catch (_) { }
                 try {
                     const result = yield (0, RequestWriteOff_1.default)(data, env, this._storageManager, this.context);
+                    // Notify the webview so it can reset form and unselect the issue
                     const payload = {
                         id: (data === null || data === void 0 ? void 0 : data.id) || (data === null || data === void 0 ? void 0 : data.uuid),
-                        fileName: (data === null || data === void 0 ? void 0 : data.fileName),
-                        lineNumber: (data === null || data === void 0 ? void 0 : data.lineNumber),
-                        elementName: (data === null || data === void 0 ? void 0 : data.elementName),
+                        fileName: data === null || data === void 0 ? void 0 : data.fileName,
+                        lineNumber: data === null || data === void 0 ? void 0 : data.lineNumber,
+                        elementName: data === null || data === void 0 ? void 0 : data.elementName,
                         status: 'REQUESTED',
                         result
                     };
@@ -340,7 +368,7 @@ class WriteOffMenuPanel {
                         try {
                             const history = yield this._storageManager.getLivecheckHistory();
                             if (Array.isArray(history)) {
-                                const entry = history.find((h) => String((h === null || h === void 0 ? void 0 : h.id)) === String(historyId));
+                                const entry = history.find((h) => String(h === null || h === void 0 ? void 0 : h.id) === String(historyId));
                                 if (entry && entry.path) {
                                     targetPath = entry.path;
                                 }
@@ -425,69 +453,4 @@ class WriteOffMenuPanel {
     }
 }
 exports.WriteOffMenuPanel = WriteOffMenuPanel;
-// Hot‑patch: add refreshData so other modules can trigger a data reload on the open panel
-WriteOffMenuPanel.prototype.refreshData = function () {
-    return __awaiter(this, void 0, void 0, function* () {
-        const logger = logger_1.QuickCloudsLogger.getInstance();
-        try {
-            logger.info('WriteOffMenuPanel: refreshData invoked (hot‑patch)');
-            let issues = [];
-            try {
-                const history = yield this._storageManager.getLivecheckHistory();
-                // Build a map of latest timestamp per file path
-                const latestByPath = {};
-                try {
-                    if (Array.isArray(history)) {
-                        for (const entry of history) {
-                            const p = entry && entry.path ? String(entry.path) : undefined;
-                            const ts = entry && entry.timestamp ? String(entry.timestamp) : undefined;
-                            if (p && ts) {
-                                if (!latestByPath[p] || String(latestByPath[p]) < ts) {
-                                    latestByPath[p] = ts;
-                                }
-                            }
-                        }
-                    }
-                }
-                catch (_) { }
-                let statusMap = {};
-                try {
-                    statusMap = (yield this._storageManager.getWriteOffStatusMap()) || {};
-                }
-                catch (_) { }
-                if (Array.isArray(history)) {
-                    for (const entry of history) {
-                        const path = require('path');
-                        const fileName = entry.path ? path.basename(entry.path) : undefined;
-                        for (const issue of entry.issues || []) {
-                            const key1 = issue && issue.id ? String(issue.id) : undefined;
-                            const key2 = issue && issue.uuid ? String(issue.uuid) : undefined;
-                            const localStatus = (key1 && statusMap[key1]) || (key2 && statusMap[key2]) || undefined;
-                            const lastTs = entry && entry.path ? latestByPath[entry.path] : undefined;
-                            issues.push(Object.assign(Object.assign({}, issue), { historyId: entry.id, historyPath: entry.path, fileName: issue.fileName || fileName, localWriteOffStatus: localStatus, lastLiveCheckDate: lastTs }));
-                        }
-                    }
-                }
-            }
-            catch (e) {
-                logger.warn('WriteOffMenuPanel: refreshData getLivecheckHistory failed: ' + (e === null || e === void 0 ? void 0 : e.message));
-            }
-            const woData = { issues: issues };
-            if (this._preselectIssue) {
-                woData.preselect = this._preselectIssue;
-            }
-            const payload = { command: 'WOdata', data: JSON.stringify(woData) };
-            logger.info('WriteOffMenuPanel: refreshData sending WOdata (' + issues.length + ' issues)');
-            try {
-                this._panel.webview.postMessage(payload);
-            }
-            catch (e) {
-                logger.warn('WriteOffMenuPanel: refreshData postMessage failed: ' + (e === null || e === void 0 ? void 0 : e.message));
-            }
-        }
-        catch (e) {
-            logger.error('WriteOffMenuPanel: refreshData failed: ' + (e === null || e === void 0 ? void 0 : e.message));
-        }
-    });
-};
 //# sourceMappingURL=WriteOffMenuPanel.js.map

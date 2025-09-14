@@ -35,6 +35,66 @@ Quick Clouds for Salesforce is a customized version of the Live Check Quality fo
 
 **Purpose**: This is the original extension that was forked to create Quick Clouds. It can be used as a reference for comparing original implementation with Quick Clouds modifications or for understanding the base functionality.
 
+## Extension Activation
+
+### When Does Quick Clouds Activate?
+
+Quick Clouds s'activa automàticament en les següents situacions:
+
+**Per Comandes:**
+- `quick-clouds.scan` - Quan s'executa l'anàlisi de codi
+- `quick-clouds.myIssues` - Quan s'obre el Quality Center
+- `quick-clouds.writeoff` - Quan es sol·licita un write-off
+- `quick-clouds.settings` - Quan s'obren els ajustos
+- `quick-clouds.validateAPIKey` - Quan es valida la clau API
+- `quick-clouds.showLogs` - Quan es mostren els logs
+
+**Per Tipus de Fitxer:**
+- `apex` - Fitxers Apex (.cls, .trigger)
+- `javascript` - Fitxers JavaScript (.js)
+- `typescript` - Fitxers TypeScript (.ts)
+- `html` - Fitxers HTML (.html)
+- `css` - Fitxers CSS (.css)
+- `xml` - Fitxers XML (.xml)
+
+**Per Contingut del Workspace:**
+- Fitxers Salesforce: `**/*.cls`, `**/*.trigger`, `**/*.component`, `**/*.page`
+- Fitxers web: `**/*.js`, `**/*.ts`, `**/*.html`, `**/*.css`, `**/*.xml`
+
+**Per URI Handler:**
+- `onUri` - Quan es rep una URI de callback (OAuth, etc.)
+
+### Activation Events Configuration
+
+L'extensió utilitza múltiples `activationEvents` per assegurar que s'activi quan sigui necessari:
+
+```json
+"activationEvents": [
+    "onUri",
+    "onCommand:quick-clouds.scan",
+    "onCommand:quick-clouds.myIssues",
+    "onCommand:quick-clouds.writeoff",
+    "onCommand:quick-clouds.settings",
+    "onCommand:quick-clouds.validateAPIKey",
+    "onCommand:quick-clouds.showLogs",
+    "onLanguage:apex",
+    "onLanguage:javascript",
+    "onLanguage:typescript",
+    "onLanguage:html",
+    "onLanguage:css",
+    "onLanguage:xml",
+    "workspaceContains:**/*.cls",
+    "workspaceContains:**/*.trigger",
+    "workspaceContains:**/*.component",
+    "workspaceContains:**/*.page",
+    "workspaceContains:**/*.js",
+    "workspaceContains:**/*.ts",
+    "workspaceContains:**/*.html",
+    "workspaceContains:**/*.css",
+    "workspaceContains:**/*.xml"
+]
+```
+
 ## Architecture & Structure
 
 ### Core Components

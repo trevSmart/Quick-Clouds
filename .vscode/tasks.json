@@ -1,36 +1,67 @@
 {
-	"version": "2.0.0",
-	"tasks": [
-		{
-			"label": "Lint",
-			"type": "npm",
-			"script": "lint:fix",
-			"group": "build",
-			"presentation": {
-				"panel": "shared",
-				"revealProblems": "onProblem",
-				"showReuseMessage": false,
-				"echo": true,
-				"clear": true,
-				"close": true
-			},
-			"problemMatcher": "$eslint-stylish"
-		},
-		{
-			"type": "npm",
-			"script": "package",
-			"problemMatcher": [],
-			"label": "Build",
-			"detail": "Build and install VSIX",
-			"group": {
-				"kind": "build",
-				"isDefault": true
-			},
-			"presentation": {
-				"showReuseMessage": false,
-				"panel": "shared",
-				"reveal": "always"
-			}
-		}
-	]
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "npm",
+      "script": "compile",
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "silent",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "problemMatcher": ["$tsc"],
+      "label": "npm: compile",
+      "detail": "Compile TypeScript files"
+    },
+    {
+      "type": "npm",
+      "script": "build:webview",
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "silent",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "label": "npm: build:webview",
+      "detail": "Build React webview UI"
+    },
+    {
+      "type": "npm",
+      "script": "package",
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "label": "npm: package",
+      "detail": "Package extension as VSIX"
+    },
+    {
+      "type": "shell",
+      "command": "npm run compile && npm run build:webview",
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "silent",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "problemMatcher": ["$tsc"],
+      "label": "Build All",
+      "detail": "Compile TypeScript and build webview"
+    }
+  ]
 }
