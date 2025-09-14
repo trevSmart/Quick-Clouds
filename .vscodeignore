@@ -15,6 +15,10 @@ tsconfig.json
 out/**/*.map
 out/**/*.d.ts
 
+# Test artifacts
+test-results/**
+test/**
+
 # Temporary files
 tmp/**
 *.apex
