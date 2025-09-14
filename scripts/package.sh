@@ -5,6 +5,14 @@
 
 set -e  # Exit on any error
 
+# Ensure required paths exist
+mkdir -p dist
+if [ ! -f out/extension.js ]; then
+    echo "❌ Missing extension entry point: out/extension.js"
+    echo "   Run the TypeScript build before packaging."
+    exit 1
+fi
+
 echo "🚀 Starting Quick Clouds packaging process..."
 
 # Step 1: Build webview
@@ -39,9 +47,13 @@ cd ..
 echo "📦 Packaging extension..."
 NODE_OPTIONS="--require ./scripts/vsce-file-polyfill.js" vsce package --out "dist/quick-clouds-v$VERSION.vsix"
 
-# Step 6: Install extension
-echo "🔧 Installing extension..."
-code-insiders --install-extension "dist/quick-clouds-v$VERSION.vsix" --force
+# Step 6: Install extension (optional)
+if command -v code-insiders >/dev/null 2>&1; then
+    echo "🔧 Installing extension..."
+    code-insiders --install-extension "dist/quick-clouds-v$VERSION.vsix" --force
+else
+    echo "⚠️ code-insiders not found, skipping installation"
+fi
 
 echo "✅ Package process completed successfully!"
 echo "📁 Extension file: dist/quick-clouds-v$VERSION.vsix"
