@@ -45,7 +45,7 @@ cd ..
 
 # Step 5: Package extension
 echo "📦 Packaging extension..."
-NODE_OPTIONS="--require ./scripts/vsce-file-polyfill.js" vsce package --out "dist/quick-clouds-v$VERSION.vsix"
+NODE_OPTIONS="--require ./scripts/vsce-file-polyfill.js" vsce package --out "tmp/quick-clouds-v$VERSION.vsix"
 
 # Step 6: Install extension (optional)
 if command -v code-insiders >/dev/null 2>&1; then
