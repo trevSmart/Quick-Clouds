@@ -36,8 +36,12 @@ const buttonLCSingleton_1 = require("./utilities/buttonLCSingleton");
 function executeLiveCheck(context, newWO, storageManager) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
+            // Get current file name for tooltip
+            const activeEditor = vscode.window.activeTextEditor;
+            const fileName = activeEditor ? path.basename(activeEditor.document.fileName) : undefined;
+
             // Set button to spinning state
-            (0, buttonLCSingleton_1.setButtonLCSpinning)(true);
+            (0, buttonLCSingleton_1.setButtonLCSpinning)(true, fileName);
 
             const { response, documentPath, qualityGatesPassed } = yield (0, LiveCheck_1.runLivecheck)(context, storageManager);
 

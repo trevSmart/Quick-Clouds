@@ -1,0 +1,36 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Lint",
+			"type": "npm",
+			"script": "lint",
+			"group": "build",
+			"presentation": {
+				"panel": "shared",
+				"revealProblems": "onProblem",
+				"showReuseMessage": false,
+				"echo": true,
+				"clear": true,
+				"close": true
+			},
+			"problemMatcher": "$eslint-stylish"
+		},
+		{
+			"type": "npm",
+			"script": "package",
+			"problemMatcher": [],
+			"label": "Build",
+			"detail": "Build and install VSIX",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"presentation": {
+				"showReuseMessage": false,
+				"panel": "shared",
+				"reveal": "always"
+			}
+		}
+	]
+}

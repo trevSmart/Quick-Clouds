@@ -11,7 +11,6 @@ build/
 webview-ui/build/
 
 # VS Code
-.vscode/
 *.vsix
 
 # OS generated files

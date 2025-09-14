@@ -9,8 +9,12 @@ import { setButtonLCSpinning } from './buttonLCSingleton';
 
 export async function executeLiveCheck(context: vscode.ExtensionContext, newWO: vscode.StatusBarItem, storageManager: any): Promise<void> {
     try {
+        // Get current file name for tooltip
+        const activeEditor = vscode.window.activeTextEditor;
+        const fileName = activeEditor ? path.basename(activeEditor.document.fileName) : undefined;
+
         // Set button to spinning state
-        setButtonLCSpinning(true);
+        setButtonLCSpinning(true, fileName);
 
         const { response, documentPath, qualityGatesPassed } = await runLivecheck(context, storageManager);
 

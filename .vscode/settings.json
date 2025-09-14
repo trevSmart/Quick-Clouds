@@ -1,0 +1,42 @@
+{
+  "typescript.preferences.includePackageJsonAutoImports": "off",
+  "typescript.suggest.autoImports": false,
+  "typescript.validate.enable": false,
+  "javascript.validate.enable": false,
+  "vitest.enable": true,
+  "vitest.commandLine": "npm run test:run",
+  "vitest.rootConfig": "./vitest.config.ts",
+  "actionButtons": {
+    "commands": [
+			{
+				"name": "$(terminal)",
+				"useVsCodeApi": true,
+				"command": "workbench.action.terminal.toggleTerminal",
+				"color": "#e3e3e3"
+			},
+      {
+				"name": ".",
+				"useVsCodeApi": true,
+				// "command": "sf.retrieve.current.source.file",
+				"color": "#00000000" // slightly darker and more blueish green
+			},
+			{
+				"name": "$(lightbulb-autofix) Lint",
+				"useVsCodeApi": true,
+				"command": "workbench.action.tasks.runTask",
+				"args": [
+					"Lint"
+				],
+				"color": "#6D81fA"
+			},
+      {
+        "name": "$(package) Build",
+        "useVsCodeApi": true,
+        "command": "workbench.action.tasks.build",
+        "color": "#cc8888"
+    }
+    ],
+    "defaultColor": "white",
+    "reloadButton": null
+  }
+}
