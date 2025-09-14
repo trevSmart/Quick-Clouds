@@ -171,6 +171,9 @@ async function activate(context) {
         }
     });
     context.subscriptions.push(validateAPIKeyCommand, liveCheckCommand, writeOffCommand, myIssuesCommand, settingsCommand, applyChangesCommand, discardChangesCommand, deleteLCHistoryCommand, showLogsCommand, disposableUriHandler);
+    ensureInitialized().catch((err) => {
+        logger.error('Quick Clouds: initialization failed', err);
+    });
     logger.info(`Quick Clouds: activate() completed (commands ready) in ${Date.now() - activateStart} ms`);
 }
 function deactivate() {

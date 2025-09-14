@@ -183,6 +183,11 @@ export async function activate(context: vscode.ExtensionContext) {
         disposableUriHandler
     );
 
+    // Initialize on activation so status bar items appear without invoking a command
+    ensureInitialized().catch((err) => {
+        logger.error('Quick Clouds: initialization failed', err);
+    });
+
     logger.info(`Quick Clouds: activate() completed (commands ready) in ${Date.now() - activateStart} ms`);
 }
 
