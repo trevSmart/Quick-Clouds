@@ -96,10 +96,10 @@ export async function activate(context: vscode.ExtensionContext) {
                     }
                 } catch (_) { }
 
-                vscode.window.showInformationMessage('All issues cleared');
+                vscode.window.showInformationMessage('Quick Clouds: All issues cleared');
             } catch (error) {
                 logger.error('Failed to delete data', error);
-                vscode.window.showErrorMessage('Failed to delete data');
+                vscode.window.showErrorMessage('Quick Clouds: Failed to delete data');
             }
         });
 

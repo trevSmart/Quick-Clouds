@@ -137,14 +137,14 @@ function executeLiveCheck(context, newWO, storageManager) {
                     vscode.window.showInformationMessage('Live check PASSED');
                 } else if (counts.high === 0) {
                     const plural = totalIssues === 1 ? 'issue' : 'issues';
-                    const warnMsg = `Live check PASSED with ${totalIssues} ${plural} found${summarySuffix}`;
+                    const warnMsg = `Live check PASSED with ${totalIssues} ${plural} ${summarySuffix}`;
                     vscode.window.showWarningMessage(warnMsg);
                 } else {
-                    const message = `Live check FAILED with ${totalIssues} ${totalIssues === 1 ? 'issue' : 'issues'} found (${summary})`;
+                    const message = `Live check FAILED with ${totalIssues} ${totalIssues === 1 ? 'issue' : 'issues'} (${summary})`;
                     vscode.window.showErrorMessage(message);
                 }
             } else if (hasValidResult) {
-                const message = `Live check FAILED with ${totalIssues} ${totalIssues === 1 ? 'issue' : 'issues'} found (${summary})`;
+                const message = `Live check FAILED with ${totalIssues} ${totalIssues === 1 ? 'issue' : 'issues'} (${summary})`;
                 if (counts.high > 0) {
                     vscode.window.showErrorMessage(message);
                 } else if (totalIssues > 0) {
@@ -157,7 +157,7 @@ function executeLiveCheck(context, newWO, storageManager) {
             logger.error('ExecuteLiveCheck failed:', error);
             // Enhanced error message
             const errorMessage = error.message || error.toString();
-            const detailedMessage = `LiveCheck execution failed: ${errorMessage}`;
+            const detailedMessage = `Quick Clouds: LiveCheck execution failed: ${errorMessage}`;
             vscode.window.showInformationMessage(detailedMessage);
             logger.error('LiveCheck execution error details:', {
                 message: error.message,

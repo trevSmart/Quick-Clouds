@@ -470,7 +470,9 @@ function App() {
     // Render status badge with a custom tooltip for APPROVED
     const renderStatusBadge = (issue) => {
         const status = getLocalStatus(issue);
-        if (!(status === 'REQUESTED' || status === 'APPROVED')) return null;
+        if (!(status === 'REQUESTED' || status === 'APPROVED')) {
+            return null;
+        }
 
         const w = issue?.writeOff || {};
         const validator = w?.validator;
@@ -478,7 +480,11 @@ function App() {
         const expirationDate = w?.expirationDate;
         let expirationText = '';
         if (expirationDate) {
-            try { expirationText = formatShortDateTime(expirationDate); } catch (_) { expirationText = String(expirationDate); }
+            try {
+                expirationText = formatShortDateTime(expirationDate);
+            } catch (_) {
+                expirationText = String(expirationDate);
+            }
         }
 
         // New: always show these two lines, with fallbacks
@@ -614,13 +620,19 @@ function App() {
                                             {(() => {
                                                 // Determine latest check timestamp among issues in this group
                                                 const isoList = (fileIssues || []).map(it => it.lastLiveCheckDate).filter(Boolean);
-                                                if (isoList.length === 0) return null;
+                                                if (isoList.length === 0) {
+                                                    return null;
+                                                }
                                                 let latestIso = isoList[0];
                                                 for (const iso of isoList) {
-                                                    if (String(iso) > String(latestIso)) latestIso = iso;
+                                                    if (String(iso) > String(latestIso)) {
+                                                        latestIso = iso;
+                                                    }
                                                 }
                                                 let local = '';
-                                                try { local = formatShortDateTime(latestIso); } catch(_) {}
+                                                try {
+                                                    local = formatShortDateTime(latestIso);
+                                                } catch(_) {}
                                                 return local ? (
                                                     <span className="last-check" title="Last Live Check">{local}</span>
                                                 ) : null;
@@ -695,13 +707,19 @@ function App() {
                                             <span className="issues-count">{fileIssues.length} {fileIssues.length === 1 ? 'issue' : 'issues'}</span>
                                             {(() => {
                                                 const isoList = (fileIssues || []).map(it => it.lastLiveCheckDate).filter(Boolean);
-                                                if (isoList.length === 0) return null;
+                                                if (isoList.length === 0) {
+                                                    return null;
+                                                }
                                                 let latestIso = isoList[0];
                                                 for (const iso of isoList) {
-                                                    if (String(iso) > String(latestIso)) latestIso = iso;
+                                                    if (String(iso) > String(latestIso)) {
+                                                        latestIso = iso;
+                                                    }
                                                 }
                                                 let local = '';
-                                                try { local = formatShortDateTime(latestIso); } catch(_) {}
+                                                try {
+                                                    local = formatShortDateTime(latestIso);
+                                                } catch(_) {}
                                                 return local ? (
                                                     <span className="last-check" title="Last Live Check">{local}</span>
                                                 ) : null;
