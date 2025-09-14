@@ -245,6 +245,27 @@ function App() {
     };
     const isExpanded = (fileName) => (expandedGroups[fileName] ?? true);
 
+    // Position tooltips outside overflow-clipped containers
+    useEffect(() => {
+        const wrappers = document.querySelectorAll('.qc-tooltip-wrap, .status-badge-wrap');
+        wrappers.forEach(wrap => {
+            if (wrap.dataset.tooltipBound) {
+                return;
+            }
+            const tooltip = wrap.querySelector('.qc-tooltip');
+            if (!tooltip) {
+                return;
+            }
+            const updatePosition = () => {
+                const rect = wrap.getBoundingClientRect();
+                tooltip.style.top = `${rect.bottom + 8}px`;
+                tooltip.style.left = `${rect.left + rect.width / 2}px`;
+            };
+            wrap.addEventListener('mouseenter', updatePosition);
+            wrap.dataset.tooltipBound = 'true';
+        });
+    }, [issues, expandedGroups, viewMode]);
+
     // Calculate severity statistics
     const getSeverityStats = (issuesList) => {
         const stats = {
@@ -814,12 +835,76 @@ function App() {
                                                     try {
                                                         local = formatLastChecked(latestIso).replace('Last check:', 'Last checked:');
                                                     } catch(_) {}
+
+                                                    // Get unique documentation URLs from issues in this file
+                                                    const docUrls = [...new Set((fileIssues || [])
+                                                        .filter(it => it.documentationURL && it.documentationURL.trim())
+                                                        .map(it => ({ url: it.documentationURL, rule: it.issueType }))
+                                                    )];
+
+                                                    // Get unique impact areas from issues in this file
+                                                    const impactAreas = [...new Set((fileIssues || [])
+                                                        .filter(it => it.impactArea && it.impactArea.trim())
+                                                        .map(it => it.impactArea)
+                                                    )];
+
+                                                    // Get unique issue IDs from issues in this file
+                                                    const issueIds = [...new Set((fileIssues || [])
+                                                        .filter(it => it.uuid && it.uuid.trim())
+                                                        .map(it => it.uuid)
+                                                    )];
+
+                                                    // Function to normalize capitalization to sentence case
+                                                    const toSentenceCase = (str) => {
+                                                        if (!str) {
+                                                            return '';
+                                                        }
+                                                        return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+                                                    };
+
                                                     return local ? (
                                                         <span className="qc-tooltip-wrap" aria-label="Show file scan details">
                                                             <span className="codicon codicon-info info-icon" aria-hidden="true"></span>
                                                             <div className="qc-tooltip" role="tooltip" aria-label="File scan details">
                                                                 <div className="arrow"></div>
                                                                 <div className="row">{local}</div>
+                                                                {issueIds.length > 0 && (
+                                                                    <div className="row" style={{ marginTop: '8px', borderTop: '1px solid var(--vscode-panel-border)', paddingTop: '8px' }}>
+                                                                        <div style={{ fontSize: '11px', color: 'var(--vscode-descriptionForeground)', marginBottom: '4px' }}>
+                                                                            Issue id: {issueIds.join(', ')}
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+                                                                {impactAreas.length > 0 && (
+                                                                    <div className="row" style={{ marginTop: '8px', borderTop: '1px solid var(--vscode-panel-border)', paddingTop: '8px' }}>
+                                                                        <div style={{ fontSize: '11px', color: 'var(--vscode-descriptionForeground)', marginBottom: '4px' }}>
+                                                                            Area: {impactAreas.map(area => toSentenceCase(area)).join(', ')}
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+                                                                {docUrls.length > 0 && (
+                                                                    <div className="row" style={{ marginTop: '8px', borderTop: '1px solid var(--vscode-panel-border)', paddingTop: '8px' }}>
+                                                                        <div style={{ fontSize: '11px', color: 'var(--vscode-descriptionForeground)', marginBottom: '4px' }}>Rule documentation:</div>
+                                                                        {docUrls.map((doc, index) => (
+                                                                            <div key={index} style={{ marginBottom: '2px' }}>
+                                                                                <a
+                                                                                    href={doc.url}
+                                                                                    target="_blank"
+                                                                                    rel="noopener noreferrer"
+                                                                                    style={{
+                                                                                        color: 'var(--vscode-textLink-foreground)',
+                                                                                        textDecoration: 'none',
+                                                                                        fontSize: '11px'
+                                                                                    }}
+                                                                                    onMouseEnter={(e) => e.target.style.textDecoration = 'underline'}
+                                                                                    onMouseLeave={(e) => e.target.style.textDecoration = 'none'}
+                                                                                >
+                                                                                    {doc.rule || 'Documentation'}
+                                                                                </a>
+                                                                            </div>
+                                                                        ))}
+                                                                    </div>
+                                                                )}
                                                             </div>
                                                         </span>
                                                     ) : null;
@@ -856,6 +941,44 @@ function App() {
                                                 </span>
                                                 <span className="issue-rule">{issue.issueType}</span>
                                                 {renderStatusBadge(issue)}
+                                                {/* Issue details popover */}
+                                                <span className="qc-tooltip-wrap" aria-label="Show issue details">
+                                                    <span className="codicon codicon-info info-icon" aria-hidden="true"></span>
+                                                    <div className="qc-tooltip" role="tooltip" aria-label="Issue details">
+                                                        <div className="arrow"></div>
+                                                        <div className="row">
+                                                            Issue id: {issue.uuid || issue.id || 'N/A'}
+                                                        </div>
+                                                        {issue.impactArea && (
+                                                            <div className="row" style={{ marginTop: '8px', borderTop: '1px solid var(--vscode-panel-border)', paddingTop: '8px' }}>
+                                                                <div style={{ fontSize: '11px', color: 'var(--vscode-descriptionForeground)', marginBottom: '4px' }}>
+                                                                    Area: {issue.impactArea.charAt(0).toUpperCase() + issue.impactArea.slice(1).toLowerCase()}
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                        {issue.documentationURL && (
+                                                            <div className="row" style={{ marginTop: '8px', borderTop: '1px solid var(--vscode-panel-border)', paddingTop: '8px' }}>
+                                                                <div style={{ fontSize: '11px', color: 'var(--vscode-descriptionForeground)', marginBottom: '4px' }}>Rule documentation:</div>
+                                                                <div style={{ marginBottom: '2px' }}>
+                                                                    <a
+                                                                        href={issue.documentationURL}
+                                                                        target="_blank"
+                                                                        rel="noopener noreferrer"
+                                                                        style={{
+                                                                            color: 'var(--vscode-textLink-foreground)',
+                                                                            textDecoration: 'none',
+                                                                            fontSize: '11px'
+                                                                        }}
+                                                                        onMouseEnter={(e) => e.target.style.textDecoration = 'underline'}
+                                                                        onMouseLeave={(e) => e.target.style.textDecoration = 'none'}
+                                                                    >
+                                                                        {issue.issueType || 'Documentation'}
+                                                                    </a>
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </span>
                                             </div>
                                             <div className="issue-line">
                                                 <button
