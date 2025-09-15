@@ -65,7 +65,7 @@
     border-radius: 10px;
     overflow: hidden;
     margin-bottom: 20px;
-    border: 1px solid var(--vscode-tab-border);
+    border: 1px solid var(--vscode-chart-guide);
 }
 
 /* Non-issue informational banner */
@@ -151,9 +151,10 @@
 
 .writeoff-form {
     margin-bottom: 20px;
-    background-color: var(--vscode-panel-background);
+    background-color: var(--vscode-editorCommentsWidget-replyInputBackground);
     border-radius: 10px;
-    border: 1px solid var(--vscode-tab-border);
+    border: 1px solid var(--vscode-chart-guide);
+    overflow: hidden;
 }
 
 .writeoff-form-content {
@@ -165,11 +166,11 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 10px 12px 10px 16px;
-    margin: 0 0 14px 0;
+    padding: 15px 12px 13px 22px;
     /* border: 1px solid var(--vscode-panel-border); */
-    border-radius: 6px 6px 0 0;
-    background: var(--vscode-editor-background);
+    border-radius: 10px 10px 0 0;
+    background: var(--vscode-panel-background);
+    border-bottom: 1px solid var(--vscode-panel-border);
 }
 
 .selected-issue-text {
@@ -293,7 +294,7 @@
 .issues-list {
     /* Allow tooltips/popovers to overflow outside the list */
     overflow: visible;
-    background-color: var(--vscode-panel-background);
+    background-color: var(--vscode-chat-requestBackground);
 }
 
 .rule-group {
@@ -309,16 +310,16 @@
     justify-content: space-between;
     align-items: center;
     padding: 12px 20px;
-    background-color: var(--vscode-chat-requestBackground);
+    background-color: rgb(38, 38, 38)
+    ;
     border-bottom: 1px solid var(--vscode-panel-border);
-    box-shadow: 0 1px 1px 1px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 1px 1px 1px rgba(0, 0, 0, 0.15); rgb(38, 38, 38)
     cursor: pointer;
     user-select: none;
 }
 
 .rule-header h4 {
     margin: 0;
-    color: var(--vscode-tab-inactiveForeground);
     font-size: 14px;
     font-weight: 500;
     display: flex;
@@ -328,6 +329,7 @@
        the issues count and last check can align to the right */
     flex: 1;
     min-width: 0; /* allow inner content (filename) to shrink if needed */
+    letter-spacing: 0.08px;
 }
 
 .rule-header h4 .codicon {
@@ -386,7 +388,7 @@
 
 .issues-count-main {
     color: color-mix(in srgb, var(--vscode-tab-unfocusedActiveForeground) 80%, transparent);
-    font-weight: 600;
+    font-weight: 500;
 }
 
 .last-check {
@@ -469,7 +471,7 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 5px;
 }
 
 .issue-line {
@@ -724,13 +726,14 @@
 .qc-tooltip-wrap {
     position: relative;
     display: inline-block;
+    top: 3px;
 }
 
 /* Quick Clouds tooltip styling using VS Code theme colors */
 .qc-tooltip {
     position: fixed;
     z-index: 50;
-    transform: translateX(-50%) translateY(8px);
+    transform: translateX(-50%) translateY(-8px);
     /* Wider popover but shrink-to-fit when content is short */
     width: max-content;
     min-width: 0;
