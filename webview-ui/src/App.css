@@ -159,6 +159,7 @@
     border-radius: 10px;
     border: 1px solid var(--vscode-chart-guide);
     overflow: hidden;
+    transition: all 0.2s ease-in-out;
 }
 
 .writeoff-form.has-overlay {
@@ -183,11 +184,12 @@
 .writeoff-overlay-message {
     background-color: var(--vscode-editor-background);
     color: var(--vscode-editor-foreground);
-    padding: 16px 20px;
+    padding: 16px 24px 15px;
     border-radius: 8px;
     border: 1px solid var(--vscode-panel-border);
     text-align: center;
-    font-size: 14px;
+    font-size: 13px;
+    font-weight: 300;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
@@ -200,7 +202,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 15px 12px 13px 22px;
+    padding: 15px 12px 1px 22px;
     /* border: 1px solid var(--vscode-panel-border); */
     border-radius: 10px 10px 0 0;
     background: var(--vscode-panel-background);
@@ -845,6 +847,7 @@
     font-weight: normal;
     color: var(--vscode-editorGutter-foldingControlForeground);
     margin-top: -1px;
+    font-size: 12.7px;
 }
 
 .single-submit-btn {

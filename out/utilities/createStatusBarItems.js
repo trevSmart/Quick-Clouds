@@ -54,7 +54,7 @@ function createStatusBarItems(apiKeyStatus, authType, isAuthenticated = false, s
     // Priority 20 to sit between LiveCheck (30) and Quality Center (10)
     const newWO = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 20);
     // Display plain text without codicon
-    newWO.text = '$(comment-unresolved) Write-off';
+    newWO.text = '$(comment-unresolved) My issues';
     newWO.command = 'quick-clouds.writeoff';
     // Show write-off button if debug mode is enabled, otherwise hide it
     if (debugMode) {

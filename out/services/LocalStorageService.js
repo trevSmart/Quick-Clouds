@@ -258,6 +258,88 @@ class LocalStorageService {
             return map;
         });
     }
+    hasHighUnapprovedIssues() {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const issuesHistory = yield this.getLivecheckHistory();
+                const writeOffStatusMap = yield this.getWriteOffStatusMap();
+                // Check all issues in all history entries
+                for (const historyEntry of issuesHistory) {
+                    for (const issue of historyEntry.issues) {
+                        // Check if issue is HIGH severity
+                        if (issue.severity && issue.severity.toUpperCase() === 'HIGH') {
+                            // Check if issue is not approved
+                            const writeOffStatus = writeOffStatusMap[issue.id];
+                            if (!writeOffStatus || writeOffStatus !== 'APPROVED') {
+                                return true; // Found HIGH issue without approval
+                            }
+                        }
+                    }
+                }
+                return false; // No HIGH unapproved issues found
+            }
+            catch (error) {
+                console.error('Error checking for HIGH unapproved issues:', error);
+                return false; // Return false on error to avoid false positives
+            }
+        });
+    }
+    getUnapprovedIssuesStatus() {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                console.log('🔍 Checking unapproved issues status...');
+                const issuesHistory = yield this.getLivecheckHistory();
+                const writeOffStatusMap = yield this.getWriteOffStatusMap();
+                console.log(`📊 Found ${issuesHistory.length} history entries`);
+                console.log(`📋 Write-off status map:`, writeOffStatusMap);
+                let hasHigh = false;
+                let hasMedium = false;
+                let totalIssues = 0;
+                let unapprovedIssues = 0;
+                // Check all issues in all history entries
+                for (const historyEntry of issuesHistory) {
+                    console.log(`📁 History entry ${historyEntry.id}: ${historyEntry.issues.length} issues`);
+                    for (const issue of historyEntry.issues) {
+                        totalIssues++;
+                        const writeOffStatus = writeOffStatusMap[issue.id];
+                        console.log(`🔍 Issue ${issue.id}: severity=${issue.severity}, writeOffStatus=${writeOffStatus}`);
+                        // Check if issue is not approved
+                        if (!writeOffStatus || writeOffStatus !== 'APPROVED') {
+                            unapprovedIssues++;
+                            const severity = issue.severity ? issue.severity.toUpperCase() : '';
+                            if (severity === 'HIGH') {
+                                hasHigh = true;
+                                console.log('🚨 Found HIGH unapproved issue:', issue.id);
+                            }
+                            else if (severity === 'MEDIUM') {
+                                hasMedium = true;
+                                console.log('⚠️ Found MEDIUM unapproved issue:', issue.id);
+                            }
+                        }
+                    }
+                }
+                console.log(`📈 Summary: ${totalIssues} total issues, ${unapprovedIssues} unapproved`);
+                console.log(`🎯 Status: hasHigh=${hasHigh}, hasMedium=${hasMedium}`);
+                // Return status: 'error' for HIGH, 'warning' for MEDIUM (but no HIGH), 'normal' for none
+                let status;
+                if (hasHigh) {
+                    status = 'error';
+                }
+                else if (hasMedium) {
+                    status = 'warning';
+                }
+                else {
+                    status = 'normal';
+                }
+                console.log(`🎨 Returning status: ${status}`);
+                return status;
+            }
+            catch (error) {
+                console.error('❌ Error checking for unapproved issues:', error);
+                return 'normal'; // Return normal on error to avoid false positives
+            }
+        });
+    }
     getLastScanHistoryId() {
         return __awaiter(this, void 0, void 0, function* () {
             const db = yield this.getDb();

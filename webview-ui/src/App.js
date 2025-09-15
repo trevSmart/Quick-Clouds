@@ -1047,7 +1047,7 @@ function App() {
             </div>
 
             <div className="section-title">
-                <h2>Request details</h2>
+                <h2>My issues</h2>
             </div>
             <div className="writeoff-form-container">
                 <div className={`writeoff-form ${(viewMode === 'single' && !selectedIssue) || (viewMode === 'bulk' && selectedIssues.length === 0) ? 'has-overlay' : ''}`}>
