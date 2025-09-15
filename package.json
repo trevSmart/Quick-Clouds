@@ -2,7 +2,7 @@
 	"name": "quick-clouds-for-salesforce",
 	"displayName": "Quick Clouds for Salesforce",
 	"description": "Checks for adherence to coding best practices for Salesforce.",
-	"version": "0.2.77",
+	"version": "0.2.81",
 	"license": "MIT",
 	"icon": "resources/logo.webp",
 	"engines": {
@@ -148,9 +148,14 @@
 		"test:run": "vitest run --config vitest.config.ts",
 		"test:ui": "vitest --ui --config vitest.config.ts",
 		"test:coverage": "vitest run --reporter=verbose --config vitest.config.ts",
-		"test:watch": "vitest --watch --config vitest.config.ts"
+		"test:watch": "vitest --watch --config vitest.config.ts",
+		"test:e2e": "playwright test",
+		"test:e2e:ui": "playwright test --ui",
+		"test:e2e:headed": "playwright test --headed",
+		"test:e2e:debug": "playwright test --debug"
 	},
 	"devDependencies": {
+		"@playwright/test": "^1.55.0",
 		"@types/axios": "^0.14.4",
 		"@types/jsdom": "^21.1.7",
 		"@types/node": "^24.3.1",
