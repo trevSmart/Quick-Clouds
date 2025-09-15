@@ -1049,45 +1049,47 @@ function App() {
             <div className="section-title">
                 <h2>Request details</h2>
             </div>
-            <div className="writeoff-form">
-                {viewMode === 'single' && selectedIssue && (
-                    <div className={`selected-issue-banner ${getSeverityClass(selectedIssue.severity)}`}>
-                        <div className="issue-details">
-                            <div className="issue-header">
-                                <span className={`severity-badge ${getSeverityClass(selectedIssue.severity)}`}>
-                                    {selectedIssue.severity}
-                                </span>
-                                <span className="issue-rule">{selectedIssue.issueType}</span>
-                                {renderStatusBadge(selectedIssue)}
+            <div className="writeoff-form-container">
+                <div className={`writeoff-form ${(viewMode === 'single' && !selectedIssue) || (viewMode === 'bulk' && selectedIssues.length === 0) ? 'has-overlay' : ''}`}>
+                    {viewMode === 'single' && selectedIssue && (
+                        <div className={`selected-issue-banner ${getSeverityClass(selectedIssue.severity)}`}>
+                            <div className="issue-details">
+                                <div className="issue-header">
+                                    <span className={`severity-badge ${getSeverityClass(selectedIssue.severity)}`}>
+                                        {selectedIssue.severity}
+                                    </span>
+                                    <span className="issue-rule">{selectedIssue.issueType}</span>
+                                    {renderStatusBadge(selectedIssue)}
+                                </div>
+                                <div className="issue-line">
+                                    <button
+                                        className="issue-link"
+                                        title="Open file at this line"
+                                        onClick={(e) => handleOpenInEditor(selectedIssue, e)}
+                                    >
+                                        {formatIssueLine(selectedIssue, true)}
+                                    </button>
+                                    <button
+                                        className="go-to-file-btn"
+                                        title="Open file at this line"
+                                        onClick={(e) => handleOpenInEditor(selectedIssue, e)}
+                                    >
+                                        <span className="codicon codicon-go-to-file" aria-hidden="true"></span>
+                                    </button>
+                                </div>
                             </div>
-                            <div className="issue-line">
-                                <button
-                                    className="issue-link"
-                                    title="Open file at this line"
-                                    onClick={(e) => handleOpenInEditor(selectedIssue, e)}
-                                >
-                                    {formatIssueLine(selectedIssue, true)}
-                                </button>
-                                <button
-                                    className="go-to-file-btn"
-                                    title="Open file at this line"
-                                    onClick={(e) => handleOpenInEditor(selectedIssue, e)}
-                                >
-                                    <span className="codicon codicon-go-to-file" aria-hidden="true"></span>
-                                </button>
-                            </div>
+                            <button
+                                className="clear-selection-btn"
+                                onClick={() => setSelectedIssue(null)}
+                                title="Clear selected issue"
+                                aria-label="Clear selected issue"
+                            >
+                                <span className="codicon codicon-close" aria-hidden="true"></span>
+                            </button>
                         </div>
-                        <button
-                            className="clear-selection-btn"
-                            onClick={() => setSelectedIssue(null)}
-                            title="Clear selected issue"
-                            aria-label="Clear selected issue"
-                        >
-                            <span className="codicon codicon-close" aria-hidden="true"></span>
-                        </button>
-                    </div>
-                )}
-                <div className="writeoff-form-content">
+                    )}
+
+                    <div className="writeoff-form-content">
                     <div className="form-group">
                         <label>Templates:</label>
                         <select
@@ -1142,7 +1144,20 @@ function App() {
                             </button>
                         </div>
                     )}
+                    </div>
                 </div>
+
+                {/* Overlay when no issues are selected - outside the blurred form */}
+                {((viewMode === 'single' && !selectedIssue) || (viewMode === 'bulk' && selectedIssues.length === 0)) && (
+                    <div className="writeoff-overlay">
+                        <div className="writeoff-overlay-message">
+                            {viewMode === 'single'
+                                ? 'Please select an issue to request a write-off'
+                                : 'Please select one or more issues to request a write-off'
+                            }
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

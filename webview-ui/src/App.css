@@ -149,12 +149,47 @@
 }
 
 
-.writeoff-form {
+.writeoff-form-container {
+    position: relative;
     margin-bottom: 20px;
+}
+
+.writeoff-form {
     background-color: var(--vscode-editorCommentsWidget-replyInputBackground);
     border-radius: 10px;
     border: 1px solid var(--vscode-chart-guide);
     overflow: hidden;
+}
+
+.writeoff-form.has-overlay {
+    filter: blur(1px);
+    pointer-events: none;
+}
+
+.writeoff-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    border-radius: 10px;
+}
+
+.writeoff-overlay-message {
+    background-color: var(--vscode-editor-background);
+    color: var(--vscode-editor-foreground);
+    padding: 20px 30px;
+    border-radius: 8px;
+    border: 1px solid var(--vscode-panel-border);
+    text-align: center;
+    font-size: 16px;
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .writeoff-form-content {
@@ -309,9 +344,8 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 20px;
-    background-color: rgb(38, 38, 38)
-    ;
+    padding: 12px 17px;
+    /* background-color: rgb(38, 38, 38); */
     border-bottom: 1px solid var(--vscode-panel-border);
     box-shadow: 0 1px 1px 1px rgb(38, 38, 38);
     cursor: pointer;
@@ -329,7 +363,7 @@
        the issues count and last check can align to the right */
     flex: 1;
     min-width: 0; /* allow inner content (filename) to shrink if needed */
-    letter-spacing: 0.08px;
+    letter-spacing: 0.1px;
 }
 
 .rule-header h4 .codicon {
@@ -388,7 +422,7 @@
 
 .issues-count-main {
     color: color-mix(in srgb, var(--vscode-tab-unfocusedActiveForeground) 80%, transparent);
-    font-weight: 500;
+    margin-right: 2px;
 }
 
 .last-check {
@@ -649,7 +683,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 14px 20px 14px 52px;
+    padding: 14px 20px 14px 70px;
     border-bottom: 1px solid var(--vscode-panel-border);
     transition: all 0.2s;
     cursor: pointer;
