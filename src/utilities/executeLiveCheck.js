@@ -8,7 +8,7 @@ import { updateDiagnostics } from './UpdateDiagnostics';
 import { QuickCloudsLogger } from './logger';
 import { WriteOffMenuPanel } from '../panels/WriteOffMenuPanel';
 import { env } from '../extension';
-import { updateQualityCenterVisibility } from './buttonQualityCenterSingleton';
+import { updateQualityCenterVisibility, setQualityCenterButtonStatus } from './buttonQualityCenterSingleton';
 
 // Manage concurrent Live Check sessions per file
 const latestSessionByFile: Map<string, string> = new Map();
@@ -134,6 +134,15 @@ export async function executeLiveCheck(context: vscode.ExtensionContext, newWO: 
                     } else if (severity === 'low') {
                         counts.low++;
                     }
+                }
+
+                // Update Quality Center button color based on unapproved issue severities
+                if (counts.high > 0) {
+                    setQualityCenterButtonStatus('error');
+                } else if (counts.medium > 0) {
+                    setQualityCenterButtonStatus('warning');
+                } else {
+                    setQualityCenterButtonStatus('normal');
                 }
                 const parts: string[] = [];
                 if (counts.high) { parts.push(`${counts.high} high`); }
