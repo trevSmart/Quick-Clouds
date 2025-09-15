@@ -78,6 +78,69 @@ async function activate(context) {
                 (0, buttonLCSingleton_2.updateButtonLCVisibility)(storageManager);
             });
             const { newWO, myIssues, applyChangesButton, discardChangesButton, loginButton } = (0, createStatusBarItems_1.createStatusBarItems)(apiKeyStatus, authType, isAuthenticated, storageManager);
+            // Helper: update My issues button background based on unapproved severities
+            const refreshMyIssuesButtonSeverity = async () => {
+                try {
+                    const logger = logger_2.QuickCloudsLogger.getInstance();
+                    logger.info('MyIssuesButton: Checking for unapproved HIGH/MEDIUM issues...');
+                    // Only style the "My issues" button (not Quality Center)
+                    const history = await storageManager.getLivecheckHistory();
+                    let statusMap = {};
+                    try {
+                        statusMap = (await storageManager.getWriteOffStatusMap()) || {};
+                    } catch { /* ignore */ }
+                    let hasUnapprovedHigh = false;
+                    let hasUnapprovedMedium = false;
+                    let totalIssues = 0;
+                    let unapprovedCount = 0;
+                    let highCount = 0;
+                    let mediumCount = 0;
+                    for (const entry of Array.isArray(history) ? history : []) {
+                        for (const issue of entry.issues || []) {
+                            totalIssues++;
+                            const issueId = (issue && (issue.id || issue.uuid)) ? String(issue.id || issue.uuid) : undefined;
+                            const localStatus = issueId ? statusMap[issueId] : undefined;
+                            const serverApproved = issue?.writeOff?.writeOffStatus === 'APPROVED';
+                            const isApproved = localStatus === 'approved' || serverApproved === true;
+                            if (!isApproved) {
+                                unapprovedCount++;
+                                const sev = (issue?.severity || '').toUpperCase();
+                                if (sev === 'HIGH') {
+                                    hasUnapprovedHigh = true;
+                                    highCount++;
+                                }
+                                else if (sev === 'MEDIUM') {
+                                    hasUnapprovedMedium = true;
+                                    mediumCount++;
+                                }
+                            }
+                            if (hasUnapprovedHigh) { break; }
+                        }
+                        if (hasUnapprovedHigh) { break; }
+                    }
+                    logger.info(`MyIssuesButton: Analysis complete - Total issues: ${totalIssues}, Unapproved: ${unapprovedCount}, HIGH: ${highCount}, MEDIUM: ${mediumCount}`);
+                    if (hasUnapprovedHigh) {
+                        newWO.backgroundColor = new vscode.ThemeColor('statusBarItem.errorBackground');
+                        newWO.tooltip = 'Unapproved HIGH issues present';
+                        logger.info('MyIssuesButton: Setting ERROR background (unapproved HIGH issues detected)');
+                    } else if (hasUnapprovedMedium) {
+                        newWO.backgroundColor = new vscode.ThemeColor('statusBarItem.warningBackground');
+                        newWO.tooltip = 'Unapproved MEDIUM issues present';
+                        logger.info('MyIssuesButton: Setting WARNING background (unapproved MEDIUM issues detected)');
+                    } else {
+                        newWO.backgroundColor = undefined;
+                        newWO.tooltip = undefined;
+                        logger.info('MyIssuesButton: Setting DEFAULT background (no unapproved HIGH/MEDIUM issues)');
+                    }
+                } catch (error) {
+                    const logger = logger_2.QuickCloudsLogger.getInstance();
+                    logger.error('MyIssuesButton: Failed to update button severity:', error);
+                }
+            };
+            // Initial refresh
+            const logger = logger_2.QuickCloudsLogger.getInstance();
+            logger.info('MyIssuesButton: Performing initial button style check');
+            await refreshMyIssuesButtonSeverity();
             // React to configuration changes (status bar visibility, debug mode)
             const cfgListener = vscode.workspace.onDidChangeConfiguration((e) => {
                 if (e.affectsConfiguration('QuickClouds.showSettingsButton')) {
@@ -93,6 +156,8 @@ async function activate(context) {
                 }
             });
             context.subscriptions.push(cfgListener);
+            // Store refresher function for later use
+            const refreshMyIssuesButtonSeverityRef = refreshMyIssuesButtonSeverity;
             // Restore diagnostics in the background to avoid blocking first command
             setTimeout(async () => {
                 try {
@@ -103,7 +168,7 @@ async function activate(context) {
                 }
             }, 0);
             logger.info(`Quick Clouds: initialization completed in ${Date.now() - t0} ms`);
-            return { storageManager, apiKeyStatus, authType, isAuthenticated, buttonLC, newWO, myIssues, applyChangesButton, discardChangesButton, loginButton };
+            return { storageManager, apiKeyStatus, authType, isAuthenticated, buttonLC, newWO, myIssues, applyChangesButton, discardChangesButton, loginButton, refreshMyIssuesButtonSeverityRef };
         })();
         return initPromise;
     }
@@ -115,6 +180,13 @@ async function activate(context) {
     const liveCheckCommand = vscode.commands.registerCommand(constants_2.CMD_SCAN, async () => {
         const { storageManager, newWO } = await ensureInitialized();
         await (0, executeLiveCheck_1.executeLiveCheck)(context, newWO, storageManager);
+        // Update My issues button style after scan
+        const refresher = (await ensureInitialized()).refreshMyIssuesButtonSeverityRef;
+        if (typeof refresher === 'function') {
+            const logger = logger_2.QuickCloudsLogger.getInstance();
+            logger.info('MyIssuesButton: Refreshing button style after scan completion');
+            await refresher();
+        }
     });
     const writeOffCommand = vscode.commands.registerCommand(constants_2.CMD_WRITE_OFF, async (document, diagnostic) => {
         const { storageManager, newWO } = await ensureInitialized();
@@ -154,6 +226,13 @@ async function activate(context) {
             }
             catch { }
             vscode.window.showInformationMessage('Quick Clouds: All issues cleared');
+            // Refresh My issues button style after clearing
+            const refresher = (await ensureInitialized()).refreshMyIssuesButtonSeverityRef;
+            if (typeof refresher === 'function') {
+                const logger = logger_2.QuickCloudsLogger.getInstance();
+                logger.info('MyIssuesButton: Refreshing button style after clearing all data');
+                await refresher();
+            }
         }
         catch (error) {
             logger.error('Failed to delete data', error);

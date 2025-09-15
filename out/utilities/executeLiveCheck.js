@@ -170,16 +170,6 @@ async function executeLiveCheck(context, newWO, storageManager) {
                         counts.low++;
                     }
                 }
-                // Update Quality Center button color based on unapproved issue severities
-                if (counts.high > 0) {
-                    (0, buttonQualityCenterSingleton_1.setQualityCenterButtonStatus)('error');
-                }
-                else if (counts.medium > 0) {
-                    (0, buttonQualityCenterSingleton_1.setQualityCenterButtonStatus)('warning');
-                }
-                else {
-                    (0, buttonQualityCenterSingleton_1.setQualityCenterButtonStatus)('normal');
-                }
                 const parts = [];
                 if (counts.high) {
                     parts.push(`${counts.high} high`);

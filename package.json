@@ -2,7 +2,7 @@
 	"name": "quick-clouds-for-salesforce",
 	"displayName": "Quick Clouds for Salesforce",
 	"description": "Checks for adherence to coding best practices for Salesforce.",
-	"version": "0.2.81",
+	"version": "0.2.93",
 	"license": "MIT",
 	"icon": "resources/logo.webp",
 	"engines": {
@@ -25,29 +25,10 @@
 	],
 	"activationEvents": [
 		"onUri",
-		"onCommand:quick-clouds.scan",
-		"onCommand:quick-clouds.myIssues",
-		"onCommand:quick-clouds.writeoff",
-		"onCommand:quick-clouds.settings",
-		"onCommand:quick-clouds.validateAPIKey",
-		"onCommand:quick-clouds.showLogs",
-		"onCommand:quick-clouds.deleteLCHistory",
-		"onCommand:quick-clouds.applyChanges",
-		"onCommand:quick-clouds.discardChanges",
-		"onLanguage:apex",
-		"onLanguage:javascript",
-		"onLanguage:typescript",
-		"onLanguage:html",
-		"onLanguage:css",
-		"onLanguage:xml",
 		"workspaceContains:**/*.cls",
 		"workspaceContains:**/*.trigger",
-		"workspaceContains:**/*.component",
 		"workspaceContains:**/*.page",
 		"workspaceContains:**/*.js",
-		"workspaceContains:**/*.ts",
-		"workspaceContains:**/*.html",
-		"workspaceContains:**/*.css",
 		"workspaceContains:**/*.xml"
 	],
 	"main": "./out/extension.js",
@@ -130,7 +111,7 @@
 			"editor/title": [
 				{
 					"command": "quick-clouds.scan",
-					"when": "editorTextFocus && (resourceLangId == apex || resourceLangId == javascript || resourceLangId == typescript || resourceLangId == html || resourceLangId == css || resourceLangId == xml)",
+					"when": "editorTextFocus && (resourceLangId == apex || resourceLangId == javascript || resourceLangId == xml) && resourcePath =~ /.*\\/force-app\\/.*/",
 					"group": "navigation@100",
 					"icon": "$(code-review)"
 				}
@@ -148,11 +129,7 @@
 		"test:run": "vitest run --config vitest.config.ts",
 		"test:ui": "vitest --ui --config vitest.config.ts",
 		"test:coverage": "vitest run --reporter=verbose --config vitest.config.ts",
-		"test:watch": "vitest --watch --config vitest.config.ts",
-		"test:e2e": "playwright test",
-		"test:e2e:ui": "playwright test --ui",
-		"test:e2e:headed": "playwright test --headed",
-		"test:e2e:debug": "playwright test --debug"
+		"test:watch": "vitest --watch --config vitest.config.ts"
 	},
 	"devDependencies": {
 		"@playwright/test": "^1.55.0",

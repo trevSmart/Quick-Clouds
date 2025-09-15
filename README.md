@@ -32,3 +32,13 @@ Available settings:
 
 ## Supported configuration element (CE) types
 You can check the following types of CEs: Classes, Triggers, Pages, Components, Objects, Reports, Workflows, Javascript.
+
+## License & Attribution
+
+This project is licensed under the MIT License. See [LICENSE.md](LICENSE.md) for details.
+
+**Original Extension**: This extension is based on the original [Live Check Quality for Salesforce](https://marketplace.visualstudio.com/items?itemName=QualityClouds.livecheckqualityforsalesforce) extension by QualityClouds, which is also licensed under the MIT License.
+
+**Attribution**:
+- Original extension: Copyright 2023 QualityClouds
+- Quick Clouds fork: Copyright (c) 2025 trevSmart

@@ -13,7 +13,9 @@
         "showReuseMessage": true,
         "clear": false
       },
-      "problemMatcher": ["$tsc"],
+      "problemMatcher": [
+        "$tsc"
+      ],
       "label": "npm: compile",
       "detail": "Compile TypeScript files"
     },
@@ -35,7 +37,10 @@
     {
       "type": "npm",
       "script": "package",
-      "group": "build",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -45,7 +50,8 @@
         "clear": false
       },
       "label": "npm: package",
-      "detail": "Package extension as VSIX"
+      "detail": "Package extension as VSIX",
+      "problemMatcher": []
     },
     {
       "type": "shell",
@@ -59,7 +65,9 @@
         "showReuseMessage": true,
         "clear": false
       },
-      "problemMatcher": ["$tsc"],
+      "problemMatcher": [
+        "$tsc"
+      ],
       "label": "Build All",
       "detail": "Compile TypeScript and build webview"
     }
