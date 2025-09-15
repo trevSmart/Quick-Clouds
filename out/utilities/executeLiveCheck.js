@@ -47,6 +47,7 @@ const UpdateDiagnostics_1 = require("./UpdateDiagnostics");
 const logger_2 = require("./logger");
 const WriteOffMenuPanel_1 = require("../panels/WriteOffMenuPanel");
 const extension_2 = require("../extension");
+const buttonQualityCenterSingleton_1 = require("./buttonQualityCenterSingleton");
 // Manage concurrent Live Check sessions per file
 const latestSessionByFile = new Map();
 const cancelledSessions = new Set();
@@ -117,6 +118,7 @@ async function executeLiveCheck(context, newWO, storageManager) {
                     await (0, UpdateDiagnostics_1.updateDiagnostics)(vscode.window.activeTextEditor.document, response, context, storageManager);
                     newWO.show();
                 }
+                await (0, buttonQualityCenterSingleton_1.updateQualityCenterVisibility)(storageManager);
                 // If the Write‑off panel is open, refresh its data so it reflects the latest scan
                 try {
                     const panel = WriteOffMenuPanel_1.WriteOffMenuPanel.currentPanel;

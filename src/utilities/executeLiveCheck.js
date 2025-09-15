@@ -8,6 +8,7 @@ import { updateDiagnostics } from './UpdateDiagnostics';
 import { QuickCloudsLogger } from './logger';
 import { WriteOffMenuPanel } from '../panels/WriteOffMenuPanel';
 import { env } from '../extension';
+import { updateQualityCenterVisibility } from './buttonQualityCenterSingleton';
 
 // Manage concurrent Live Check sessions per file
 const latestSessionByFile: Map<string, string> = new Map();
@@ -85,6 +86,7 @@ export async function executeLiveCheck(context: vscode.ExtensionContext, newWO: 
                     await updateDiagnostics(vscode.window.activeTextEditor.document, response, context, storageManager);
                     newWO.show();
                 }
+                await updateQualityCenterVisibility(storageManager);
 
                 // If the Write‑off panel is open, refresh its data so it reflects the latest scan
                 try {
