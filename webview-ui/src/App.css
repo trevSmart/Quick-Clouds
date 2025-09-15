@@ -313,7 +313,7 @@
     background-color: rgb(38, 38, 38)
     ;
     border-bottom: 1px solid var(--vscode-panel-border);
-    box-shadow: 0 1px 1px 1px rgba(0, 0, 0, 0.15); rgb(38, 38, 38)
+    box-shadow: 0 1px 1px 1px rgb(38, 38, 38);
     cursor: pointer;
     user-select: none;
 }
